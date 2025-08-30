@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/employee_provider.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/common_app_bar_actions.dart';
 import 'employee_list_simple.dart';
 import 'employee_performance_dashboard.dart';
 import 'employee_dashboard_screen.dart';
@@ -32,53 +33,103 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
   }
 
   void _initializeTabs() {
-    // This will be called after the first build when we have access to the AuthProvider
+    // Try to setup tabs immediately, and also after first build as fallback
+    if (mounted) {
+      _ensureTabsAreSetup();
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _setupTabs();
+        _ensureTabsAreSetup();
       }
     });
   }
 
-  void _setupTabs() {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final isShopOwnerOrAdmin = authProvider.isShopOwnerOrAdmin;
+  void _ensureTabsAreSetup() {
+    debugPrint('🔧 EmployeeManagementHome: Ensuring tabs are setup');
+    // Only setup if not already done
+    if (_tabs.isEmpty) {
+      debugPrint('📝 EmployeeManagementHome: Tabs are empty, setting up...');
+      _setupTabs();
+      debugPrint('✅ EmployeeManagementHome: Setup complete, tabs length: ${_tabs.length}');
+    } else {
+      debugPrint('🚦 EmployeeManagementHome: Tabs already setup (${_tabs.length} tabs)');
+    }
+  }
 
-    if (isShopOwnerOrAdmin) {
-      // Shop owner/admin tabs
+  void _setupTabs() {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      debugPrint('🔐 EmployeeManagementHome: Auth provider user: ${authProvider.user?.email}');
+      debugPrint('👑 EmployeeManagementHome: isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
+      debugPrint('🎭 EmployeeManagementHome: userRole: ${authProvider.userRole}');
+
+      final isShopOwnerOrAdmin = authProvider.isShopOwnerOrAdmin;
+
+      if (isShopOwnerOrAdmin) {
+        debugPrint('👨‍💼 EmployeeManagementHome: Setting up admin tabs');
+        // Shop owner/admin tabs
+        _tabs = [
+          const EmployeeListSimple(),
+          const EmployeePerformanceDashboard(),
+        ];
+        _tabTitles = [
+          'Employee List',
+          'Performance Dashboard',
+        ];
+        _tabIcons = [
+          Icons.people,
+          Icons.analytics,
+        ];
+      } else {
+        debugPrint('👷 EmployeeManagementHome: Setting up employee tabs');
+        // Employee tabs
+        _tabs = [
+          const EmployeeDashboardScreen(),
+          const EmployeePerformanceDashboard(),
+        ];
+        _tabTitles = [
+          'My Dashboard',
+          'Performance',
+        ];
+        _tabIcons = [
+          Icons.dashboard,
+          Icons.analytics,
+        ];
+      }
+
+      setState(() {}); // Trigger rebuild after setting up tabs
+      debugPrint('📱 EmployeeManagementHome: Tabs setup complete with ${_tabs.length} tabs');
+
+    } catch (e) {
+      debugPrint('❌ EmployeeManagementHome: Error setting up tabs: $e');
+
+      // Fallback tabs in case of error
+      debugPrint('🔄 EmployeeManagementHome: Using fallback tabs due to error');
       _tabs = [
         const EmployeeListSimple(),
-        const EmployeePerformanceDashboard(),
       ];
       _tabTitles = [
-        'Employee List',
-        'Performance Dashboard',
+        'Employee List'
       ];
       _tabIcons = [
         Icons.people,
-        Icons.analytics,
       ];
-    } else {
-      // Employee tabs
-      _tabs = [
-        const EmployeeDashboardScreen(),
-        const EmployeePerformanceDashboard(),
-      ];
-      _tabTitles = [
-        'My Dashboard',
-        'Performance',
-      ];
-      _tabIcons = [
-        Icons.dashboard,
-        Icons.analytics,
-      ];
+
+      setState(() {}); // Trigger rebuild with fallback
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🔄 EmployeeManagementHome: Building widget');
+
+    // Ensure tabs are setup every build for safety
+    _ensureTabsAreSetup();
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
+        debugPrint('🔐 EmployeeManagementHome build: Checking permissions');
         // Check if user has permission to access employee management
         final hasEmployeeManagementAccess = authProvider.isShopOwnerOrAdmin ||
             authProvider.hasRole(UserRole.employee) ||
@@ -88,7 +139,10 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
             authProvider.hasRole(UserRole.supervisor) ||
             authProvider.hasRole(UserRole.apprentice);
 
+        debugPrint('🔑 EmployeeManagementHome: hasEmployeeManagementAccess: $hasEmployeeManagementAccess');
+
         if (!hasEmployeeManagementAccess) {
+          debugPrint('❌ EmployeeManagementHome: Access denied');
           return Scaffold(
             appBar: AppBar(
               title: const Text('Access Denied'),
@@ -121,15 +175,35 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
           );
         }
 
+        debugPrint('✅ EmployeeManagementHome: Building main scaffold with ${_tabs.length} tabs');
+
         return Scaffold(
           appBar: AppBar(
             title: const Text('Employee Management'),
             toolbarHeight: kToolbarHeight + 5,
             backgroundColor: Theme.of(context).primaryColor,
             foregroundColor: Colors.white,
+            actions: const [CommonAppBarActions()],
           ),
-          body: _tabs.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+          body: (_tabs.isEmpty || _selectedTab >= _tabs.length)
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      const Text('Setting up employee management...'),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () {
+                          debugPrint('🔄 EmployeeManagementHome: Manual retry triggered');
+                          _ensureTabsAreSetup();
+                        },
+                        child: const Text('Retry Setup'),
+                      ),
+                    ],
+                  ),
+                )
               : _tabs[_selectedTab],
           bottomNavigationBar: _tabs.isEmpty
               ? null

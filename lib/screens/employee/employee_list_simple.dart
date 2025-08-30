@@ -270,24 +270,30 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
   @override
   void initState() {
     super.initState();
+    debugPrint('🏗️ EmployeeListSimple initState - starting initialization');
     // Start with a simple loading state
     _loading = true;
     _initComplete = false;
 
     // Use a simple delayed initialization to avoid complex async issues
     Future.delayed(const Duration(milliseconds: 500), () {
+      debugPrint('⏰ EmployeeListSimple delayed initialization triggered');
       if (mounted) {
         _initializeSimple();
+      } else {
+        debugPrint('⚠️ EmployeeListSimple not mounted during delayed initialization');
       }
     });
   }
 
   void _initializeSimple() {
+    debugPrint('🚀 EmployeeListSimple _initializeSimple - starting simple initialization');
     // Simple synchronous initialization first
     setState(() {
       _loading = false;
       _initComplete = true;
     });
+    debugPrint('✅ EmployeeListSimple simple initialization complete, now loading data');
 
     // Then try to load data asynchronously
     _loadEmployeeData();
@@ -295,8 +301,10 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
   Future<void> _loadEmployeeData() async {
     try {
-      debugPrint('🚀 Loading employee data...');
+      debugPrint('🚀 EmployeeListSimple _loadEmployeeData - starting data load');
+      debugPrint('📦 Checking EmployeeProvider availability');
       final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      debugPrint('✅ EmployeeProvider obtained successfully');
 
       // Simple load with timeout
       await employeeProvider.loadEmployees().timeout(
@@ -307,398 +315,224 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
         },
       );
 
-      debugPrint('✅ Employee data loaded successfully');
+      debugPrint('✅ EmployeeListSimple data loaded successfully');
       debugPrint('📈 Found ${employeeProvider.employees.length} employees');
 
       if (mounted) {
+        debugPrint('🔄 EmployeeListSimple - clearing error and updating state');
         setState(() {
           _initError = null;
         });
+      } else {
+        debugPrint('⚠️ EmployeeListSimple not mounted when setting success state');
       }
     } catch (e) {
-      debugPrint('❌ Failed to load employee data: $e');
+      debugPrint('❌ EmployeeListSimple failed to load employee data: $e');
       if (mounted) {
+        debugPrint('🔄 EmployeeListSimple - setting error state');
         setState(() {
           _initError = 'Failed to load employees: $e';
         });
+      } else {
+        debugPrint('⚠️ EmployeeListSimple not mounted when setting error state');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🔄 EmployeeListSimple build - rebuilding widget');
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
+        debugPrint('🔐 EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
+        debugPrint('👑 isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
         // Check if user has permission to view employee list
         if (!authProvider.isShopOwnerOrAdmin) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Access Denied'),
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.lock,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'You don\'t have permission to view employee management.',
-                    style: TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Go Back'),
-                  ),
-                ],
-              ),
+          debugPrint('❌ EmployeeListSimple access denied - user is not shop owner or admin');
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.lock,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'You don\'t have permission to view employee management.',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Go Back'),
+                ),
+              ],
             ),
           );
         }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Employee Management'),
-            backgroundColor: Theme.of(context).primaryColor,
-            foregroundColor: Colors.white,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.bug_report),
-                onPressed: () => _showDebugInfo(context),
-                tooltip: 'Database Debug',
+  debugPrint('✅ EmployeeListSimple access granted - building main content');
+  return Expanded(
+    child: Consumer<EmployeeProvider>(
+      builder: (context, employeeProvider, child) {
+        debugPrint('📊 EmployeeListSimple building with provider state:');
+        debugPrint('  - _initComplete: $_initComplete');
+        debugPrint('  - employeeProvider.isLoading: ${employeeProvider.isLoading}');
+        debugPrint('  - _initError: $_initError');
+        debugPrint('  - employeeProvider.errorMessage: ${employeeProvider.errorMessage}');
+        debugPrint('  - employeeProvider.employees.length: ${employeeProvider.employees.length}');
+
+        // Show loading if initialization is incomplete OR provider is loading
+        if (!_initComplete || employeeProvider.isLoading) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                !_initComplete ? 'Initializing employee management...' : 'Loading employees...',
+                style: const TextStyle(fontSize: 16),
               ),
-              IconButton(
-                icon: const Icon(Icons.analytics),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EmployeePerformanceDashboard(),
-                    ),
-                  );
-                },
-                tooltip: 'Performance Dashboard',
+              if (!_initComplete) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'If this takes too long, please check your internet connection',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                // Emergency bypass button
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    debugPrint('🚨 Emergency bypass activated');
+                    try {
+                      await EmployeeManagementHelper.populateDemoEmployees(context, silent: true);
+                      await employeeProvider.loadEmployees();
+                      setState(() {
+                        _loading = false;
+                        _initComplete = true;
+                        _initError = null;
+                      });
+                    } catch (e) {
+                      debugPrint('❌ Emergency bypass failed: $e');
+                      setState(() {
+                        _initError = 'Emergency bypass failed: $e';
+                        _loading = false;
+                        _initComplete = true;
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.warning),
+                  label: const Text('Emergency: Load Demo Data'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'If loading is stuck, click above to bypass',
+                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ],
+          );
+        }
+
+        // Show initialization error if any
+        if (_initError != null) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                'Initialization failed: $_initError',
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _initComplete = false;
+                        _initError = null;
+                      });
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        await employeeProvider.loadEmployees();
+                      });
+                    },
+                    child: const Text('Retry'),
+                  ),
+                  const SizedBox(width: 16),
+                  OutlinedButton(
+                    onPressed: () => EmployeeManagementHelper.forceRefreshEmployees(context, employeeProvider.loadEmployees),
+                    child: const Text('Force Refresh'),
+                  ),
+                ],
               ),
             ],
-          ),
-          body: Consumer<EmployeeProvider>(
-            builder: (context, employeeProvider, child) {
-              // Show loading if initialization is incomplete OR provider is loading
-              if (!_initComplete || employeeProvider.isLoading) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 16),
-                      Text(
-                        !_initComplete ? 'Initializing employee management...' : 'Loading employees...',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      if (!_initComplete) ...[
-                        const SizedBox(height: 8),
-                        const Text(
-                          'If this takes too long, please check your internet connection',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        // Emergency bypass button
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            debugPrint('🚨 Emergency bypass activated');
-                            try {
-                              await EmployeeManagementHelper.populateDemoEmployees(context, silent: true);
-                              await employeeProvider.loadEmployees();
-                              setState(() {
-                                _loading = false;
-                                _initComplete = true;
-                                _initError = null;
-                              });
-                            } catch (e) {
-                              debugPrint('❌ Emergency bypass failed: $e');
-                              setState(() {
-                                _initError = 'Emergency bypass failed: $e';
-                                _loading = false;
-                                _initComplete = true;
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.warning),
-                          label: const Text('Emergency: Load Demo Data'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'If loading is stuck, click above to bypass',
-                          style: TextStyle(fontSize: 10, color: Colors.grey),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ],
-                  ),
-                );
-              }
+          );
+        }
 
-              // Show initialization error if any
-              if (_initError != null) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error, size: 64, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Initialization failed: $_initError',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _initComplete = false;
-                                _initError = null;
-                              });
-                              WidgetsBinding.instance.addPostFrameCallback((_) async {
-                                await employeeProvider.loadEmployees();
-                              });
-                            },
-                            child: const Text('Retry'),
-                          ),
-                          const SizedBox(width: 16),
-                          OutlinedButton(
-                            onPressed: () => EmployeeManagementHelper.forceRefreshEmployees(context, employeeProvider.loadEmployees),
-                            child: const Text('Force Refresh'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }
+        // Show provider error if any
+        if (employeeProvider.errorMessage != null) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                'Error: ${employeeProvider.errorMessage}',
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => employeeProvider.loadEmployees(),
+                child: const Text('Retry'),
+              ),
+            ],
+          );
+        }
 
-              // Show provider error if any
-              if (employeeProvider.errorMessage != null) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error, size: 64, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Error: ${employeeProvider.errorMessage}',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => employeeProvider.loadEmployees(),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                );
-              }
+        final employees = employeeProvider.employees;
 
-              final employees = employeeProvider.employees;
-
-              return Column(
+        return Column(
+          children: [
+            // Employee Management Statistics
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  // Search and Filter Section
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
+                  _buildStatCard('Total', employeeProvider.totalEmployees.toString(), Icons.people),
+                  _buildStatCard('Active', employeeProvider.activeEmployees.length.toString(), Icons.person, color: Colors.green),
+                  _buildStatCard('Owners', employees.where((e) => e.role == UserRole.shopOwner).length.toString(), Icons.star, color: Colors.purple),
+                  _buildStatCard('Avg Rating', employeeProvider.averageRating.toStringAsFixed(1), Icons.star_rate, color: Colors.amber),
+                ],
+              ),
+            ),
+
+            // Employee List
+            Expanded(
+              child: employees.isEmpty
+                ? Center(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Search Bar
-                        TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search employees...',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context).colorScheme.surface,
-                          ),
-                          onChanged: (value) => employeeProvider.searchEmployees(value),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Filter Chips
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Status Filter Chips
-                            Wrap(
-                              spacing: 8,
-                              children: [
-                                FilterChip(
-                                  label: const Text('All Status'),
-                                  selected: _selectedStatusFilter == null,
-                                  onSelected: (selected) {
-                                    setState(() => _selectedStatusFilter = null);
-                                    employeeProvider.filterByActiveStatus(null);
-                                  },
-                                ),
-                                FilterChip(
-                                  label: const Text('Active'),
-                                  selected: _selectedStatusFilter == true,
-                                  onSelected: (selected) {
-                                    setState(() => _selectedStatusFilter = selected ? true : null);
-                                    employeeProvider.filterByActiveStatus(selected ? true : null);
-                                  },
-                                ),
-                                FilterChip(
-                                  label: const Text('Inactive'),
-                                  selected: _selectedStatusFilter == false,
-                                  onSelected: (selected) {
-                                    setState(() => _selectedStatusFilter = selected ? false : null);
-                                    employeeProvider.filterByActiveStatus(selected ? false : null);
-                                  },
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 8),
-
-                           // Role Filter Chips
-                           Wrap(
-                             spacing: 8,
-                             children: [
-                               FilterChip(
-                                 label: const Text('All Roles'),
-                                 selected: _selectedRoleFilter == null,
-                                 onSelected: (_) {
-                                   setState(() => _selectedRoleFilter = null);
-                                   // Reset to show all employees
-                                 },
-                               ),
-                               FilterChip(
-                                 label: const Text('👑 Owner'),
-                                 selected: _selectedRoleFilter == UserRole.shopOwner,
-                                 onSelected: (selected) {
-                                   setState(() {
-                                     _selectedRoleFilter = selected ? UserRole.shopOwner : null;
-                                   });
-                                 },
-                               ),
-                               FilterChip(
-                                 label: const Text('👷 Regular Staff'),
-                                 selected: _selectedRoleFilterString == 'employee',
-                                 onSelected: (selected) {
-                                   setState(() {
-                                     _selectedRoleFilterString = selected ? 'employee' : null;
-                                     _selectedRoleFilter = null; // Clear the role filter since we're using string filter
-                                   });
-                                 },
-                               ),
-                             ],
-                           ),
-   
-                           const SizedBox(height: 8),
-   
-                           // Quick Actions
-                           Wrap(
-                             spacing: 8,
-                             children: [
-                               if (employees.isEmpty) ...[
-                                 FilterChip(
-                                   label: const Text('📥 Populate Demo Data'),
-                                   selected: false,
-                                   onSelected: (selected) {
-                                     if (selected) {
-                                       EmployeeManagementHelper.populateDemoEmployees(context);
-                                     }
-                                   },
-                                   backgroundColor: Colors.blue[50],
-                                 ),
-                               ] else ...[
-                                 FilterChip(
-                                   label: const Text('🔄 Refresh'),
-                                   selected: false,
-                                   onSelected: (selected) {
-                                     if (selected) {
-                                       employeeProvider.loadEmployees();
-                                     }
-                                   },
-                                   backgroundColor: Colors.green[50],
-                                 ),
-                                 FilterChip(
-                                   selected: false,
-                                   onSelected: null,
-                                   backgroundColor: Colors.grey[100],
-                                   label: Text('📊 ${employees.length} Employees Loaded'),
-                                 ),
-                               ],
-                             ],
-                           ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Employee Management Statistics
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatCard('Total', employeeProvider.totalEmployees.toString(), Icons.people),
-                        _buildStatCard('Active', employeeProvider.activeEmployees.length.toString(), Icons.person, color: Colors.green),
-                        _buildStatCard('Owners', employees.where((e) => e.role == UserRole.shopOwner).length.toString(), Icons.star, color: Colors.purple),
-                        _buildStatCard('Avg Rating', employeeProvider.averageRating.toStringAsFixed(1), Icons.star_rate, color: Colors.amber),
-                      ],
-                    ),
-                  ),
-
-                  // Employee List
-                  Expanded(
-                    child: employees.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Welcome to Employee Management',
-                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black54),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'No employees found in the database',
-                                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                                ),
-                                const SizedBox(height: 32),
 
                                 // Quick Setup Options
                                 Card(
@@ -1123,18 +957,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
               );
             },
           ),
-          floatingActionButton: Consumer<AuthProvider>(
-            builder: (context, authProvider, child) {
-              if (authProvider.isShopOwnerOrAdmin) {
-                return FloatingActionButton.extended(
-                  onPressed: () => _showAddEmployeeDialog(context),
-                  icon: const Icon(Icons.person_add),
-                  label: const Text('Add Employee'),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
+          // Removed floating action button - parent screen handles this
         );
       },
     );

@@ -4,6 +4,7 @@ import '../../models/user_role.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
+import '../../widgets/common_app_bar_actions.dart';
 
 class PersonalInformationScreen extends StatefulWidget {
   const PersonalInformationScreen({super.key});
@@ -119,6 +120,11 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
               onPressed: !_isLoading ? _saveChanges : null,
               child: const Text('Save'),
             ),
+          // Common app bar actions
+          const CommonAppBarActions(
+            showLogout: true,
+            showCart: true,
+          ),
         ],
       ),
       body: Container(

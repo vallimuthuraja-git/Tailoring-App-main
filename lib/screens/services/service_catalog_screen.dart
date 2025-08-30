@@ -30,7 +30,13 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 10, vsync: this);
-    _loadServices();
+
+    // Delay the service loading to avoid calling notifyListeners during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadServices();
+      }
+    });
   }
 
   @override
@@ -42,6 +48,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
 
   Future<void> _loadServices() async {
     final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+
+    // Load services - this is now safe to call as PostFrameCallback ensures build phase is complete
     await serviceProvider.loadServices();
 
     // If no services exist, load demo data

@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
+import '../../widgets/common_app_bar_actions.dart';
 
 class MeasurementsScreen extends StatefulWidget {
   const MeasurementsScreen({super.key});
@@ -82,6 +83,12 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
           backgroundColor: themeProvider.isDarkMode
               ? DarkAppColors.surface
               : AppColors.surface,
+          actions: const [
+            CommonAppBarActions(
+              showLogout: true,
+              showCart: true,
+            ),
+          ],
         ),
         body: Center(
           child: CircularProgressIndicator(
@@ -104,6 +111,11 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
           TextButton(
             onPressed: _isLoading ? null : _saveMeasurements,
             child: const Text('Save'),
+          ),
+          // Common app bar actions
+          const CommonAppBarActions(
+            showLogout: true,
+            showCart: true,
           ),
         ],
       ),

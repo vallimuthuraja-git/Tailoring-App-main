@@ -1,0 +1,69 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub/
+build/
+flutter_*.iml
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Firebase
+.firebase/hosting.*.cache
+.firebase/
+
+# IDE
+.metadata
+tailoring_app.iml
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Test coverage
+coverage/
+
+# Android (if any)
+android/app/build/
+android/.gradle/
+
+# iOS (if any)
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Web build artifacts
+build/web/
+*.js.map
+
+# Node modules (if any)
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Generated files
+*.g.dart
+*.freezed.dart
+
+# Chrome development files
+.dart_tool/chrome-device/
+
+# Firebase debug
+firebase-debug.log

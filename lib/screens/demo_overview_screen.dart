@@ -71,7 +71,7 @@ class _DemoOverviewScreenState extends State<DemoOverviewScreen>
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.slideshow,
                 color: Colors.white,
                 size: 20,
@@ -701,11 +701,11 @@ class DemoAnalyticsTab extends StatelessWidget {
   final List<Customer> customers;
 
   const DemoAnalyticsTab({
-    Key? key,
+    super.key,
     required this.products,
     required this.orders,
     required this.customers,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

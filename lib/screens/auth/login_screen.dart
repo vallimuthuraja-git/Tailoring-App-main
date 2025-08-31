@@ -17,12 +17,23 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+enum LoginStep {
+  phone,
+  otp,
+  additional,
+}
+
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController(); // Keep for future phone OTP feature
+  final _otpController = TextEditingController(); // Keep for future phone OTP feature
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  LoginStep _currentStep = LoginStep.phone; // Keep for future phone OTP feature
+  String? _verificationId; // Keep for future phone OTP feature
+  String? _phoneNumber; // Keep for future phone OTP feature
 
   @override
   void initState() {
@@ -34,6 +45,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneController.dispose(); // Keep for future phone OTP feature
+    _otpController.dispose(); // Keep for future phone OTP feature
     super.dispose();
   }
 
@@ -138,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        'Sign in to your tailoring account',
+                                        'Sign in with your email and password',
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: themeProvider.isDarkMode
@@ -433,70 +446,149 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   children: [
                                                     Expanded(
                                                       child: ElevatedButton.icon(
-                                                         onPressed: authProvider.isLoading
-                                                             ? null
-                                                             : () => _demoLogin(context, UserRole.customer),
-                                                         icon: const Icon(Icons.person, size: 18),
-                                                         label: const Text('Demo Customer'),
-                                                         style: ElevatedButton.styleFrom(
-                                                           backgroundColor: themeProvider.isDarkMode
-                                                               ? DarkAppColors.secondary.withValues(alpha: 0.8)
-                                                               : AppColors.secondary.withValues(alpha: 0.8),
-                                                           foregroundColor: themeProvider.isDarkMode
-                                                               ? DarkAppColors.onSecondary
-                                                               : AppColors.onSecondary,
-                                                           shape: RoundedRectangleBorder(
-                                                             borderRadius: BorderRadius.circular(12),
-                                                           ),
-                                                           elevation: 0,
-                                                         ),
-                                                       ),
-                                                     ),
-                                                     const SizedBox(width: 12),
-                                                     Expanded(
-                                                       child: ElevatedButton.icon(
-                                                          onPressed: authProvider.isLoading
-                                                              ? null
-                                                              : () => _demoLogin(context, UserRole.shopOwner),
-                                                          icon: const Icon(Icons.store, size: 18),
-                                                          label: const Text('Demo Shop'),
-                                                         style: ElevatedButton.styleFrom(
-                                                           backgroundColor: themeProvider.isDarkMode
-                                                               ? Colors.orange.shade700.withValues(alpha: 0.8)
-                                                               : Colors.orange.shade600.withValues(alpha: 0.8),
-                                                           foregroundColor: Colors.white,
-                                                           shape: RoundedRectangleBorder(
-                                                             borderRadius: BorderRadius.circular(12),
-                                                           ),
-                                                           elevation: 0,
-                                                         ),
+                                                        onPressed: authProvider.isLoading
+                                                            ? null
+                                                            : () => _demoLogin(context, UserRole.customer),
+                                                        icon: const Icon(Icons.person, size: 18),
+                                                        label: const Text('Demo Customer'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: themeProvider.isDarkMode
+                                                              ? DarkAppColors.secondary.withValues(alpha: 0.8)
+                                                              : AppColors.secondary.withValues(alpha: 0.8),
+                                                          foregroundColor: themeProvider.isDarkMode
+                                                              ? DarkAppColors.onSecondary
+                                                              : AppColors.onSecondary,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                          elevation: 0,
                                                         ),
-                                                     ),
-                                                   ],
-                                                 ),
-                                                 const SizedBox(height: 16),
-                                                 SizedBox(
-                                                   width: double.infinity,
-                                                   child: ElevatedButton.icon(
-                                                      onPressed: authProvider.isLoading
-                                                          ? null
-                                                          : () => _showEmployeeDemoDialog(context),
-                                                      icon: const Icon(Icons.work, size: 18),
-                                                      label: const Text('Demo Partner (Employee)'),
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor: themeProvider.isDarkMode
-                                                            ? Colors.green.shade700.withValues(alpha: 0.8)
-                                                            : Colors.green.shade600.withValues(alpha: 0.8),
-                                                        foregroundColor: Colors.white,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(12),
-                                                        ),
-                                                        elevation: 0,
                                                       ),
                                                     ),
-                                                 ),
-                                               ],
-                                             ),
+                                                    const SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: authProvider.isLoading
+                                                            ? null
+                                                            : () => _demoLogin(context, UserRole.shopOwner),
+                                                        icon: const Icon(Icons.store, size: 18),
+                                                        label: const Text('Demo Shop'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: themeProvider.isDarkMode
+                                                              ? Colors.orange.shade700.withValues(alpha: 0.8)
+                                                              : Colors.orange.shade600.withValues(alpha: 0.8),
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                          elevation: 0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 16),
+                                                Text(
+                                                  'Demo Partners',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: themeProvider.isDarkMode
+                                                        ? DarkAppColors.onSurface
+                                                        : AppColors.onSurface,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 12),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: authProvider.isLoading
+                                                            ? null
+                                                            : () => _demoLogin(context, UserRole.employee),
+                                                        icon: const Icon(Icons.work, size: 18),
+                                                        label: const Text('General Employee'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: themeProvider.isDarkMode
+                                                              ? Colors.green.shade700.withValues(alpha: 0.8)
+                                                              : Colors.green.shade600.withValues(alpha: 0.8),
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                          elevation: 0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: authProvider.isLoading
+                                                            ? null
+                                                            : () => _demoLogin(context, UserRole.tailor),
+                                                        icon: const Icon(Icons.content_cut, size: 18),
+                                                        label: const Text('Tailor'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: themeProvider.isDarkMode
+                                                              ? Colors.green.shade500.withValues(alpha: 0.8)
+                                                              : Colors.green.shade400.withValues(alpha: 0.8),
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                          elevation: 0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 16),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: authProvider.isLoading
+                                                            ? null
+                                                            : () => _demoLogin(context, UserRole.cutter),
+                                                        icon: const Icon(Icons.cut_sharp, size: 18),
+                                                        label: const Text('Cutter'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: themeProvider.isDarkMode
+                                                              ? Colors.green.shade600.withValues(alpha: 0.8)
+                                                              : Colors.green.shade500.withValues(alpha: 0.8),
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                          elevation: 0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: authProvider.isLoading
+                                                            ? null
+                                                            : () => _demoLogin(context, UserRole.finisher),
+                                                        icon: const Icon(Icons.check_circle, size: 18),
+                                                        label: const Text('Finisher'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: themeProvider.isDarkMode
+                                                              ? Colors.green.shade800.withValues(alpha: 0.8)
+                                                              : Colors.green.shade300.withValues(alpha: 0.8),
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                          elevation: 0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
 
                                             const SizedBox(height: 32),
 
@@ -667,66 +759,136 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _showEmployeeDemoDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) => AlertDialog(
-          backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
-          title: Text(
-            'Choose Employee Role',
-            style: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildEmployeeDemoButton(context, UserRole.employee, 'General Employee', Icons.work),
-              const SizedBox(height: 12),
-              _buildEmployeeDemoButton(context, UserRole.tailor, 'Tailor', Icons.content_cut),
-              const SizedBox(height: 12),
-              _buildEmployeeDemoButton(context, UserRole.cutter, 'Cutter', Icons.cut),
-              const SizedBox(height: 12),
-              _buildEmployeeDemoButton(context, UserRole.finisher, 'Finisher', Icons.check_circle),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+
+  // Phone OTP methods (kept for future use but currently disabled)
+  /*
+  void _handleSendOTP() async {
+    if (_formKey.currentState!.validate()) {
+      // Parse full phone number
+      String phoneNumber = '+91' + _phoneController.text.replaceAll('+91', '').replaceAll(' ', '').trim();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      setState(() {
+        _phoneNumber = phoneNumber;
+      });
+      final success = await authProvider.startPhoneVerification(
+        phoneNumber: phoneNumber,
+        onCodeSent: (verificationId) {
+          if (mounted) {
+            setState(() {
+              _verificationId = verificationId;
+              _currentStep = LoginStep.otp;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('OTP sent successfully')),
+            );
+          }
+        },
+        onError: (error) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error)),
+            );
+          }
+        },
+        onVerified: (userCredential) async {
+          if (mounted) {
+            // Auto-verified, log in directly
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            await authProvider.verifyOTP(
+              verificationId: _verificationId!,
+              smsCode: 'auto',
+              role: UserRole.customer,
+            );
+            if (authProvider.userProfile == null) {
+              setState(() {
+                _currentStep = LoginStep.additional;
+              });
+            } else {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              );
+            }
+          }
+        },
+      );
+    }
   }
 
-  Widget _buildEmployeeDemoButton(BuildContext context, UserRole role, String label, IconData icon) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          Navigator.of(context).pop(); // Close dialog
-          _demoLogin(context, role);
+  void _handleVerifyOTP() async {
+    if (_formKey.currentState!.validate()) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      try {
+        final userCredential = await authProvider.verifyOTP(
+          verificationId: _verificationId!,
+          smsCode: _otpController.text,
+          role: UserRole.customer,
+        );
+        if (authProvider.userProfile == null) {
+          if (mounted) {
+            setState(() {
+              _currentStep = LoginStep.additional;
+            });
+          }
+        } else {
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+          }
+        }
+      } catch (e) {
+        // Verification failed, error message already set in authProvider
+      }
+    }
+  }
+
+  void _handleResendOTP() async {
+    if (_phoneNumber != null) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.resendOTP(
+        phoneNumber: _phoneNumber!,
+        onCodeSent: (verificationId) {
+          if (mounted) {
+            setState(() {
+              _verificationId = verificationId;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('OTP resent successfully')),
+            );
+          }
         },
-        icon: Icon(icon, size: 18),
-        label: Text(label),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: themeProvider.isDarkMode ? Colors.green.shade700 : Colors.green.shade600,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-      ),
-    );
+        onError: (error) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error)),
+            );
+          }
+        },
+      );
+    }
+  }
+  */
+
+  void _handleAdditionalAuth() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    bool success = false;
+
+    // If email is provided, update profile with display name
+    if (_emailController.text.isNotEmpty) {
+      String displayName = _emailController.text.split('@')[0];
+      try {
+        success = await authProvider.updateUserProfile(displayName: displayName);
+      } catch (e) {
+        success = true; // If update fails, still allow login
+      }
+    } else {
+      success = true; // Allow if no additional auth needed
+    }
+
+    if (success && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
   }
 }

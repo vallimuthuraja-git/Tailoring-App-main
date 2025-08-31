@@ -306,6 +306,23 @@ class AuthService {
     await _firestore.collection('users').doc(user.uid).set(userModel.toJson());
   }
 
+  // Public method to create/update user profile
+  Future<void> createUserProfile(User user, UserRole role, [String? phoneNumber]) async {
+    UserModel userModel = UserModel(
+      id: user.uid,
+      email: user.email ?? '',
+      displayName: user.displayName ?? '',
+      phoneNumber: phoneNumber ?? user.phoneNumber,
+      photoUrl: user.photoURL,
+      role: role,
+      isEmailVerified: user.emailVerified,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    await _firestore.collection('users').doc(user.uid).set(userModel.toJson());
+  }
+
   // Update user profile in Firestore
   Future<void> _updateUserProfileInFirestore(String userId, Map<String, dynamic> updates) async {
     await _firestore.collection('users').doc(userId).update(updates);

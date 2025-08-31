@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../models/service.dart';
 import '../../services/auth_service.dart' as auth;
 import '../../providers/service_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../utils/theme_constants.dart';
 import '../../widgets/role_based_guard.dart';
 import 'service_detail_screen.dart';
 import 'service_create_screen.dart';
@@ -42,12 +44,75 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return RoleBasedRouteGuard(
       requiredRole: auth.UserRole.shopOwner,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Service Management'),
           toolbarHeight: kToolbarHeight + 5,
+          title: Center(
+            child: SizedBox(
+              height: 48,
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: TextField(
+                controller: _searchController,
+                style: TextStyle(
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search services...',
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                        : AppColors.onSurface.withValues(alpha: 0.7),
+                  ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                : AppColors.onSurface.withValues(alpha: 0.7),
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            Provider.of<ServiceProvider>(context, listen: false).searchServices('');
+                          },
+                        )
+                      : null,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                          : AppColors.onSurface.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: themeProvider.isDarkMode
+                      ? DarkAppColors.background
+                      : AppColors.background,
+                ),
+                onChanged: (value) => Provider.of<ServiceProvider>(context, listen: false).searchServices(value),
+              ),
+            ),
+          ),
+          backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+          elevation: 0,
+          iconTheme: IconThemeData(
+            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          ),
+          titleTextStyle: TextStyle(
+            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
           actions: [
             // Offline sync indicator
             Consumer<ServiceProvider>(
@@ -69,7 +134,10 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
             RoleBasedWidget(
               requiredRole: auth.UserRole.shopOwner,
               child: IconButton(
-                icon: const Icon(Icons.add_business),
+                icon: Icon(
+                  Icons.add_business,
+                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -199,25 +267,6 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Search Bar
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search services...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Theme.of(context).colorScheme.surface,
-            ),
-            onChanged: (value) {
-              final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
-              serviceProvider.searchServices(value);
-            },
-          ),
-          const SizedBox(height: 12),
-
           // Filters Row
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -243,7 +292,7 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                 _buildFilterChip(
                   label: 'Status',
                   value: _activeStatusFilter == null ? 'All' :
-                         _activeStatusFilter! ? 'Active' : 'Inactive',
+                          _activeStatusFilter! ? 'Active' : 'Inactive',
                   onTap: () => _showStatusFilterDialog(),
                 ),
 

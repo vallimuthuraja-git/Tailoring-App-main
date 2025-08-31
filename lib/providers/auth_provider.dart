@@ -126,6 +126,92 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Phone authentication
+  Future<bool> startPhoneVerification({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(String error) onError,
+    required Function(UserCredential userCredential) onVerified,
+  }) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      await _authService.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        onCodeSent: onCodeSent,
+        onError: onError,
+        onVerified: onVerified,
+      );
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<UserCredential> verifyOTP({
+    required String verificationId,
+    required String smsCode,
+    UserRole role = UserRole.customer,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      UserCredential userCredential = await _authService.verifyOTP(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+
+      _user = userCredential.user;
+      await _loadUserProfile();
+
+      // If new user, create profile
+      final existingProfile = await _authService.getUserProfile(_user!.uid);
+      if (existingProfile == null) {
+        // Create user profile for phone auth
+        await _authService.createUserProfile(_user!, role, _user!.phoneNumber);
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return userCredential;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+      throw e;
+    }
+  }
+
+  Future<bool> resendOTP({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(String error) onError,
+  }) async {
+    try {
+      await _authService.resendOTP(
+        phoneNumber: phoneNumber,
+        onCodeSent: onCodeSent,
+        onError: onError,
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+
   // Sign out
   Future<void> signOut() async {
     _isLoading = true;

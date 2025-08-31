@@ -85,7 +85,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                       onChanged: (_) {
                         controller.openView();
                       },
-                      hintText: 'Search services...',
+                      hintText: 'Search by name, category, or type...',
                       hintStyle: WidgetStatePropertyAll<TextStyle>(
                         TextStyle(
                           color: themeProvider.isDarkMode

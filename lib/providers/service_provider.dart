@@ -14,6 +14,11 @@ class ServiceProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String _searchQuery = '';
+
+  // Computed properties for search state
+  bool get hasSearchQuery => _searchQuery.isNotEmpty;
+  bool get hasSearchResults => hasSearchQuery && services.isNotEmpty;
+  String get searchQuery => _searchQuery; // Add getter for public access
   ServiceCategory? _selectedCategoryFilter;
   ServiceType? _selectedTypeFilter;
   bool? _activeStatusFilter;

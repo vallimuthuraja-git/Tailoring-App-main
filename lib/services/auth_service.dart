@@ -179,6 +179,17 @@ class AuthService {
         password: password,
       );
       print('✅ Successfully signed in user: ${userCredential.user?.email}');
+
+      // Fetch and log user role for debugging
+      if (email == 'admin@demo.com') {
+        final profile = await getUserProfile(userCredential.user!.uid);
+        if (profile != null) {
+          print('🔍 ADMIN LOGIN: User role assigned is ${profile.role.name}');
+        } else {
+          print('❌ ADMIN LOGIN: No profile found for admin user');
+        }
+      }
+
       return userCredential;
     } catch (e) {
       print('❌ Sign in error for $email: $e');
@@ -254,10 +265,17 @@ class AuthService {
       print('🔍 Fetching user profile for ID: $userId');
       DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
       if (doc.exists) {
-        print('✅ User profile found for $userId');
-        return UserModel.fromJson(doc.data() as Map<String, dynamic>);
+        final userModel = UserModel.fromJson(doc.data() as Map<String, dynamic>);
+        print('✅ User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
+        if (userModel.email == 'admin@demo.com') {
+          print('🔍 ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
+        }
+        return userModel;
       } else {
         print('❌ No user profile found for $userId');
+        if ('admin@demo.com' == 'admin@demo.com') { // placeholder, but actually check if this is admin id
+          print('❌ ADMIN PROFILE FETCH: No profile exists');
+        }
         return null;
       }
     } catch (e) {
@@ -392,6 +410,11 @@ class AuthService {
 
   // Demo accounts for testing
   static const Map<String, Map<String, String>> demoAccounts = {
+    'admin': {
+      'email': 'admin@demo.com',
+      'password': 'password123',
+      'displayName': 'Admin',
+    },
     'customer': {
       'email': 'customer@demo.com',
       'password': 'password123',

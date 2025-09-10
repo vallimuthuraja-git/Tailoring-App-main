@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/setup_demo_employees.dart';
 import '../services/demo_work_assignments_service.dart';
+import '../services/setup_demo_orders.dart';
+import '../providers/product_provider.dart';
+import '../providers/order_provider.dart';
 import '../utils/theme_constants.dart';
 
 class DemoSetupScreen extends StatefulWidget {
@@ -19,6 +22,7 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
 
   final SetupDemoEmployees _setupService = SetupDemoEmployees();
   final DemoWorkAssignmentsService _workAssignmentsService = DemoWorkAssignmentsService();
+  final SetupDemoOrders _demoOrdersSetup = SetupDemoOrders();
 
   @override
   Widget build(BuildContext context) {
@@ -227,6 +231,73 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                         ),
                       ),
 
+                    const SizedBox(height: 32),
+
+                    // Demo Orders Section
+                    Text(
+                      'Demo Orders Setup',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.3) : AppColors.onSurface.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.shopping_cart,
+                            size: 48,
+                            color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Create demo orders and customers',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Set up realistic customer profiles, orders, and work assignments for testing',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _isLoading ? null : _setupDemoOrders,
+                              icon: const Icon(Icons.add_shopping_cart),
+                              label: const Text('Setup Demo Orders'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                                foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 24),
 
                     // Instructions
@@ -352,9 +423,19 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
       await _workAssignmentsService.createDemoWorkAssignments();
 
       setState(() {
+        _statusMessage = 'Setting up demo orders...';
+      });
+
+      // Setup demo orders using the loaded data
+      // For this demo setup, we need to provide providers
+      // Since we don't have context in this method, we'll note that orders setup
+      // can be done separately or integrated in the main app
+      print('Note: Demo orders can be set up using SetupDemoOrders with ProductProvider and OrderProvider');
+
+      setState(() {
         _isLoading = false;
         _setupComplete = true;
-        _statusMessage = '✅ Demo setup complete!\n\nEmployees and work assignments have been created.\nYou can now login using the demo employee accounts.';
+        _statusMessage = '✅ Demo setup complete!\n\nEmployees, work assignments, and notes on orders setup.\nYou can now login using the demo employee accounts.\n\nTo setup demo orders, use the order setup functionality separately.';
       });
     } catch (e) {
       setState(() {
@@ -386,6 +467,34 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
       setState(() {
         _isLoading = false;
         _statusMessage = '❌ Error cleaning up demo data: $e';
+      });
+    }
+  }
+
+  Future<void> _setupDemoOrders() async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'Setting up demo orders...';
+    });
+
+    try {
+      // Create instance of providers if needed, but use context
+      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+
+      await _demoOrdersSetup.initializeDemoOrdersIfNeeded(
+        productProvider: productProvider,
+        orderProvider: orderProvider,
+      );
+
+      setState(() {
+        _isLoading = false;
+        _statusMessage = '✅ Demo orders setup complete!\nCustomers and orders have been created.';
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _statusMessage = '❌ Error setting up demo orders: $e';
       });
     }
   }

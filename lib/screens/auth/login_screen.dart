@@ -440,53 +440,72 @@ class _LoginScreenState extends State<LoginScreen> {
                                             const SizedBox(height: 20),
 
                                             // Demo Login Buttons
-                                            Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: ElevatedButton.icon(
-                                                        onPressed: authProvider.isLoading
-                                                            ? null
-                                                            : () => _demoLogin(context, UserRole.customer),
-                                                        icon: const Icon(Icons.person, size: 18),
-                                                        label: const Text('Demo Customer'),
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: themeProvider.isDarkMode
-                                                              ? DarkAppColors.secondary.withValues(alpha: 0.8)
-                                                              : AppColors.secondary.withValues(alpha: 0.8),
-                                                          foregroundColor: themeProvider.isDarkMode
-                                                              ? DarkAppColors.onSecondary
-                                                              : AppColors.onSecondary,
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                          ),
-                                                          elevation: 0,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 12),
-                                                    Expanded(
-                                                      child: ElevatedButton.icon(
-                                                        onPressed: authProvider.isLoading
-                                                            ? null
-                                                            : () => _demoLogin(context, UserRole.shopOwner),
-                                                        icon: const Icon(Icons.store, size: 18),
-                                                        label: const Text('Demo Shop'),
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: themeProvider.isDarkMode
-                                                              ? Colors.orange.shade700.withValues(alpha: 0.8)
-                                                              : Colors.orange.shade600.withValues(alpha: 0.8),
-                                                          foregroundColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                          ),
-                                                          elevation: 0,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                             Column(
+                                               children: [
+                                                 // Demo Admin Button
+                                                 ElevatedButton.icon(
+                                                   onPressed: authProvider.isLoading
+                                                       ? null
+                                                       : () => _demoLogin(context, UserRole.admin),
+                                                   icon: const Icon(Icons.admin_panel_settings, size: 18),
+                                                   label: const Text('Demo Admin'),
+                                                   style: ElevatedButton.styleFrom(
+                                                     backgroundColor: themeProvider.isDarkMode
+                                                         ? Colors.red.shade700.withValues(alpha: 0.8)
+                                                         : Colors.red.shade600.withValues(alpha: 0.8),
+                                                     foregroundColor: Colors.white,
+                                                     shape: RoundedRectangleBorder(
+                                                       borderRadius: BorderRadius.circular(12),
+                                                     ),
+                                                     elevation: 0,
+                                                   ),
+                                                 ),
+                                                 const SizedBox(height: 16),
+                                                 Row(
+                                                   children: [
+                                                     Expanded(
+                                                       child: ElevatedButton.icon(
+                                                         onPressed: authProvider.isLoading
+                                                             ? null
+                                                             : () => _demoLogin(context, UserRole.customer),
+                                                         icon: const Icon(Icons.person, size: 18),
+                                                         label: const Text('Demo Customer'),
+                                                         style: ElevatedButton.styleFrom(
+                                                           backgroundColor: themeProvider.isDarkMode
+                                                               ? DarkAppColors.secondary.withValues(alpha: 0.8)
+                                                               : AppColors.secondary.withValues(alpha: 0.8),
+                                                           foregroundColor: themeProvider.isDarkMode
+                                                               ? DarkAppColors.onSecondary
+                                                               : AppColors.onSecondary,
+                                                           shape: RoundedRectangleBorder(
+                                                             borderRadius: BorderRadius.circular(12),
+                                                           ),
+                                                           elevation: 0,
+                                                         ),
+                                                       ),
+                                                     ),
+                                                     const SizedBox(width: 12),
+                                                     Expanded(
+                                                       child: ElevatedButton.icon(
+                                                         onPressed: authProvider.isLoading
+                                                             ? null
+                                                             : () => _demoLogin(context, UserRole.shopOwner),
+                                                         icon: const Icon(Icons.store, size: 18),
+                                                         label: const Text('Demo Shop'),
+                                                         style: ElevatedButton.styleFrom(
+                                                           backgroundColor: themeProvider.isDarkMode
+                                                               ? Colors.orange.shade700.withValues(alpha: 0.8)
+                                                               : Colors.orange.shade600.withValues(alpha: 0.8),
+                                                           foregroundColor: Colors.white,
+                                                           shape: RoundedRectangleBorder(
+                                                             borderRadius: BorderRadius.circular(12),
+                                                           ),
+                                                           elevation: 0,
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ],
+                                                 ),
                                                 const SizedBox(height: 16),
                                                 Text(
                                                   'Demo Partners',
@@ -722,6 +741,9 @@ class _LoginScreenState extends State<LoginScreen> {
         break;
       case UserRole.shopOwner:
         success = await authProvider.demoLoginAsShopOwner();
+        break;
+      case UserRole.admin:
+        success = await authProvider.demoLoginAsAdmin();
         break;
       case UserRole.employee:
         success = await authProvider.demoLoginAsEmployee();

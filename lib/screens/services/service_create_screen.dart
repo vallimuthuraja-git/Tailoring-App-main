@@ -1,10 +1,14 @@
 // Service Create Screen with Offline Support
 // Form to create new tailoring services with comprehensive customization options
 
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/service.dart' as svc;
 import '../../services/auth_service.dart' as auth;
+import '../../services/firebase_storage_service.dart';
 import '../../providers/service_provider.dart';
 import '../../widgets/role_based_guard.dart';
 
@@ -36,6 +40,13 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
   bool _requiresFitting = false;
   bool _isActive = true;
   bool _isLoading = false;
+
+  // Image upload state
+  final List<XFile> _selectedImages = [];
+  final List<String> _uploadedImageUrls = [];
+  bool _isUploadingImages = false;
+  double _uploadProgress = 0.0;
+  String? _uploadError;
 
   final List<String> _features = [];
   final List<String> _requirements = [];
@@ -229,6 +240,12 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                   controller: _fabricsController,
                   hintText: 'Enter fabric type (e.g., Silk, Cotton, Georgette)',
                 ),
+
+                const SizedBox(height: 32),
+
+                // Service Images
+                _buildSectionTitle('Service Images'),
+                _buildImageSelectionSection(),
 
                 const SizedBox(height: 32),
 
@@ -444,6 +461,276 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
     );
   }
 
+  Widget _buildImageSelectionSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Service Images (${_selectedImages.length + _uploadedImageUrls.length}/10)',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (_selectedImages.isNotEmpty || _uploadedImageUrls.isNotEmpty)
+                  TextButton(
+                    onPressed: _isUploadingImages ? null : _uploadSelectedImages,
+                    child: _isUploadingImages
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(_selectedImages.isNotEmpty ? 'Upload Images' : 'Upload Status'),
+                  ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Image picker buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _selectedImages.length >= 10 ? null : _pickImagesFromGallery,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Gallery'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade100,
+                      foregroundColor: Colors.blue.shade900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _selectedImages.length >= 10 ? null : _pickImageFromCamera,
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('Camera'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade100,
+                      foregroundColor: Colors.green.shade900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Upload progress indicator
+            if (_isUploadingImages) ...[
+              LinearProgressIndicator(value: _uploadProgress),
+              const SizedBox(height: 8),
+              Text(
+                '${(_uploadProgress * 100).toStringAsFixed(1)}% uploaded',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // Upload error message
+            if (_uploadError != null) ...[
+              Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.red.shade50,
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _uploadError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => setState(() => _uploadError = null),
+                      icon: const Icon(Icons.close, size: 16, color: Colors.red),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // Selected images thumbnails
+            if (_selectedImages.isNotEmpty) ...[
+              const Text(
+                'Selected Images:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _selectedImages.length,
+                  itemBuilder: (context, index) {
+                    return _buildImageThumbnail(_selectedImages[index], index, false);
+                  },
+                ),
+              ),
+            ],
+
+            // Uploaded images thumbnails
+            if (_uploadedImageUrls.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Text(
+                'Uploaded Images:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _uploadedImageUrls.length,
+                  itemBuilder: (context, index) {
+                    return _buildUploadedImageThumbnail(_uploadedImageUrls[index], index);
+                  },
+                ),
+              ),
+            ],
+
+            // Info text
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(8),
+              color: Colors.blue.shade50,
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Upload high-quality images to showcase your service. Maximum 10 images, each under 10MB.',
+                      style: TextStyle(fontSize: 12, color: Colors.blue),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageThumbnail(XFile imageFile, int index, bool isUploaded) {
+    return Container(
+      width: 80,
+      height: 80,
+      margin: const EdgeInsets.only(right: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.file(
+              File(imageFile.path),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey.shade200,
+                  child: const Icon(Icons.broken_image, color: Colors.grey),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            top: 2,
+            right: 2,
+            child: GestureDetector(
+              onTap: () => _removeImage(index),
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUploadedImageThumbnail(String imageUrl, int index) {
+    return Container(
+      width: 80,
+      height: 80,
+      margin: const EdgeInsets.only(right: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  color: Colors.grey.shade200,
+                  child: const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey.shade200,
+                  child: const Icon(Icons.broken_image, color: Colors.grey),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            top: 2,
+            right: 2,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check,
+                size: 14,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _addItem(List<String> items, TextEditingController controller) {
     final value = controller.text.trim();
     if (value.isNotEmpty && !items.contains(value)) {
@@ -454,53 +741,229 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
     }
   }
 
+  // Image picker methods
+  Future<void> _pickImagesFromGallery() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final List<XFile> images = await picker.pickMultiImage(
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 85,
+      );
+
+      if (images.isNotEmpty) {
+        // Limit to maximum 10 images per service
+        if (_selectedImages.length + images.length > 10) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Maximum 10 images allowed per service')),
+            );
+          }
+          return;
+        }
+
+        setState(() {
+          _selectedImages.addAll(images);
+          _uploadError = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error selecting images: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        // Check if we've reached the limit
+        if (_selectedImages.length >= 10) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Maximum 10 images allowed per service')),
+            );
+          }
+          return;
+        }
+
+        setState(() {
+          _selectedImages.add(image);
+          _uploadError = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error taking photo: $e')),
+        );
+      }
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
+
+  Future<void> _uploadSelectedImages() async {
+    if (_selectedImages.isEmpty) return;
+
+    debugPrint('_uploadSelectedImages called with ${_selectedImages.length} images');
+    final serviceId = 'service_${DateTime.now().millisecondsSinceEpoch}';
+    final firebaseStorageService = FirebaseStorageService();
+
+    setState(() {
+      _isUploadingImages = true;
+      _uploadProgress = 0.0;
+      _uploadError = null;
+      _uploadedImageUrls.clear();
+    });
+
+    try {
+      debugPrint('_uploadSelectedImages: calling uploadMultipleImages');
+      final uploadedUrls = await firebaseStorageService.uploadMultipleImages(
+        _selectedImages,
+        folder: 'services',
+        serviceId: serviceId,
+        onProgress: (progress) {
+          debugPrint('_uploadSelectedImages: progress $progress');
+          setState(() => _uploadProgress = progress);
+        },
+        onImageComplete: (completed, total) {
+          debugPrint('Uploaded $completed of $total images');
+        },
+      );
+
+      debugPrint('_uploadSelectedImages: uploaded ${uploadedUrls.length} urls: $uploadedUrls');
+      setState(() {
+        _uploadedImageUrls.addAll(uploadedUrls);
+        _selectedImages.clear();
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Successfully uploaded ${uploadedUrls.length} images')),
+        );
+      }
+    } catch (e) {
+      debugPrint('_uploadSelectedImages: error $e');
+      setState(() => _uploadError = e.toString());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error uploading images: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isUploadingImages = false);
+    }
+  }
+
   void _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
+    debugPrint('_submitForm called');
+    if (!_formKey.currentState!.validate()) {
+      debugPrint('_submitForm: validation failed');
+      return;
+    }
 
     if (_features.isEmpty) {
+      debugPrint('_submitForm: no features, showing snackbar');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please add at least one feature')),
       );
       return;
     }
 
+    // Handle image uploads if there are selected images
+    if (_selectedImages.isNotEmpty) {
+      debugPrint('_submitForm: handling uploads, ${_selectedImages.length} images');
+      try {
+        await _uploadSelectedImages();
+
+        // If upload failed, don't proceed
+        if (_uploadError != null) {
+          debugPrint('_submitForm: upload error: $_uploadError');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please upload images before creating the service')),
+          );
+          return;
+        }
+      } catch (e) {
+        debugPrint('_submitForm: upload exception: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload images: $e')),
+        );
+        return;
+      }
+    } else {
+      debugPrint('_submitForm: no images to upload');
+    }
+
+    debugPrint('_submitForm: image handling done, urls: $_uploadedImageUrls');
     setState(() => _isLoading = true);
 
     try {
+      debugPrint('_submitForm: creating service object');
       final service = svc.Service(
-        id: 'service_${DateTime.now().millisecondsSinceEpoch}',
-        name: _nameController.text,
-        description: _descriptionController.text,
-        shortDescription: _shortDescriptionController.text,
-        category: _selectedCategory,
-        type: _selectedType,
-        duration: _selectedDuration,
-        complexity: _selectedComplexity,
-        basePrice: double.parse(_basePriceController.text),
-        features: _features,
-        requirements: _requirements,
-        preparationTips: _preparationTips,
-        recommendedFabrics: _recommendedFabrics,
-        isActive: _isActive,
-        requiresMeasurement: _requiresMeasurement,
-        requiresFitting: _requiresFitting,
-        estimatedHours: int.parse(_estimatedHoursController.text),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+          id: 'service_${DateTime.now().millisecondsSinceEpoch}',
+          name: _nameController.text,
+          description: _descriptionController.text,
+          shortDescription: _shortDescriptionController.text,
+          category: _selectedCategory,
+          type: _selectedType,
+          duration: _selectedDuration,
+          complexity: _selectedComplexity,
+          basePrice: double.parse(_basePriceController.text),
+          features: _features,
+          requirements: _requirements,
+          preparationTips: _preparationTips,
+          recommendedFabrics: _recommendedFabrics,
+          isActive: _isActive,
+          requiresMeasurement: _requiresMeasurement,
+          requiresFitting: _requiresFitting,
+          estimatedHours: int.parse(_estimatedHoursController.text),
+          imageUrls: _uploadedImageUrls,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
 
+      debugPrint('_submitForm: calling serviceProvider.createService');
       final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
       final success = await serviceProvider.createService(service);
+      debugPrint('_submitForm: createService result: $success');
 
       if (success && mounted) {
+        debugPrint('_submitForm: service created successfully, navigating back');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Service created successfully!')),
         );
+
+        // Reset image upload state
+        setState(() {
+          _selectedImages.clear();
+          _uploadedImageUrls.clear();
+          _uploadProgress = 0.0;
+          _uploadError = null;
+        });
+
         Navigator.pop(context);
       } else {
+        debugPrint('_submitForm: createService failed');
         throw Exception('Failed to create service');
       }
     } catch (e) {
+      debugPrint('_submitForm: error creating service: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),

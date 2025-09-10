@@ -118,22 +118,28 @@ class ServiceProvider with ChangeNotifier {
 
   // Create new service
   Future<bool> createService(Service service) async {
+    debugPrint('createService called with service: ${service.name}, category: ${service.category}, price: ${service.basePrice}');
     _isLoading = true;
     notifyListeners();
 
     try {
+      debugPrint('createService: converting to json');
       final serviceData = service.toJson();
       serviceData.remove('id');
       serviceData['createdAt'] = Timestamp.fromDate(DateTime.now());
       serviceData['updatedAt'] = Timestamp.fromDate(DateTime.now());
 
+      debugPrint('createService: serviceData: $serviceData');
       await _firebaseService.addDocument('services', serviceData);
 
+      debugPrint('createService: calling loadServices');
       await loadServices();
+      debugPrint('createService: success');
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
+      debugPrint('createService: error $e');
       _isLoading = false;
       _errorMessage = 'Failed to create service: $e';
       notifyListeners();
@@ -143,15 +149,18 @@ class ServiceProvider with ChangeNotifier {
 
   // Update service
   Future<bool> updateService(String serviceId, Map<String, dynamic> updates) async {
+    debugPrint('updateService called for $serviceId with updates: $updates');
     _isLoading = true;
     notifyListeners();
 
     try {
       updates['updatedAt'] = Timestamp.fromDate(DateTime.now());
 
+      debugPrint('updateService: calling firebase update');
       await _firebaseService.updateDocument('services', serviceId, updates);
 
       // Update local data
+      debugPrint('updateService: updating local data');
       final index = _services.indexWhere((service) => service.id == serviceId);
       if (index != -1) {
         final updatedService = _services[index].copyWith(
@@ -167,10 +176,12 @@ class ServiceProvider with ChangeNotifier {
         _applyFilters();
       }
 
+      debugPrint('updateService: success');
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
+      debugPrint('updateService: error $e');
       _isLoading = false;
       _errorMessage = 'Failed to update service: $e';
       notifyListeners();

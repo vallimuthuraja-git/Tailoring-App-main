@@ -19,6 +19,7 @@ import '../workflow/tailoring_workflow_screen.dart';
 import '../ai/ai_assistance_screen.dart';
 import '../demo_overview_screen.dart';
 import '../employee/simple_employee_list_screen.dart';
+import '../dashboard/analytics_dashboard_screen.dart';
 
 // Using beautiful theme-level opacity extensions
 // No more deprecated withValues(alpha:) calls - everything uses withValues() internally
@@ -643,7 +644,12 @@ class DashboardTab extends StatelessWidget {
                 title: 'Analytics',
                 color: Colors.cyan,
                 onTap: () {
-                  // Navigate to analytics
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AnalyticsDashboardScreen(),
+                    ),
+                  );
                 },
               ),
             ),

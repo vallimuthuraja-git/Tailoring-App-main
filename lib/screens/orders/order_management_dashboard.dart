@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../models/order.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../utils/theme_constants.dart';
+import '../../services/quality_control_service.dart';
 import 'order_creation_wizard.dart';
 import 'order_details_screen.dart';
 import 'package:intl/intl.dart';
@@ -626,6 +628,15 @@ class _OrderManagementDashboardState extends State<OrderManagementDashboard>
               Icons.person_add,
               () => _showEmployeeAssignmentDialog(context, order),
             ),
+            // Quality Control for completed orders by shop owners
+            if (order.status == OrderStatus.completed &&
+                Provider.of<AuthProvider>(context, listen: false).isShopOwnerOrAdmin)
+              _buildActionButton(
+                context,
+                'Quality Control',
+                Icons.check_circle_outline,
+                () => _performQualityControl(context, order),
+              ),
             const SizedBox(height: 10),
             _buildActionButton(
               context,
@@ -794,6 +805,88 @@ class _OrderManagementDashboardState extends State<OrderManagementDashboard>
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Cancel Order'),
           ),
+        ],
+      ),
+    );
+  }
+
+  void _performQualityControl(BuildContext context, Order order) async {
+    final qualityService = QualityControlService();
+    final checkpoints = await qualityService.getCheckpointsForOrder(order.id);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Quality Control'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Order: ${order.id.substring(0, 8)}'),
+              const SizedBox(height: 16),
+              if (checkpoints.isEmpty)
+                const Text('No quality checkpoints found for this order.')
+              else ...[
+                const Text('Quality Checkpoints:'),
+                const SizedBox(height: 8),
+                ...checkpoints.map((checkpoint) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          Icon(
+                            checkpoint.isApproved
+                                ? Icons.check_circle
+                                : checkpoint.needsRework
+                                    ? Icons.warning
+                                    : Icons.schedule,
+                            color: checkpoint.isApproved
+                                ? Colors.green
+                                : checkpoint.needsRework
+                                    ? Colors.red
+                                    : Colors.orange,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  checkpoint.checkpointName,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  checkpoint.statusText,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: checkpoint.isApproved
+                                        ? Colors.green
+                                        : checkpoint.needsRework
+                                            ? Colors.red
+                                            : Colors.orange,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          if (checkpoints.any((c) => c.status == QualityStatus.pending))
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context), // TODO: Implement inspection dialog
+              child: const Text('Start Inspection'),
+            ),
         ],
       ),
     );

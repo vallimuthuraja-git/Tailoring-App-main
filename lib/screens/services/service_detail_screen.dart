@@ -7,6 +7,7 @@ import '../../models/service.dart';
 import '../../services/auth_service.dart' as auth;
 import '../../providers/service_provider.dart';
 import '../../widgets/role_based_guard.dart';
+import 'service_edit_screen.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
   final Service service;
@@ -51,10 +52,15 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               child: IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () {
-                  // Navigate to edit screen (to be implemented)
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Edit functionality coming soon')),
-                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ServiceEditScreen(service: _service),
+                    ),
+                  ).then((_) {
+                    // Refresh service details after editing
+                    _loadServiceDetails();
+                  });
                 },
                 tooltip: 'Edit Service',
               ),

@@ -54,6 +54,9 @@ class AuthProvider with ChangeNotifier {
     if (_user != null) {
       try {
         _userProfile = await _authService.getUserProfile(_user!.uid);
+        if (_userProfile?.email == 'admin@demo.com') {
+          print('🔍 AUTH PROVIDER LOAD: Admin user profile loaded with role: ${_userProfile?.role.name}');
+        }
         notifyListeners();
       } catch (e) {
         _errorMessage = 'Failed to load user profile';
@@ -401,6 +404,10 @@ class AuthProvider with ChangeNotifier {
     return await _demoLogin('shopOwner', UserRole.shopOwner);
   }
 
+  Future<bool> demoLoginAsAdmin() async {
+    return await _demoLogin('admin', UserRole.admin);
+  }
+
   Future<bool> demoLoginAsEmployee() async {
     return await _demoLogin('employee', UserRole.employee);
   }
@@ -428,31 +435,52 @@ class AuthProvider with ChangeNotifier {
     final password = account['password']!;
     final displayName = account['displayName']!;
 
+    print('🔑 DEMO LOGIN START FOR: $accountKey');
+    print('📧 Email: $email');
+    print('🔒 Password: ${password.replaceAll(RegExp(r'.'), '*')}'); // Hide actual password
+    print('👤 Display Name: $displayName');
+    print('⚡ Role: $role');
+
+    debugPrint('🔑 DEMO LOGIN START: $accountKey - Email: $email, Role: $role');
+
     try {
+      print('🚀 DEMO LOGIN START: Attempting to login as $displayName ($email)');
       _isLoading = true;
       _errorMessage = 'Logging in as $displayName...';
       notifyListeners();
 
-      debugPrint('DEBUG: Attempting demo login for $email as $role');
+      debugPrint('🔄 DEMO LOGIN: Setting loading state');
+      print('🔍 DEMO LOGIN: Current user before login: $_user');
 
       // First, try to sign in with existing demo account
       try {
-        debugPrint('DEBUG: Attempting to sign in existing demo account');
+        debugPrint('🔍 DEMO LOGIN: Attempting to sign in existing demo account via AuthService');
         UserCredential userCredential = await _authService.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
         _user = userCredential.user;
+
+        debugPrint('✅ DEMO LOGIN: Auth sign-in successful, now loading user profile');
         await _loadUserProfile();
 
-        debugPrint('DEBUG: Successfully signed in existing demo account: ${_user?.email}');
+        if (_userProfile == null) {
+          debugPrint('❌ DEMO LOGIN: User profile not found after successful auth');
+          throw Exception('Demo account exists but profile not found in Firestore');
+        }
+
+        debugPrint('✅ DEMO LOGIN: Profile loaded. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
+        if (_userProfile?.email == 'admin@demo.com') {
+          print('🔍 AUTH PROVIDER: Admin demo login - assigned role: ${_userProfile?.role.name}');
+        }
 
       } catch (e) {
         // If sign-in fails (e.g., account doesn't exist), try to create the account
-        debugPrint('DEBUG: Sign in failed, attempting to create demo account: $e');
+        debugPrint('🚫 DEMO LOGIN: Sign in failed ($e), attempting to create new demo account');
 
         try {
+          debugPrint('🔧 DEMO LOGIN: Creating account via AuthService signup');
           UserCredential userCredential = await _authService.signUpWithEmailAndPassword(
             email: email,
             password: password,
@@ -461,13 +489,19 @@ class AuthProvider with ChangeNotifier {
           );
 
           _user = userCredential.user;
-          // User profile is already created in signUpWithEmailAndPassword
+
+          debugPrint('✅ DEMO LOGIN: Account created successfully, loading profile');
           await _loadUserProfile();
 
-          debugPrint('DEBUG: Successfully created and signed in demo account: ${_user?.email}');
+          if (_userProfile == null) {
+            debugPrint('❌ DEMO LOGIN: Profile creation/loading failed');
+            throw Exception('Failed to create/load user profile in Firestore');
+          }
+
+          debugPrint('✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
 
         } catch (createError) {
-          debugPrint('DEBUG: Failed to create demo account: $createError');
+          debugPrint('❌ DEMO LOGIN: Account creation failed: $createError');
           throw createError;
         }
       }
@@ -476,11 +510,15 @@ class AuthProvider with ChangeNotifier {
       _errorMessage = 'Demo login successful for $displayName!';
       notifyListeners();
 
-      debugPrint('DEBUG: Demo login completed successfully');
+      debugPrint('🎉 DEMO LOGIN: Success! Navigating to home screen now');
       return true;
 
     } catch (e) {
-      debugPrint('DEBUG: Demo login error: $e');
+      debugPrint('💥 DEMO LOGIN ERROR: $e');
+      print('❌ DEMO LOGIN FAILURE: Detailed error: $e');
+      print('🔍 DEMO LOGIN FAILURE: Error type: ${e.runtimeType.toString()}');
+      print('🔍 DEMO LOGIN FAILURE: User profile after failure: $_userProfile');
+
       _isLoading = false;
       _errorMessage = 'Demo login failed: $e';
       notifyListeners();

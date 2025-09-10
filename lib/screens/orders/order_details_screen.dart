@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/order.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
+// ignore_for_file: deprecated_member_use
 
 class OrderDetailsScreen extends StatefulWidget {
   final Order order;
@@ -141,7 +142,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         'Ordered: ${_formatDate(order.orderDate)}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: Color(0xFF757575),
                         ),
                       ),
                       if (order.deliveryDate != null)
@@ -149,7 +150,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           'Delivery: ${_formatDate(order.deliveryDate!)}',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.blue[600],
+                            color: Color(0xFF2196F3),
                           ),
                         ),
                     ],
@@ -198,7 +199,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               '${item.category} • Quantity: ${item.quantity}',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: Color(0xFF757575),
                               ),
                             ),
                             if (item.notes != null && item.notes!.isNotEmpty)
@@ -206,7 +207,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                 'Notes: ${item.notes}',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.blue[600],
+                                  color: Color(0xFF2196F3),
                                   fontStyle: FontStyle.italic,
                                 ),
                               ),
@@ -277,7 +278,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             if (order.measurements.isEmpty)
               const Text(
                 'No measurements provided',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: Color(0xFF9E9E9E)),
               )
             else
               Wrap(
@@ -438,11 +439,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: OrderStatus.values.map((status) {
-              return RadioListTile<OrderStatus>(
-                title: Text(_getStatusText(status)),
-                value: status,
-                groupValue: selectedStatus,
-                onChanged: (value) => setState(() => selectedStatus = value),
+              return InkWell(
+                onTap: () => setState(() => selectedStatus = status),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Radio<OrderStatus>(value: status, groupValue: selectedStatus, onChanged: (value) => setState(() => selectedStatus = value)),
+                    Expanded(child: Text(_getStatusText(status))),
+                  ],
+                ),
               );
             }).toList(),
           ),
@@ -484,11 +489,19 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ...PaymentStatus.values.map((status) {
-                return RadioListTile<PaymentStatus>(
-                  title: Text(_getPaymentStatusText(status)),
-                  value: status,
-                  groupValue: selectedStatus,
-                  onChanged: (value) => setState(() => selectedStatus = value),
+                return InkWell(
+                  onTap: () => setState(() => selectedStatus = status),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Radio<PaymentStatus>(
+                        value: status,
+                        groupValue: selectedStatus,
+                        onChanged: (value) => setState(() => selectedStatus = value),
+                      ),
+                      Expanded(child: Text(_getPaymentStatusText(status))),
+                    ],
+                  ),
                 );
               }),
               if (selectedStatus == PaymentStatus.paid) ...[
@@ -599,7 +612,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: _getStatusColor(status).withOpacity(0.1),
+        color: _getStatusColor(status).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _getStatusColor(status)),
       ),

@@ -10,6 +10,8 @@ import 'providers/cart_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/employee_provider.dart';
 import 'providers/service_provider.dart';
+import 'providers/wishlist_provider.dart';
+import 'providers/review_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/ai/ai_assistance_screen.dart';
@@ -67,6 +69,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => EmployeeProvider()),
         ChangeNotifierProvider(create: (_) => ServiceProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider.value(value: _themeProvider),
       ],
       child: Consumer<ThemeProvider>(

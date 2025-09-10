@@ -165,8 +165,8 @@ class OfflineStorageService {
     debugPrint('Database upgraded from $oldVersion to $newVersion');
   }
 
-  void _onConnectivityChanged(ConnectivityResult result) {
-    if (result != ConnectivityResult.none) {
+  void _onConnectivityChanged(List<ConnectivityResult> results) {
+    if (results.isNotEmpty && results.first != ConnectivityResult.none) {
       // Online - trigger sync
       syncPendingChanges();
     }
@@ -446,8 +446,8 @@ class OfflineStorageService {
     }
 
     // Try to sync immediately if online
-    final connectivityResult = await _connectivity.checkConnectivity();
-    if (connectivityResult != ConnectivityResult.none) {
+    final connectivityResults = await _connectivity.checkConnectivity();
+    if (connectivityResults.isNotEmpty && connectivityResults.first != ConnectivityResult.none) {
       await syncPendingChanges();
     }
   }

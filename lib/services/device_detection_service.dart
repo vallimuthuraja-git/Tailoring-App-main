@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:device_info_plus/device_info_plus.dart';
 
 class DeviceInfo {
   final String platform;
@@ -120,7 +120,9 @@ class DeviceDetectionService {
 
   DeviceDetectionService._internal();
 
-  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  // TODO: Fix device_info_plus dependency
+  // final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  final dynamic deviceInfo = null;
 
   // Web-specific method to detect system theme preference
   Future<Brightness?> _getWebSystemBrightness() async {
@@ -179,13 +181,14 @@ class DeviceDetectionService {
       }
 
       if (Platform.isIOS) {
-        final iosInfo = await _deviceInfo.iosInfo;
+        // TODO: Re-enable when device_info_plus is working
+        // final iosInfo = await deviceInfo.iosInfo;
         final isTablet = screenSize.shortestSide >= 600;
 
         return DeviceInfo(
           platform: 'ios',
-          model: iosInfo.model,
-          osVersion: iosInfo.systemVersion,
+          model: 'iOS Device',
+          osVersion: 'Unknown',
           isMobile: !isTablet,
           isTablet: isTablet,
           isDesktop: false,
@@ -196,14 +199,15 @@ class DeviceDetectionService {
       }
 
       if (Platform.isAndroid) {
-        final androidInfo = await _deviceInfo.androidInfo;
+        // TODO: Re-enable when device_info_plus is working
+        // final androidInfo = await deviceInfo.androidInfo;
         final isTablet = screenSize.shortestSide >= 600;
 
         return DeviceInfo(
           platform: 'android',
-          model: '${androidInfo.brand} ${androidInfo.model}',
-          osVersion: androidInfo.version.release,
-          isMobile: !isTablet && androidInfo.isPhysicalDevice,
+          model: 'Android Device',
+          osVersion: 'Unknown',
+          isMobile: !isTablet,
           isTablet: isTablet,
           isDesktop: false,
           isWeb: false,
@@ -214,12 +218,13 @@ class DeviceDetectionService {
       }
 
       if (Platform.isWindows) {
-        final windowsInfo = await _deviceInfo.windowsInfo;
+        // TODO: Re-enable when device_info_plus is working
+        // final windowsInfo = await deviceInfo.windowsInfo;
 
         return DeviceInfo(
           platform: 'windows',
           model: 'Windows PC',
-          osVersion: windowsInfo.displayVersion,
+          osVersion: 'Unknown',
           isMobile: false,
           isTablet: false,
           isDesktop: true,
@@ -230,12 +235,13 @@ class DeviceDetectionService {
       }
 
       if (Platform.isMacOS) {
-        final macOsInfo = await _deviceInfo.macOsInfo;
+        // TODO: Re-enable when device_info_plus is working
+        // final macOsInfo = await deviceInfo.macOsInfo;
 
         return DeviceInfo(
           platform: 'macos',
-          model: macOsInfo.model,
-          osVersion: macOsInfo.osRelease,
+          model: 'Mac Device',
+          osVersion: 'Unknown',
           isMobile: false,
           isTablet: false,
           isDesktop: true,
@@ -246,12 +252,13 @@ class DeviceDetectionService {
       }
 
       if (Platform.isLinux) {
-        final linuxInfo = await _deviceInfo.linuxInfo;
+        // TODO: Re-enable when device_info_plus is working
+        // final linuxInfo = await deviceInfo.linuxInfo;
 
         return DeviceInfo(
           platform: 'linux',
           model: 'Linux System',
-          osVersion: linuxInfo.version,
+          osVersion: 'Unknown',
           isMobile: false,
           isTablet: false,
           isDesktop: true,

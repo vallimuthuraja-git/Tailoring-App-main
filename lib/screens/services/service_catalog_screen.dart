@@ -1,17 +1,15 @@
-// Service Catalog Screen - Main entry point for all tailoring services
-// Displays services integrated with cart functionality and full order types
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/service.dart';
 import '../../providers/service_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
-import '../../providers/cart_provider.dart';
+import '../../providers/wishlist_provider.dart';
 import '../../utils/theme_constants.dart';
-import '../cart/cart_screen.dart';
 import 'service_detail_screen.dart';
-import 'service_create_screen.dart';
+import 'customer_service_detail_screen.dart';
+import 'service_booking_wizard.dart';
 
 class ServiceCatalogScreen extends StatefulWidget {
   const ServiceCatalogScreen({super.key});
@@ -20,698 +18,669 @@ class ServiceCatalogScreen extends StatefulWidget {
   State<ServiceCatalogScreen> createState() => _ServiceCatalogScreenState();
 }
 
-class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
+class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   ServiceCategory? _selectedCategoryFilter;
+  ServiceType? _selectedTypeFilter;
+  bool _showOnlyAvailable = true;
+  bool _isGridView = true; // Default to grid view
+
+  bool _isLoaded = false;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
-
-    // Delay the service loading to avoid calling notifyListeners during build phase
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
+      if (!_isLoaded) {
         _loadServices();
+        _loadViewModePreference();
+        _isLoaded = true;
+        _fadeController.forward();
       }
     });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _searchController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
   Future<void> _loadServices() async {
+    debugPrint('🔄 ServiceCatalogScreen loading services');
     final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
-
-    // Load services - this is now safe to call as PostFrameCallback ensures build phase is complete
     await serviceProvider.loadServices();
+    debugPrint('✅ ServiceCatalogScreen services loaded successfully: ${serviceProvider.services.length}');
+  }
 
-    // If no services exist, load demo data
-    if (serviceProvider.services.isEmpty) {
-      await serviceProvider.initializeSampleServices();
+  Future<void> _loadViewModePreference() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _isGridView = prefs.getBool('service_view_mode_grid') ?? true;
+      });
+    } catch (e) {
+      debugPrint('Error loading view mode preference: $e');
     }
   }
 
+  Future<void> _saveViewModePreference(bool isGrid) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('service_view_mode_grid', isGrid);
+    } catch (e) {
+      debugPrint('Error saving view mode preference: $e');
+    }
+  }
+
+  void _toggleViewMode() {
+    setState(() {
+      _isGridView = !_isGridView;
+    });
+    _saveViewModePreference(_isGridView);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer4<ServiceProvider, AuthProvider, ThemeProvider, CartProvider>(
-      builder: (context, serviceProvider, authProvider, themeProvider, cartProvider, child) {
-        final isShopOwner = authProvider.isShopOwnerOrAdmin;
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
-        return Scaffold(
-          appBar: AppBar(
-            toolbarHeight: kToolbarHeight + 5,
-            title: Center(
-              child: SizedBox(
-                height: 48,
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: SearchAnchor(
-                  builder: (BuildContext context, SearchController controller) {
-                    return SearchBar(
-                      controller: controller,
-                      elevation: const WidgetStatePropertyAll<double>(0),
-                      padding: const WidgetStatePropertyAll<EdgeInsets>(
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                      ),
-                      onTap: () {
-                        controller.openView();
-                      },
-                      onChanged: (_) {
-                        controller.openView();
-                      },
-                      hintText: 'Search by name, category, or type...',
-                      hintStyle: WidgetStatePropertyAll<TextStyle>(
-                        TextStyle(
-                          color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withValues(alpha: 0.5)
-                              : AppColors.onSurface.withValues(alpha: 0.5),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      textStyle: WidgetStatePropertyAll<TextStyle>(
-                        TextStyle(
-                          color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface
-                              : AppColors.onSurface,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      trailing: [
-                        Icon(
-                          Icons.search,
-                          color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withValues(alpha: 0.8)
-                              : AppColors.onSurface.withValues(alpha: 0.8),
-                          size: 20,
-                        ),
-                      ],
-                      backgroundColor: WidgetStatePropertyAll<Color>(
-                        themeProvider.isDarkMode
-                            ? DarkAppColors.surface.withValues(alpha: 0.9)
-                            : AppColors.surface.withValues(alpha: 0.9),
-                      ),
-                      surfaceTintColor: WidgetStatePropertyAll<Color>(
-                        themeProvider.isDarkMode
-                            ? DarkAppColors.surface
-                            : AppColors.surface,
-                      ),
-                      shape: WidgetStatePropertyAll<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.0),
-                          side: BorderSide(
-                            color: themeProvider.isDarkMode
-                                ? DarkAppColors.primary.withValues(alpha: 0.3)
-                                : AppColors.primary.withValues(alpha: 0.3),
-                            width: 1.0,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  suggestionsBuilder: (BuildContext context, SearchController controller) {
-                    if (controller.text.isEmpty) {
-                      return <Widget>[];
-                    }
-
-                    serviceProvider.searchServices(controller.text);
-
-                    return List<ListTile>.generate(5, (int index) {
-                      final String item = 'service $index';
-                      return ListTile(
-                        title: Text(
-                          item,
-                          style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? DarkAppColors.onSurface
-                                : AppColors.onSurface,
-                          ),
-                        ),
-                        onTap: () {
-                          controller.closeView(item);
-                        },
-                      );
-                    });
-                  },
-                ),
-              ),
-            ),
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
-            elevation: 0,
-            iconTheme: IconThemeData(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Book a Service',
+            style: TextStyle(
               color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
             ),
-            actions: [
-              // Cart Icon with Badge
-              Consumer<CartProvider>(
-                builder: (context, cartProvider, child) {
-                  return Stack(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.shopping_cart),
-                        color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                        onPressed: () => _navigateToCart(context),
-                        tooltip: 'View Cart',
-                      ),
-                      if (cartProvider.itemCount > 0)
-                        Positioned(
-                          right: 8,
-                          top: 8,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 16,
-                              minHeight: 16,
-                            ),
-                            child: Text(
-                              cartProvider.itemCount.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+          ),
+          backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+          elevation: 0,
+          iconTheme: IconThemeData(
+            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          ),
+          titleTextStyle: TextStyle(
+            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+          actions: [
+            // View Toggle Button
+            IconButton(
+              icon: Icon(
+                _isGridView ? Icons.view_list : Icons.grid_view,
+                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              ),
+              onPressed: _toggleViewMode,
+              tooltip: _isGridView ? 'Switch to List View' : 'Switch to Grid View',
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: _buildSearchBar(themeProvider),
+          ),
+        ),
+        body: Column(
+          children: [
+            _buildFilters(themeProvider),
+            Expanded(
+              child: Consumer<ServiceProvider>(
+                builder: (context, serviceProvider, child) {
+                  if (serviceProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (serviceProvider.errorMessage != null) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text('Error loading services', style: Theme.of(context).textTheme.titleLarge),
+                          const SizedBox(height: 8),
+                          Text(serviceProvider.errorMessage!, style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: _loadServices,
+                            child: const Text('Retry'),
                           ),
-                        ),
-                    ],
+                        ],
+                      ),
+                    );
+                  }
+
+                  final services = serviceProvider.services.where((service) => service.isActive).toList();
+                  debugPrint('📊 ServiceCatalogScreen entered, services: ${services.length}');
+
+                  if (services.isEmpty) {
+                    debugPrint('⚠️ No services available after filtering - total services: ${serviceProvider.services.length}');
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.business_center, size: 64, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text('No services available', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                          SizedBox(height: 8),
+                          Text('Please check back later', style: TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: _isGridView
+                          ? _buildGridView(services, themeProvider)
+                          : _buildListView(services, themeProvider),
+                    ),
                   );
                 },
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.filter_list,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                ),
-                onPressed: () => _showFilterBottomSheet(context),
-              ),
-            ],
-          ),
-          body: Column(
-            children: [
-              // Service Category Tabs
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: themeProvider.isDarkMode
-                      ? DarkAppColors.surface.withValues(alpha: 0.8)
-                      : AppColors.surface.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: themeProvider.isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.1)
-                        : AppColors.onSurface.withValues(alpha: 0.1),
-                  ),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  indicator: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                        (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary).withValues(alpha: 0.8),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: themeProvider.isDarkMode
-                      ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                      : AppColors.onSurface.withValues(alpha: 0.7),
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 11,
-                  ),
-                  tabs: [
-                    _buildCategoryTab('All', Icons.apps),
-                    _buildCategoryTab('Saree', Icons.woman),
-                    _buildCategoryTab('Garment', Icons.checkroom),
-                    _buildCategoryTab('Alterations', Icons.content_cut),
-                    _buildCategoryTab('Custom', Icons.design_services),
-                    _buildCategoryTab('Consultation', Icons.chat),
-                    _buildCategoryTab('Measurements', Icons.straighten),
-                    _buildCategoryTab('Special Occasion', Icons.celebration),
-                    _buildCategoryTab('Corporate', Icons.business),
-                    _buildCategoryTab('Bridal', Icons.diamond),
-                  ],
-                  onTap: (index) {
-                    ServiceCategory? category;
-                    switch (index) {
-                      case 1:
-                        category = ServiceCategory.sareeServices;
-                        break;
-                      case 2:
-                        category = ServiceCategory.garmentServices;
-                        break;
-                      case 3:
-                        category = ServiceCategory.alterationServices;
-                        break;
-                      case 4:
-                        category = ServiceCategory.customDesign;
-                        break;
-                      case 5:
-                        category = ServiceCategory.consultation;
-                        break;
-                      case 6:
-                        category = ServiceCategory.measurements;
-                        break;
-                      case 7:
-                        category = ServiceCategory.specialOccasion;
-                        break;
-                      case 8:
-                        category = ServiceCategory.corporateWear;
-                        break;
-                      case 9:
-                        category = ServiceCategory.bridalServices;
-                        break;
-                      default:
-                        category = null;
-                    }
-                    serviceProvider.filterByCategory(category);
-                  },
-                ),
-              ),
+            ),
+          ],
+     ),
+   );
+  }
 
-              // Main Content
-              Expanded(
-                child: serviceProvider.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : serviceProvider.services.isEmpty
-                        ? _buildEmptyState()
-                        : _buildServiceGrid(serviceProvider),
-              ),
-            ],
-          ),
-          floatingActionButton: isShopOwner
-              ? FloatingActionButton.extended(
-                  onPressed: () => _showAddServiceDialog(context),
-                  icon: const Icon(Icons.add_business),
-                  label: const Text('Add Service'),
-                  backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                  foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+  Widget _buildSearchBar(ThemeProvider themeProvider) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: TextField(
+        controller: _searchController,
+        style: TextStyle(
+          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Search services...',
+          prefixIcon: Icon(Icons.search, color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7)),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: Icon(Icons.clear, color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7)),
+                  onPressed: () {
+                    _searchController.clear();
+                    Provider.of<ServiceProvider>(context, listen: false).searchServices('');
+                  },
                 )
               : null,
-        );
-      },
-    );
-  }
-
-  Widget _buildCategoryTab(String text, IconData icon) {
-    return Tab(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 14),
-          const SizedBox(width: 4),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
-        ],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        ),
+        onChanged: (value) => Provider.of<ServiceProvider>(context, listen: false).searchServices(value),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildFilters(ThemeProvider themeProvider) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.05,
+        vertical: 8,
+      ),
+      color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary).withValues(alpha: 0.1),
-                    (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary).withValues(alpha: 0.05),
-                  ],
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.business_center_outlined,
-                size: 64,
-                color: themeProvider.isDarkMode
-                    ? DarkAppColors.primary.withValues(alpha: 0.7)
-                    : AppColors.primary.withValues(alpha: 0.7),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'No Services Found',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Try adjusting your search or filter criteria',
-              style: TextStyle(
-                fontSize: 16,
-                color: themeProvider.isDarkMode
-                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                    : AppColors.onSurface.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                _searchController.clear();
-                _tabController.animateTo(0);
-                Provider.of<ServiceProvider>(context, listen: false).filterByCategory(null);
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text('Show All Services'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
+            _buildFilterChip('All Categories', null, themeProvider),
+            const SizedBox(width: 8),
+            ...ServiceCategory.values.map((category) => Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _buildFilterChip(category.name, category, themeProvider),
+            )),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildServiceGrid(ServiceProvider serviceProvider) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount;
-        double childAspectRatio;
+  Widget _buildFilterChip(String label, ServiceCategory? category, ThemeProvider themeProvider) {
+    final isSelected = _selectedCategoryFilter == category;
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) {
+        setState(() => _selectedCategoryFilter = category);
+        Provider.of<ServiceProvider>(context, listen: false).filterByCategory(category);
+      },
+      backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+      selectedColor: (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary).withOpacity(0.2),
+      checkmarkColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+    );
+  }
 
-        final availableWidth = constraints.maxWidth;
+  Widget _buildGridView(List<Service> services, ThemeProvider themeProvider) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = 2; // Default for mobile
+    if (screenWidth >= 1200) {
+      crossAxisCount = 3; // Large desktop
+    } else if (screenWidth >= 900) {
+      crossAxisCount = 3; // Tablet/desktop
+    } else if (screenWidth >= 600) {
+      crossAxisCount = 2; // Small desktop - keep at 2 for better spacing
+    }
 
-        if (availableWidth >= 600) {
-          crossAxisCount = 3;
-          childAspectRatio = 0.8;
-        } else {
-          crossAxisCount = 2;
-          childAspectRatio = 0.85;
-        }
-
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: childAspectRatio,
-          ),
-          itemCount: serviceProvider.services.length,
-          itemBuilder: (context, index) {
-            final service = serviceProvider.services[index];
-            return _ServiceCard(service: service);
-          },
-        );
+    return GridView.builder(
+      key: const ValueKey('grid'),
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.05,
+        vertical: 16,
+      ),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: screenWidth >= 600 ? 0.85 : 0.8,
+      ),
+      itemCount: services.length,
+      itemBuilder: (context, index) {
+        final service = services[index];
+        return _buildServiceCard(service, themeProvider);
       },
     );
   }
 
-  void _showFilterBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  Widget _buildListView(List<Service> services, ThemeProvider themeProvider) {
+    return ListView.builder(
+      key: const ValueKey('list'),
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.05,
+        vertical: 16,
       ),
-      builder: (context) => const ServiceFilterBottomSheet(),
+      itemCount: services.length,
+      itemBuilder: (context, index) {
+        final service = services[index];
+        return _buildServiceListItem(service, themeProvider);
+      },
     );
   }
 
-  void _showAddServiceDialog(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ServiceCreateScreen(),
-      ),
-    );
-  }
-
-  void _navigateToCart(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CartScreen(),
-      ),
-    );
-  }
-}
-
-class _ServiceCard extends StatefulWidget {
-  final Service service;
-
-  const _ServiceCard({required this.service});
-
-  @override
-  State<_ServiceCard> createState() => _ServiceCardState();
-}
-
-class _ServiceCardState extends State<_ServiceCard> {
-  bool _isAddingToCart = false;
-
-  void _addToCart(BuildContext context) async {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-
-    setState(() {
-      _isAddingToCart = true;
-    });
-
-    // For now, we'll add a placeholder - need to extend CartProvider for services
-    // TODO: Implement service ordering in cart
-
-    setState(() {
-      _isAddingToCart = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Service ordering coming soon!'),
-        backgroundColor: Colors.blue,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
-    final isShopOwner = authProvider.isShopOwnerOrAdmin;
-
-    return GestureDetector(
-      onTap: () => _showServiceDetails(context, widget.service),
-      child: Container(
-        decoration: BoxDecoration(
-          color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withValues(alpha: 0.1)
-                : AppColors.onSurface.withValues(alpha: 0.1),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withValues(alpha: 0.05)
-                  : AppColors.onSurface.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildServiceCard(Service service, ThemeProvider themeProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Consumer<WishlistProvider>(
+        builder: (context, wishlistProvider, child) => Stack(
           children: [
-            // Service Image/Icon
-            Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                gradient: LinearGradient(
-                  colors: [
-                    _getServiceColor(widget.service.category).withValues(alpha: 0.1),
-                    _getServiceColor(widget.service.category).withValues(alpha: 0.05),
-                  ],
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  _getServiceIcon(widget.service.category),
-                  size: 48,
-                  color: _getServiceColor(widget.service.category),
-                ),
-              ),
-            ),
-
-            // Service Details
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Service Name
-                  Text(
-                    widget.service.name,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface
-                          : AppColors.onSurface,
-                      height: 1.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  // Category Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: _getServiceColor(widget.service.category).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      widget.service.categoryName,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: _getServiceColor(widget.service.category),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Price
-                  Text(
-                    '₹${widget.service.effectivePrice.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: themeProvider.isDarkMode
-                          ? DarkAppColors.primary
-                          : AppColors.primary,
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  // Duration
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: 12,
-                        color: themeProvider.isDarkMode
-                            ? DarkAppColors.onSurface.withValues(alpha: 0.6)
-                            : AppColors.onSurface.withValues(alpha: 0.6),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        widget.service.durationText,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withValues(alpha: 0.6)
-                              : AppColors.onSurface.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Book Service Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: widget.service.isActive && !_isAddingToCart
-                          ? () => _addToCart(context)
-                          : null,
-                      icon: _isAddingToCart
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : const Icon(Icons.book_online, size: 16),
-                      label: Text(
-                        _isAddingToCart
-                            ? 'Booking...'
-                            : 'Book Service',
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: themeProvider.isDarkMode
-                            ? DarkAppColors.primary
-                            : AppColors.primary,
-                        foregroundColor: themeProvider.isDarkMode
-                            ? DarkAppColors.onPrimary
-                            : AppColors.onPrimary,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
-
-                  // Edit button for shop owners
-                  if (isShopOwner) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _editService(context, widget.service),
-                        icon: const Icon(Icons.edit, size: 14),
-                        label: const Text('Edit'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+            InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => _showServiceOptions(service),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Service Icon and Title
+                    Center(
+                      child: Hero(
+                        tag: 'service-icon-${service.id}',
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: _getServiceColor(service.category).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            _getServiceIcon(service.category),
+                            color: _getServiceColor(service.category),
+                            size: 30,
                           ),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            service.name,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            service.shortDescription,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Spacer(),
+                          // Price and Duration
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '\$${service.effectivePrice.toStringAsFixed(0)}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              Icon(Icons.access_time, size: 14, color: Colors.grey),
+                              const SizedBox(width: 2),
+                              Text(
+                                service.durationText,
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
-                ],
+                ),
+              ),
+            ),
+            // Wishlist button
+            Positioned(
+              top: 8,
+              right: 8,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () async {
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  if (authProvider.user == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please log in to manage favorites')),
+                    );
+                    return;
+                  }
+
+                  final success = await wishlistProvider.toggleWishlist(service.id);
+                  if (success && mounted) {
+                    final isInWishlist = wishlistProvider.isServiceInWishlist(service.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(isInWishlist
+                            ? '${service.name} added to favorites'
+                            : '${service.name} removed from favorites'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    wishlistProvider.isServiceInWishlist(service.id)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    size: 20,
+                    color: wishlistProvider.isServiceInWishlist(service.id)
+                        ? Colors.red
+                        : Colors.grey,
+                  ),
+                ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildServiceListItem(Service service, ThemeProvider themeProvider) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Consumer<WishlistProvider>(
+        builder: (context, wishlistProvider, child) => InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => _showServiceOptions(service),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Service Icon
+                Hero(
+                  tag: 'service-icon-${service.id}',
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: _getServiceColor(service.category).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      _getServiceIcon(service.category),
+                      color: _getServiceColor(service.category),
+                      size: 24,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Service Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        service.name,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        service.shortDescription,
+                        style: TextStyle(
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface.withOpacity(0.7)
+                              : AppColors.onSurface.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.access_time, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(
+                            service.durationText,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface.withOpacity(0.6)
+                                  : AppColors.onSurface.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: service.category == ServiceCategory.consultation
+                                  ? Colors.blue.withOpacity(0.1)
+                                  : service.category == ServiceCategory.customDesign
+                                      ? Colors.purple.withOpacity(0.1)
+                                      : Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              service.category.name,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: service.category == ServiceCategory.consultation
+                                    ? Colors.blue
+                                    : service.category == ServiceCategory.customDesign
+                                        ? Colors.purple
+                                        : Colors.green,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Price and Wishlist
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Price
+                    Text(
+                      '\$${service.effectivePrice.toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Wishlist button
+                    InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () async {
+                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                        if (authProvider.user == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please log in to manage favorites')),
+                          );
+                          return;
+                        }
+
+                        final success = await wishlistProvider.toggleWishlist(service.id);
+                        if (success && mounted) {
+                          final isInWishlist = wishlistProvider.isServiceInWishlist(service.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(isInWishlist
+                                  ? '${service.name} added to favorites'
+                                  : '${service.name} removed from favorites'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: (themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface).withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          wishlistProvider.isServiceInWishlist(service.id)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          size: 20,
+                          color: wishlistProvider.isServiceInWishlist(service.id)
+                              ? Colors.red
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showServiceOptions(Service service) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              service.name,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () => _bookService(service),
+              icon: const Icon(Icons.book_online),
+              label: const Text('Book This Service'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () => _viewServiceDetails(service),
+              icon: const Icon(Icons.info),
+              label: const Text('View Details'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _bookService(Service service) async {
+    Navigator.pop(context); // Close bottom sheet
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to book services')),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ServiceBookingWizard(service: service),
+      ),
+    );
+  }
+
+  void _viewServiceDetails(Service service) {
+    Navigator.pop(context); // Close bottom sheet
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CustomerServiceDetailScreen(service: service),
       ),
     );
   }
@@ -764,218 +733,5 @@ class _ServiceCardState extends State<_ServiceCard> {
       case ServiceCategory.bridalServices:
         return Icons.diamond;
     }
-  }
-
-  void _showServiceDetails(BuildContext context, Service service) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ServiceDetailScreen(service: service),
-      ),
-    );
-  }
-
-  void _editService(BuildContext context, Service service) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ServiceEditScreen(service: service),
-      ),
-    );
-  }
-}
-
-class ServiceFilterBottomSheet extends StatefulWidget {
-  const ServiceFilterBottomSheet({super.key});
-
-  @override
-  State<ServiceFilterBottomSheet> createState() => _ServiceFilterBottomSheetState();
-}
-
-class _ServiceFilterBottomSheetState extends State<ServiceFilterBottomSheet> {
-  RangeValues _priceRange = const RangeValues(0, 500);
-  ServiceCategory? _selectedCategory;
-  ServiceDuration? _selectedDuration;
-  ServiceComplexity? _selectedComplexity;
-  bool? _activeStatusFilter;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Filter Services',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Price Range
-            const Text(
-              'Price Range',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            RangeSlider(
-              values: _priceRange,
-              min: 0,
-              max: 500,
-              divisions: 50,
-              labels: RangeLabels(
-                '₹${_priceRange.start.toInt()}',
-                '₹${_priceRange.end.toInt()}',
-              ),
-              onChanged: (values) {
-                setState(() {
-                  _priceRange = values;
-                });
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            // Category Filter
-            const Text(
-              'Category',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: ServiceCategory.values.map((category) {
-                return FilterChip(
-                  label: Text(category.name),
-                  selected: _selectedCategory == category,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedCategory = selected ? category : null;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Duration Filter
-            const Text(
-              'Duration',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: ServiceDuration.values.map((duration) {
-                return FilterChip(
-                  label: Text(duration.name),
-                  selected: _selectedDuration == duration,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedDuration = selected ? duration : null;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Complexity Filter
-            const Text(
-              'Complexity',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: ServiceComplexity.values.map((complexity) {
-                return FilterChip(
-                  label: Text(complexity.name),
-                  selected: _selectedComplexity == complexity,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedComplexity = selected ? complexity : null;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Apply Filters Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _applyFilters(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                child: const Text(
-                  'Apply Filters',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _applyFilters(BuildContext context) {
-    final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
-
-    // Apply all filters
-    if (_selectedCategory != null) {
-      serviceProvider.filterByCategory(_selectedCategory);
-    }
-    if (_activeStatusFilter != null) {
-      serviceProvider.filterByActiveStatus(_activeStatusFilter);
-    }
-
-    Navigator.pop(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Filters applied successfully!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-}
-
-// Placeholder for service edit screen
-class ServiceEditScreen extends StatelessWidget {
-  final Service service;
-
-  const ServiceEditScreen({super.key, required this.service});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit ${service.name}'),
-      ),
-      body: const Center(
-        child: Text('Service Edit Screen - Coming Soon!'),
-      ),
-    );
   }
 }

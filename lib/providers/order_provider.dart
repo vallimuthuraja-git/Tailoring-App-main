@@ -145,13 +145,18 @@ class OrderProvider with ChangeNotifier {
     });
   }
 
-  // Create new order
+  // Create new order with enhanced parameters
   Future<bool> createOrder({
     required String customerId,
     required List<OrderItem> items,
     required Map<String, dynamic> measurements,
     required String? specialInstructions,
     required List<String> orderImages,
+    String? preferredDate,
+    String? preferredTimeSlot,
+    String? paymentMethod,
+    double? advanceAmount,
+    double? remainingAmount,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -159,8 +164,27 @@ class OrderProvider with ChangeNotifier {
     try {
       // Calculate totals
       double totalAmount = items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
-      double advanceAmount = totalAmount * 0.3; // 30% advance
-      double remainingAmount = totalAmount - advanceAmount;
+
+      // Use provided advance amounts or calculate default (30% advance)
+      double orderAdvanceAmount = advanceAmount ?? (totalAmount * 0.3);
+      double orderRemainingAmount = remainingAmount ?? (totalAmount - orderAdvanceAmount);
+
+      // Handle scheduling data from measurements if available
+      String? finalPreferredDate = preferredDate ?? measurements['preferred_date'];
+      String? finalPreferredTimeSlot = preferredTimeSlot ?? measurements['preferred_time_slot'];
+      String? finalPaymentMethod = paymentMethod ?? measurements['payment_method'];
+
+      // Store scheduling data in measurements if not already present
+      final enhancedMeasurements = Map<String, dynamic>.from(measurements);
+      if (finalPreferredDate != null && !enhancedMeasurements.containsKey('preferred_date')) {
+        enhancedMeasurements['preferred_date'] = finalPreferredDate;
+      }
+      if (finalPreferredTimeSlot != null && !enhancedMeasurements.containsKey('preferred_time_slot')) {
+        enhancedMeasurements['preferred_time_slot'] = finalPreferredTimeSlot;
+      }
+      if (finalPaymentMethod != null && !enhancedMeasurements.containsKey('payment_method')) {
+        enhancedMeasurements['payment_method'] = finalPaymentMethod;
+      }
 
       final order = Order(
         id: '',
@@ -169,12 +193,12 @@ class OrderProvider with ChangeNotifier {
         status: OrderStatus.pending,
         paymentStatus: PaymentStatus.pending,
         totalAmount: totalAmount,
-        advanceAmount: advanceAmount,
-        remainingAmount: remainingAmount,
+        advanceAmount: orderAdvanceAmount,
+        remainingAmount: orderRemainingAmount,
         orderDate: DateTime.now(),
         deliveryDate: DateTime.now().add(const Duration(days: 7)), // Default 7 days
         specialInstructions: specialInstructions,
-        measurements: measurements,
+        measurements: enhancedMeasurements,
         orderImages: orderImages,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),

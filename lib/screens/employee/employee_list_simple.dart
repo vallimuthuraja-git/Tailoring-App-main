@@ -261,8 +261,6 @@ class EmployeeListSimple extends StatefulWidget {
 
 class _EmployeeListSimpleState extends State<EmployeeListSimple> {
   bool? _selectedStatusFilter;
-  UserRole? _selectedRoleFilter;
-  String? _selectedRoleFilterString; // For UI purposes
   bool _initComplete = false;
   String? _initError;
   bool _loading = true;
@@ -599,7 +597,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                                 );
                                                 // Call direct employee setup from Firebase directly
                                                 final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-                                                await employeeProvider.forceReloadEmployees();
+                                                await employeeProvider.loadEmployees();
                                                 if (context.mounted) {
                                                   Navigator.of(context).pop(); // Close loading
                                                   await employeeProvider.loadEmployees();

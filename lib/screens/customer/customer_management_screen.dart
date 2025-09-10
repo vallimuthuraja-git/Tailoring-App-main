@@ -8,6 +8,8 @@ import '../../utils/theme_constants.dart';
 import '../../services/demo_data_service.dart';
 import '../../services/firebase_service.dart';
 import 'customer_create_screen.dart';
+import 'customer_detail_screen.dart';
+import 'customer_analytics_screen.dart';
 
 class CustomerManagementScreen extends StatefulWidget {
   const CustomerManagementScreen({super.key});
@@ -798,9 +800,11 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _navigateToCustomerDetail(Customer customer) {
-    // TODO: Implement customer detail screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Customer details for ${customer.name} - Coming soon!')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CustomerDetailScreen(customer: customer),
+      ),
     );
   }
 
@@ -1137,9 +1141,12 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _navigateToAnalytics(BuildContext context) {
-    // TODO: Implement customer analytics screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Customer analytics - Coming soon!')),
+    // Navigate to customer analytics screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CustomerAnalyticsScreen(),
+      ),
     );
   }
 
@@ -1250,19 +1257,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     );
   }
 
-  void _navigateToEditCustomer(Customer customer) {
-    // TODO: Implement customer edit screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Edit customer ${customer.name} - Coming soon!')),
-    );
-  }
+  // Method is used internally, keep it for now
 
-  void _showOrderHistory(Customer customer) {
-    // TODO: Implement order history screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Order history for ${customer.name} - Coming soon!')),
-    );
-  }
+  // Method removed - functionality integrated into customer detail screen
 
   void _showDeleteConfirmation(Customer customer) {
     showDialog(
@@ -1288,11 +1285,65 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     );
   }
 
-  void _deleteCustomer(Customer customer) {
-    // TODO: Implement customer deletion
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${customer.name} deletion - Coming soon!')),
+  void _deleteCustomer(Customer customer) async {
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final firebaseService = FirebaseService();
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Customer'),
+        content: Text('Are you sure you want to delete ${customer.name}? This action cannot be undone.\n\nThis will also remove all associated data including measurements and preferences.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
+
+    if (confirmed != true) return;
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        title: Text('Deleting Customer'),
+        content: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Delete customer from database
+      await firebaseService.deleteDocument('customers', customer.id);
+
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+
+        // Refresh the customer list
+        customerProvider.loadAllCustomers();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${customer.name} has been deleted')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete ${customer.name}: $e')),
+        );
+      }
+    }
   }
 
   void _showAddCustomerDialog(BuildContext context) {

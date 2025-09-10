@@ -446,4 +446,61 @@ class ServiceProvider with ChangeNotifier {
       }
     }
   }
+
+  // Availability checking for service booking
+  Future<List<DateTime>> getAvailableDates(String serviceId, {DateTime? startDate, int daysAhead = 30}) async {
+    final start = startDate ?? DateTime.now();
+    final end = start.add(Duration(days: daysAhead));
+    final availableDates = <DateTime>[];
+
+    // Mock availability logic - can be replaced with real API call
+    for (int i = 0; i <= daysAhead; i++) {
+      final date = start.add(Duration(days: i));
+      // Skip weekends for demo
+      if (date.weekday != DateTime.saturday && date.weekday != DateTime.sunday) {
+        availableDates.add(date);
+      }
+    }
+
+    return availableDates;
+  }
+
+  Future<List<String>> getAvailableTimeSlots(String serviceId, DateTime date) async {
+    final slots = [
+      '09:00 - 11:00', // Morning
+      '11:00 - 13:00', // Morning
+      '14:00 - 16:00', // Afternoon
+      '16:00 - 18:00', // Afternoon
+      '18:00 - 20:00', // Evening
+    ];
+
+    // Mock availability check - assume some slots are unavailable
+    final unavailableSlots = {
+      // Random unavailable slots for demo
+      date.weekday % 3 == 0 ? ['11:00 - 13:00'] : [],
+      date.weekday % 4 == 0 ? ['16:00 - 18:00'] : [],
+    }.expand((e) => e).toList();
+
+    return slots.where((slot) => !unavailableSlots.contains(slot)).toList();
+  }
+
+  Future<bool> checkSlotAvailability(String serviceId, DateTime date, String timeSlot) async {
+    final availableSlots = await getAvailableTimeSlots(serviceId, date);
+    return availableSlots.contains(timeSlot);
+  }
+
+  Future<Map<String, dynamic>> checkBusinessHours() async {
+    // Mock business hours - customizable
+    return {
+      'weekdays': {
+        'start': '09:00',
+        'end': '20:00',
+      },
+      'weekends': {
+        'start': '10:00',
+        'end': '18:00',
+      },
+      'holidays': [] // List of holiday dates
+    };
+  }
 }

@@ -83,7 +83,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           ],
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+            vertical: 16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -160,20 +163,23 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             Row(
               children: [
                 // Service Icon
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: _getServiceColor(_service.category).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: _getServiceColor(_service.category).withValues(alpha: 0.3),
+                Hero(
+                  tag: 'service-icon-${_service.id}',
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: _getServiceColor(_service.category).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: _getServiceColor(_service.category).withValues(alpha: 0.3),
+                      ),
                     ),
-                  ),
-                  child: Icon(
-                    _getServiceIcon(_service.category),
-                    color: _getServiceColor(_service.category),
-                    size: 30,
+                    child: Icon(
+                      _getServiceIcon(_service.category),
+                      color: _getServiceColor(_service.category),
+                      size: 30,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/product.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -8,6 +9,7 @@ import '../../providers/cart_provider.dart';
 import '../../utils/theme_constants.dart';
 import '../cart/cart_screen.dart';
 import 'product_edit_screen.dart';
+import 'product_detail_screen.dart';
 
 // Modern Product Catalog Screen with Enhanced Dynamic Sizing
 class ModernProductCatalogScreen extends StatefulWidget {
@@ -21,11 +23,15 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
+  bool _isGridView = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
+
+    // Load view mode preference
+    _loadViewModePreference();
 
     // Load products
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -50,6 +56,33 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadViewModePreference() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _isGridView = prefs.getBool('product_view_mode_grid') ?? false;
+      });
+    } catch (e) {
+      debugPrint('Error loading view mode preference: $e');
+    }
+  }
+
+  Future<void> _saveViewModePreference(bool isGrid) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('product_view_mode_grid', isGrid);
+    } catch (e) {
+      debugPrint('Error saving view mode preference: $e');
+    }
+  }
+
+  void _toggleViewMode() {
+    setState(() {
+      _isGridView = !_isGridView;
+    });
+    _saveViewModePreference(_isGridView);
   }
 
   @override
@@ -119,6 +152,15 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
               color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
             ),
             actions: [
+              // View Toggle Button
+              IconButton(
+                icon: Icon(
+                  _isGridView ? Icons.view_list : Icons.grid_view,
+                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                ),
+                onPressed: _toggleViewMode,
+                tooltip: _isGridView ? 'Switch to List View' : 'Switch to Grid View',
+              ),
               // Cart Icon with Badge
               Consumer<CartProvider>(
                 builder: (context, cartProvider, child) {
@@ -256,7 +298,18 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
                       : productProvider.products.isEmpty
                           ? _buildEmptyState(themeProvider)
                           : SafeArea(
-                              child: _buildProductsList(productProvider, themeProvider),
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                switchInCurve: Curves.easeInOut,
+                                switchOutCurve: Curves.easeInOut,
+                                transitionBuilder: (Widget child, Animation<double> animation) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                                child: _buildProductsList(productProvider, themeProvider),
+                              ),
                             ),
                 ),
               ),
@@ -306,14 +359,60 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
       return _buildEmptyState(themeProvider);
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: productProvider.products.length,
-      itemBuilder: (context, index) {
-        final product = productProvider.products[index];
-        return _buildProductCard(product);
-      },
-    );
+    if (_isGridView) {
+      // Grid View with Enhanced Constraints
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+      int crossAxisCount = 2; // Default for mobile
+      if (screenWidth >= 1200) {
+        crossAxisCount = 4; // Large desktop
+      } else if (screenWidth >= 900) {
+        crossAxisCount = 3; // Tablet/desktop
+      } else if (screenWidth >= 600) {
+        crossAxisCount = 3; // Small desktop
+      }
+
+      // Calculate responsive grid items per row and column
+      final int totalProducts = productProvider.products.length;
+      final int maxRowsVisible = screenWidth < 600 ? 4 : screenWidth < 1200 ? 5 : 6;
+      final int maxItemsVisible = crossAxisCount * maxRowsVisible;
+      final int effectiveItemCount = totalProducts > maxItemsVisible ? maxItemsVisible : totalProducts;
+
+      // Constrain grid height based on screen size and content
+      final double baseItemHeight = screenWidth < 600 ? 300 : screenWidth < 1200 ? 340 : 380;
+      final double gridHeight = baseItemHeight * (effectiveItemCount / crossAxisCount).ceil();
+
+      return ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: gridHeight.clamp(200, screenHeight * 0.7),
+        ),
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16),
+          physics: const BouncingScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: screenWidth < 600 ? 8 : 12,
+            mainAxisSpacing: screenWidth < 600 ? 8 : 12,
+            childAspectRatio: screenWidth < 600 ? 0.65 : screenWidth < 1200 ? 0.72 : 0.75,
+          ),
+          itemCount: totalProducts,
+          itemBuilder: (context, index) {
+            final product = productProvider.products[index];
+            return ModernProductCard(product: product, index: index);
+          },
+        ),
+      );
+    } else {
+      // List View
+      return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: productProvider.products.length,
+        itemBuilder: (context, index) {
+          final product = productProvider.products[index];
+          return _buildProductCard(product);
+        },
+      );
+    }
   }
 
   Widget _buildProductCard(Product product) {
@@ -336,7 +435,12 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {
-              // TODO: Navigate to product detail screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductDetailScreen(product: product),
+                ),
+              );
             },
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -362,11 +466,19 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
                                 child: Image.network(
                                   product.imageUrls.first,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(
+                                      Icons.inventory_2,
+                                      color: _getProductColor(product.category),
+                                      size: 24,
+                                    );
+                                  },
                                 ),
                               )
                             : Icon(
                                 Icons.inventory_2,
                                 color: _getProductColor(product.category),
+                                size: 24,
                               ),
                       ),
                       const SizedBox(width: 12),
@@ -381,6 +493,8 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -460,6 +574,8 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.primary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
                           Row(
@@ -672,36 +788,39 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              _buildStatChip(
-                '$totalProducts',
-                'Total Products',
-                Icons.inventory,
-                Colors.blue,
-              ),
-              const SizedBox(width: 12),
-              _buildStatChip(
-                '$activeProducts',
-                'Active',
-                Icons.check_circle,
-                Colors.green,
-              ),
-              const SizedBox(width: 12),
-              _buildStatChip(
-                '$popularProducts',
-                'Popular',
-                Icons.star,
-                Colors.amber,
-              ),
-              const SizedBox(width: 12),
-              _buildStatChip(
-                '$totalSold',
-                'Sold',
-                Icons.trending_up,
-                Colors.purple,
-              ),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildStatChip(
+                  '$totalProducts',
+                  'Total Products',
+                  Icons.inventory,
+                  Colors.blue,
+                ),
+                const SizedBox(width: 12),
+                _buildStatChip(
+                  '$activeProducts',
+                  'Active',
+                  Icons.check_circle,
+                  Colors.green,
+                ),
+                const SizedBox(width: 12),
+                _buildStatChip(
+                  '$popularProducts',
+                  'Popular',
+                  Icons.star,
+                  Colors.amber,
+                ),
+                const SizedBox(width: 12),
+                _buildStatChip(
+                  '$totalSold',
+                  'Sold',
+                  Icons.trending_up,
+                  Colors.purple,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -716,31 +835,40 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 4),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 100),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 10,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ],
               ),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

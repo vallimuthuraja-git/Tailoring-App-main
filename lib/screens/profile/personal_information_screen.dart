@@ -10,7 +10,8 @@ class PersonalInformationScreen extends StatefulWidget {
   const PersonalInformationScreen({super.key});
 
   @override
-  State<PersonalInformationScreen> createState() => _PersonalInformationScreenState();
+  State<PersonalInformationScreen> createState() =>
+      _PersonalInformationScreenState();
 }
 
 class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
@@ -18,6 +19,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   final _displayNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+
+  String? _selectedGender;
+  DateTime? _selectedDateOfBirth;
 
   bool _isLoading = false;
 
@@ -28,6 +32,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     _displayNameController.text = authProvider.userProfile?.displayName ?? '';
     _phoneController.text = authProvider.userProfile?.phoneNumber ?? '';
     _emailController.text = authProvider.userProfile?.email ?? '';
+    _selectedGender = authProvider.userProfile?.gender;
+    _selectedDateOfBirth = authProvider.userProfile?.dateOfBirth;
   }
 
   @override
@@ -77,7 +83,11 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final success = await authProvider.updateUserProfile(
       displayName: _displayNameController.text.trim(),
-      phoneNumber: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+      phoneNumber: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+      gender: _selectedGender,
+      dateOfBirth: _selectedDateOfBirth,
     );
 
     setState(() => _isLoading = false);
@@ -93,7 +103,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(authProvider.errorMessage ?? 'Failed to update personal information'),
+          content: Text(authProvider.errorMessage ??
+              'Failed to update personal information'),
           backgroundColor: Colors.red,
         ),
       );
@@ -167,7 +178,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                               ? LinearGradient(
                                   colors: [
                                     AppColors.primary.withValues(alpha: 0.8),
-                                    AppColors.primaryVariant.withValues(alpha: 0.9),
+                                    AppColors.primaryVariant
+                                        .withValues(alpha: 0.9),
                                   ],
                                 )
                               : const LinearGradient(
@@ -202,7 +214,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                   Text(
                                     'Keep your personal information up to date',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.9),
                                       fontSize: 14,
                                     ),
                                   ),
@@ -274,6 +287,180 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                 validator: _validatePhone,
                               ),
 
+                              const SizedBox(height: 20),
+
+                              // Gender Selection
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Gender',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: themeProvider.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: ['Male', 'Female', 'Other']
+                                        .map((gender) {
+                                      final isSelected =
+                                          _selectedGender == gender;
+                                      return ChoiceChip(
+                                        label: Text(gender),
+                                        selected: isSelected,
+                                        onSelected: (selected) {
+                                          if (selected) {
+                                            setState(() {
+                                              _selectedGender = gender;
+                                            });
+                                          }
+                                        },
+                                        backgroundColor:
+                                            themeProvider.isDarkMode
+                                                ? Colors.grey.shade800
+                                                : Colors.grey.shade100,
+                                        selectedColor: themeProvider.isDarkMode
+                                            ? AppColors.primary
+                                                .withValues(alpha: 0.2)
+                                            : AppColors.primary
+                                                .withValues(alpha: 0.2),
+                                        labelStyle: TextStyle(
+                                          color: isSelected
+                                              ? (themeProvider.isDarkMode
+                                                  ? AppColors.primary
+                                                  : AppColors.primary)
+                                              : (themeProvider.isDarkMode
+                                                  ? Colors.white70
+                                                  : Colors.black87),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Date of Birth Field
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Date of Birth',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: themeProvider.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  InkWell(
+                                    onTap: () async {
+                                      final DateTime? picked =
+                                          await showDatePicker(
+                                        context: context,
+                                        initialDate: _selectedDateOfBirth ??
+                                            DateTime.now().subtract(
+                                                const Duration(days: 365 * 18)),
+                                        firstDate: DateTime.now().subtract(
+                                            const Duration(days: 365 * 120)),
+                                        lastDate: DateTime.now().subtract(
+                                            const Duration(days: 365 * 0)),
+                                        builder: (context, child) {
+                                          return Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: themeProvider
+                                                      .isDarkMode
+                                                  ? ColorScheme.dark(
+                                                      primary:
+                                                          AppColors.primary,
+                                                      onPrimary: Colors.white,
+                                                      surface: themeProvider
+                                                              .isDarkMode
+                                                          ? Colors.grey.shade800
+                                                          : Colors.white,
+                                                      onSurface: themeProvider
+                                                              .isDarkMode
+                                                          ? Colors.white70
+                                                          : Colors.black87,
+                                                    )
+                                                  : ColorScheme.light(
+                                                      primary:
+                                                          AppColors.primary,
+                                                      onPrimary: Colors.white,
+                                                      surface: Colors.white,
+                                                      onSurface: Colors.black87,
+                                                    ),
+                                            ),
+                                            child: child!,
+                                          );
+                                        },
+                                      );
+                                      if (picked != null &&
+                                          picked != _selectedDateOfBirth) {
+                                        setState(() {
+                                          _selectedDateOfBirth = picked;
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: themeProvider.isDarkMode
+                                              ? Colors.white
+                                                  .withValues(alpha: 0.3)
+                                              : Colors.grey.shade400,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: themeProvider.isDarkMode
+                                            ? Colors.grey.shade800
+                                                .withValues(alpha: 0.5)
+                                            : Colors.grey.shade50,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today,
+                                            color: themeProvider.isDarkMode
+                                                ? Colors.white70
+                                                : Colors.grey.shade600,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              _selectedDateOfBirth != null
+                                                  ? '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'
+                                                  : 'Select your date of birth',
+                                              style: TextStyle(
+                                                color: _selectedDateOfBirth !=
+                                                        null
+                                                    ? (themeProvider.isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black87)
+                                                    : (themeProvider.isDarkMode
+                                                        ? Colors.white
+                                                            .withValues(
+                                                                alpha: 0.5)
+                                                        : Colors.grey.shade500),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
                               const SizedBox(height: 32),
 
                               // Role Display
@@ -281,7 +468,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: themeProvider.isDarkMode
-                                      ? Colors.blueGrey.shade800.withValues(alpha: 0.3)
+                                      ? Colors.blueGrey.shade800
+                                          .withValues(alpha: 0.3)
                                       : Colors.blue.shade50,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -293,7 +481,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                     ),
                                     const SizedBox(width: 12),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Account Role',
@@ -306,9 +495,11 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                           ),
                                         ),
                                         Text(
-                                          authProvider.userRole == UserRole.customer
+                                          authProvider.userRole ==
+                                                  UserRole.customer
                                               ? 'Customer'
-                                              : authProvider.userRole == UserRole.shopOwner
+                                              : authProvider.userRole ==
+                                                      UserRole.shopOwner
                                                   ? 'Esther (Owner)'
                                                   : 'Employee',
                                           style: TextStyle(
@@ -340,7 +531,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                     elevation: 2,
                                   ),
                                   child: _isLoading
-                                      ? const CircularProgressIndicator(color: Colors.white)
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white)
                                       : const Text(
                                           'Save Changes',
                                           style: TextStyle(
@@ -358,7 +550,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                 width: double.infinity,
                                 height: 50,
                                 child: OutlinedButton(
-                                  onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () => Navigator.of(context).pop(),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
                                       color: themeProvider.isDarkMode
@@ -444,8 +638,12 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final currentDisplayName = authProvider.userProfile?.displayName ?? '';
     final currentPhone = authProvider.userProfile?.phoneNumber ?? '';
+    final currentGender = authProvider.userProfile?.gender;
+    final currentDateOfBirth = authProvider.userProfile?.dateOfBirth;
 
     return currentDisplayName != _displayNameController.text ||
-           currentPhone != _phoneController.text;
+        currentPhone != _phoneController.text ||
+        currentGender != _selectedGender ||
+        currentDateOfBirth != _selectedDateOfBirth;
   }
 }

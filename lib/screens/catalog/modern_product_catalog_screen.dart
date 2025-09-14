@@ -6,9 +6,11 @@ import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/wishlist_provider.dart';
 import '../../utils/theme_constants.dart';
 import '../../utils/responsive_utils.dart';
 import '../cart/cart_screen.dart';
+import '../wishlist_screen.dart';
 import 'product_edit_screen.dart';
 import 'product_detail_screen.dart';
 
@@ -26,6 +28,9 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   bool _isGridView = false;
+  List<String> _searchSuggestions = [];
+  bool _showSuggestions = false;
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -246,119 +251,138 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
           drawer: ResponsiveUtils.isDesktop(context)
               ? _buildFilterDrawer(context, themeProvider)
               : null,
-          body: Column(
-            children: [
+          body: CustomScrollView(
+            slivers: [
+              // Hero Banner Section
+              SliverToBoxAdapter(
+                child: _buildHeroBanner(context, themeProvider),
+              ),
+
+              // Quick Action Buttons
+              SliverToBoxAdapter(
+                child: _buildQuickActions(context, themeProvider),
+              ),
+
+              // Deal Section
+              SliverToBoxAdapter(
+                child:
+                    _buildDealSection(context, productProvider, themeProvider),
+              ),
+
               // Category Tabs
-              Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: themeProvider.isDarkMode
-                      ? DarkAppColors.surface.withThemeOpacity(0.8)
-                      : AppColors.surface.withThemeOpacity(0.8),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
+              SliverToBoxAdapter(
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
                     color: themeProvider.isDarkMode
-                        ? DarkAppColors.onSurface.withThemeOpacity(0.1)
-                        : AppColors.onSurface.withThemeOpacity(0.1),
-                  ),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  indicator: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        themeProvider.isDarkMode
-                            ? DarkAppColors.primary
-                            : AppColors.primary,
-                        (themeProvider.isDarkMode
-                                ? DarkAppColors.primary
-                                : AppColors.primary)
-                            .withThemeOpacity(0.8),
-                      ],
+                        ? DarkAppColors.surface.withThemeOpacity(0.8)
+                        : AppColors.surface.withThemeOpacity(0.8),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface.withThemeOpacity(0.1)
+                          : AppColors.onSurface.withThemeOpacity(0.1),
                     ),
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: themeProvider.isDarkMode
-                      ? DarkAppColors.onSurface.withThemeOpacity(0.7)
-                      : AppColors.onSurface.withThemeOpacity(0.7),
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
+                  child: TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    indicator: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
+                          (themeProvider.isDarkMode
+                                  ? DarkAppColors.primary
+                                  : AppColors.primary)
+                              .withThemeOpacity(0.8),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface.withThemeOpacity(0.7)
+                        : AppColors.onSurface.withThemeOpacity(0.7),
+                    labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11,
+                    ),
+                    tabs: [
+                      _buildCategoryTab('All', Icons.apps),
+                      _buildCategoryTab('Men\'s', Icons.person),
+                      _buildCategoryTab('Women\'s', Icons.person_2),
+                      _buildCategoryTab('Kids', Icons.child_care),
+                      _buildCategoryTab('Formal', Icons.business_center),
+                      _buildCategoryTab('Alterations', Icons.content_cut),
+                    ],
+                    onTap: (index) {
+                      ProductCategory? category;
+                      switch (index) {
+                        case 1:
+                          category = ProductCategory.mensWear;
+                          break;
+                        case 2:
+                          category = ProductCategory.womensWear;
+                          break;
+                        case 3:
+                          category = ProductCategory.kidsWear;
+                          break;
+                        case 4:
+                          category = ProductCategory.formalWear;
+                          break;
+                        case 5:
+                          category = ProductCategory.alterations;
+                          break;
+                        default:
+                          category = null;
+                      }
+                      productProvider.filterByCategory(category);
+                    },
                   ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 11,
-                  ),
-                  tabs: [
-                    _buildCategoryTab('All', Icons.apps),
-                    _buildCategoryTab('Men\'s', Icons.person),
-                    _buildCategoryTab('Women\'s', Icons.person_2),
-                    _buildCategoryTab('Kids', Icons.child_care),
-                    _buildCategoryTab('Formal', Icons.business_center),
-                    _buildCategoryTab('Alterations', Icons.content_cut),
-                  ],
-                  onTap: (index) {
-                    ProductCategory? category;
-                    switch (index) {
-                      case 1:
-                        category = ProductCategory.mensWear;
-                        break;
-                      case 2:
-                        category = ProductCategory.womensWear;
-                        break;
-                      case 3:
-                        category = ProductCategory.kidsWear;
-                        break;
-                      case 4:
-                        category = ProductCategory.formalWear;
-                        break;
-                      case 5:
-                        category = ProductCategory.alterations;
-                        break;
-                      default:
-                        category = null;
-                    }
-                    productProvider.filterByCategory(category);
-                  },
                 ),
               ),
 
               // Stats Overview
-              _buildStatsOverview(),
+              SliverToBoxAdapter(
+                child: _buildStatsOverview(),
+              ),
 
               // Main Content
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(
-                      bottom:
-                          MediaQuery.of(context).size.width < 600 ? 90 : 80),
-                  child: productProvider.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : productProvider.products.isEmpty
-                          ? _buildEmptyState(context, themeProvider)
-                          : SafeArea(
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                switchInCurve: Curves.easeInOut,
-                                switchOutCurve: Curves.easeInOut,
-                                transitionBuilder: (Widget child,
-                                    Animation<double> animation) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                                child: _buildProductsList(
-                                    productProvider, themeProvider),
-                              ),
+              SliverPadding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).size.width < 600 ? 90 : 80),
+                sliver: productProvider.isLoading
+                    ? const SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()))
+                    : productProvider.products.isEmpty
+                        ? SliverToBoxAdapter(
+                            child: _buildEmptyState(context, themeProvider))
+                        : SliverToBoxAdapter(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              switchInCurve: Curves.easeInOut,
+                              switchOutCurve: Curves.easeInOut,
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                              child: _buildProductsList(
+                                  productProvider, themeProvider),
                             ),
-                ),
+                          ),
               ),
             ],
           ),
@@ -377,6 +401,425 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
               : null,
         );
       },
+    );
+  }
+
+  Widget _buildHeroBanner(BuildContext context, ThemeProvider themeProvider) {
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            themeProvider.isDarkMode
+                ? DarkAppColors.primary.withThemeOpacity(0.8)
+                : AppColors.primary.withThemeOpacity(0.8),
+            themeProvider.isDarkMode
+                ? DarkAppColors.primary.withThemeOpacity(0.6)
+                : AppColors.primary.withThemeOpacity(0.6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface.withThemeOpacity(0.1)
+                : AppColors.onSurface.withThemeOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Background Pattern
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.1,
+              child: Icon(
+                Icons.star,
+                size: 120,
+                color: Colors.white,
+              ),
+            ),
+          ),
+
+          // Content
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.local_offer,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Flash Sale',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Up to 70% off on premium fashion',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                  ),
+                ),
+                const Spacer(),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Navigate to deals
+                  },
+                  icon: const Icon(Icons.shopping_bag, size: 18),
+                  label: const Text('Shop Now'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: themeProvider.isDarkMode
+                        ? DarkAppColors.primary
+                        : AppColors.primary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context, ThemeProvider themeProvider) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          _buildQuickActionButton(
+            context,
+            Icons.favorite,
+            'Wishlist',
+            themeProvider,
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WishlistScreen()),
+            ),
+          ),
+          const SizedBox(width: 12),
+          _buildQuickActionButton(
+            context,
+            Icons.history,
+            'Recently Viewed',
+            themeProvider,
+            () {
+              // Navigate to recently viewed
+            },
+          ),
+          const SizedBox(width: 12),
+          _buildQuickActionButton(
+            context,
+            Icons.local_shipping,
+            'Track Order',
+            themeProvider,
+            () {
+              // Navigate to orders
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    ThemeProvider themeProvider,
+    VoidCallback onTap,
+  ) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface.withThemeOpacity(0.1)
+                  : AppColors.onSurface.withThemeOpacity(0.1),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
+                size: 24,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDealSection(BuildContext context,
+      ProductProvider productProvider, ThemeProvider themeProvider) {
+    final flashSaleProducts = productProvider.products
+        .where((product) =>
+            product.isOnSale &&
+            product.discountPercentage != null &&
+            product.discountPercentage! > 0)
+        .take(6)
+        .toList();
+
+    if (flashSaleProducts.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Icon(
+                Icons.flash_on,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Flash Sale',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  // View all deals
+                },
+                child: Text(
+                  'View All',
+                  style: TextStyle(
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.primary
+                        : AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: flashSaleProducts.length,
+            itemBuilder: (context, index) {
+              final product = flashSaleProducts[index];
+              return Container(
+                width: 140,
+                margin: const EdgeInsets.only(right: 12),
+                child: _buildDealCard(product, themeProvider),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDealCard(Product product, ThemeProvider themeProvider) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(product: product),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.surface
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface.withThemeOpacity(0.1)
+                : AppColors.onSurface.withThemeOpacity(0.1),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: product.imageUrls.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        child: Image.network(
+                          product.imageUrls.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.background
+                                  : AppColors.background,
+                              child: Icon(
+                                Icons.inventory_2,
+                                color: themeProvider.isDarkMode
+                                    ? DarkAppColors.onSurface
+                                        .withThemeOpacity(0.3)
+                                    : AppColors.onSurface.withThemeOpacity(0.3),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.background
+                            : AppColors.background,
+                        child: Icon(
+                          Icons.inventory_2,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface.withThemeOpacity(0.3)
+                              : AppColors.onSurface.withThemeOpacity(0.3),
+                        ),
+                      ),
+              ),
+            ),
+
+            // Product Info
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface
+                          : AppColors.onSurface,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        '₹${product.basePrice.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
+                        ),
+                      ),
+                      if (product.originalPrice != null) ...[
+                        const SizedBox(width: 4),
+                        Text(
+                          '₹${product.originalPrice!.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            decoration: TextDecoration.lineThrough,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface.withThemeOpacity(0.6)
+                                : AppColors.onSurface.withThemeOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  if (product.discountPercentage != null) ...[
+                    Container(
+                      margin: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${product.discountPercentage!.toStringAsFixed(0)}% OFF',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red.shade800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -588,6 +1031,30 @@ class _ModernProductCatalogScreenState extends State<ModernProductCatalogScreen>
       // Refresh products after returning from edit screen
       _loadProducts();
     });
+  }
+
+  void _navigateToEditProduct(BuildContext context, Product? product) {
+    if (product == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProductEditScreen(),
+        ),
+      ).then((_) {
+        // Refresh products after returning from add screen
+        _loadProducts();
+      });
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProductEditScreen(product: product),
+        ),
+      ).then((_) {
+        // Refresh products after returning from edit screen
+        _loadProducts();
+      });
+    }
   }
 }
 
@@ -1461,9 +1928,12 @@ class _ModernProductCardState extends State<ModernProductCard>
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final cartProvider = Provider.of<CartProvider>(context);
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
     final isShopOwner = authProvider.isShopOwnerOrAdmin;
     final isInCart = cartProvider.isInCart(widget.product.id);
+    final isInWishlist =
+        wishlistProvider.isServiceInWishlist(widget.product.id);
 
     // Content density analysis for dynamic sizing
     final bool hasBrand = widget.product.brand.isNotEmpty;
@@ -1736,7 +2206,48 @@ class _ModernProductCardState extends State<ModernProductCard>
                           ),
                         ),
 
-                      // Edit Button (Shop Owner only) - Safe Positioned
+                      // Wishlist Button - Top Right
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: EdgeInsets.all(getResponsivePadding(6)),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withThemeOpacity(0.95),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withThemeOpacity(0.15),
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              isInWishlist
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              size: getResponsiveIconSize(16),
+                              color: isInWishlist
+                                  ? Colors.red
+                                  : (themeProvider.isDarkMode
+                                      ? DarkAppColors.onSurface
+                                          .withThemeOpacity(0.7)
+                                      : AppColors.onSurface
+                                          .withThemeOpacity(0.7)),
+                            ),
+                            onPressed: () => _toggleWishlist(context),
+                            padding: EdgeInsets.zero,
+                            constraints: BoxConstraints(
+                              minWidth: getResponsiveIconSize(24),
+                              minHeight: getResponsiveIconSize(24),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Edit Button (Shop Owner only) - Bottom Right
                       if (isShopOwner)
                         Positioned(
                           bottom: 8,
@@ -1762,7 +2273,10 @@ class _ModernProductCardState extends State<ModernProductCard>
                                     ? DarkAppColors.primary
                                     : AppColors.primary,
                               ),
-                              onPressed: () => _navigateToEditProduct(context),
+                              onPressed: () =>
+                                  _ModernProductCatalogScreenState()
+                                      ._navigateToEditProduct(
+                                          context, widget.product),
                               padding: EdgeInsets.zero,
                               constraints: BoxConstraints(
                                 minWidth: getResponsiveIconSize(24),
@@ -2102,11 +2616,11 @@ class _ModernProductCardState extends State<ModernProductCard>
     );
   }
 
-  void _navigateToEditProduct(BuildContext context) {
+  void _navigateToEditProduct(BuildContext context, Product product) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductEditScreen(product: widget.product),
+        builder: (context) => ProductEditScreen(product: product),
       ),
     ).then((_) {
       // Refresh the product list after editing
@@ -2194,6 +2708,72 @@ class _ModernProductCardState extends State<ModernProductCard>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('An error occurred while adding to cart'),
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void _toggleWishlist(BuildContext context) async {
+    try {
+      final wishlistProvider =
+          Provider.of<WishlistProvider>(context, listen: false);
+      final success = await wishlistProvider.toggleWishlist(widget.product.id);
+
+      if (context.mounted) {
+        if (success) {
+          final isInWishlist =
+              wishlistProvider.isServiceInWishlist(widget.product.id);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    isInWishlist ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      isInWishlist
+                          ? '${widget.product.name} added to wishlist!'
+                          : '${widget.product.name} removed from wishlist!',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: isInWishlist ? Colors.red : Colors.grey,
+              duration: const Duration(seconds: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  wishlistProvider.errorMessage ?? 'Failed to update wishlist'),
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        debugPrint('Error toggling wishlist: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('An error occurred while updating wishlist'),
             backgroundColor: Colors.red,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),

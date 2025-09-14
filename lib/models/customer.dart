@@ -8,6 +8,7 @@ class Customer {
   final String email;
   final String phone;
   final String? photoUrl;
+  final String? gender;
   final Map<String, dynamic> measurements;
   final List<String> preferences;
   final DateTime createdAt;
@@ -22,6 +23,7 @@ class Customer {
     required this.email,
     required this.phone,
     this.photoUrl,
+    this.gender,
     required this.measurements,
     required this.preferences,
     required this.createdAt,
@@ -38,6 +40,7 @@ class Customer {
       email: json['email'],
       phone: json['phone'],
       photoUrl: json['photoUrl'],
+      gender: json['gender'],
       measurements: Map<String, dynamic>.from(json['measurements'] ?? {}),
       preferences: List<String>.from(json['preferences'] ?? []),
       createdAt: json['createdAt'] is Timestamp
@@ -59,6 +62,7 @@ class Customer {
       'email': email,
       'phone': phone,
       'photoUrl': photoUrl,
+      'gender': gender,
       'measurements': measurements,
       'preferences': preferences,
       'createdAt': createdAt.toIso8601String(),

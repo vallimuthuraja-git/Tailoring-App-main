@@ -18,26 +18,143 @@ import 'screens/ai/ai_assistance_screen.dart';
 import 'services/setup_demo_users.dart';
 import 'services/setup_demo_employees.dart';
 import 'widgets/theme_toggle_widget.dart';
+import 'widgets/loading_splash_screen.dart';
+
+// Initialization provider to manage app startup state
+class InitializationProvider extends ChangeNotifier {
+  bool _isInitialized = false;
+  bool _hasError = false;
+  String? _errorMessage;
+  String? _errorDetails;
+  double _progress = 0.0;
+  String? _currentStep;
+
+  bool get isInitialized => _isInitialized;
+  bool get hasError => _hasError;
+  String? get errorMessage => _errorMessage;
+  String? get errorDetails => _errorDetails;
+  double get progress => _progress;
+  String? get currentStep => _currentStep;
+
+  void updateProgress(double progress, String step) {
+    _progress = progress;
+    _currentStep = step;
+    notifyListeners();
+  }
+
+  void setError(String message, String? details) {
+    _hasError = true;
+    _errorMessage = message;
+    _errorDetails = details;
+    notifyListeners();
+  }
+
+  void setInitialized() {
+    _isInitialized = true;
+    notifyListeners();
+  }
+
+  void retry() {
+    _hasError = false;
+    _errorMessage = null;
+    _errorDetails = null;
+    _progress = 0.0;
+    _currentStep = null;
+    notifyListeners();
+  }
+}
+
+Future<void> initializeApp(InitializationProvider initProvider) async {
+  try {
+    // Start initialization
+    initProvider.updateProgress(0.1, 'Initializing Flutter...');
+
+    // Initialize Firebase
+    initProvider.updateProgress(0.3, 'Connecting to Firebase...');
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Setup demo users if needed
+    initProvider.updateProgress(0.6, 'Setting up demo users...');
+    await setupDemoUsers();
+
+    // Setup demo employees if needed
+    initProvider.updateProgress(0.9, 'Setting up demo employees...');
+    await setupDemoEmployees();
+
+    // Mark as initialized
+    initProvider.updateProgress(1.0, 'Ready!');
+    initProvider.setInitialized();
+  } catch (error, stackTrace) {
+    // Handle initialization errors
+    initProvider.setError(
+      'Failed to initialize application',
+      'Error: $error\n\nStack trace: $stackTrace',
+    );
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase (only once here)
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // Set up global error boundary for Flutter framework errors
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Oops! Something went wrong',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Error: ${details.exception}',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Restart the app
+                  runApp(const MyApp());
+                },
+                child: const Text('Restart App'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  };
 
-  // Setup demo users if needed
-  await setupDemoUsers();
+  // Create initialization provider
+  final initProvider = InitializationProvider();
 
-  // Setup demo employees if needed
-  await setupDemoEmployees();
+  // Start initialization
+  await initializeApp(initProvider);
 
-  runApp(const MyApp());
+  runApp(MyApp(initializationProvider: initProvider));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final InitializationProvider? initializationProvider;
+
+  const MyApp({super.key, this.initializationProvider});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -45,11 +162,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final ThemeProvider _themeProvider;
+  late final InitializationProvider _initProvider;
 
   @override
   void initState() {
     super.initState();
     _themeProvider = ThemeProvider();
+    _initProvider = widget.initializationProvider ?? InitializationProvider();
     _initializeTheme();
   }
 
@@ -62,6 +181,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: _initProvider),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
@@ -111,8 +231,25 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, child) {
+    return Consumer2<InitializationProvider, AuthProvider>(
+      builder: (context, initProvider, authProvider, child) {
+        // Show initialization splash screen if not initialized or has error
+        if (!initProvider.isInitialized || initProvider.hasError) {
+          return LoadingSplashScreen(
+            progress: initProvider.progress,
+            currentStep: initProvider.currentStep,
+            errorMessage: initProvider.errorMessage,
+            errorDetails: initProvider.errorDetails,
+            onRetry: initProvider.hasError
+                ? () async {
+                    initProvider.retry();
+                    // Restart initialization
+                    await initializeApp(initProvider);
+                  }
+                : null,
+          );
+        }
+
         // Show loading while checking authentication state
         if (authProvider.isLoading) {
           return const Scaffold(
@@ -122,7 +259,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
-                  Text('Initializing...'),
+                  Text('Checking authentication...'),
                 ],
               ),
             ),
@@ -172,12 +309,12 @@ class HomePage extends StatelessWidget {
                 border: Border.all(color: Colors.blue.shade200),
               ),
               child: const Column(
-               children: [
-                 Icon(
-                   Icons.design_services,
-                   size: 64,
-                   color: Colors.blue,
-                 ),
+                children: [
+                  Icon(
+                    Icons.design_services,
+                    size: 64,
+                    color: Colors.blue,
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'Welcome to Your',
@@ -339,13 +476,15 @@ class HomePage extends StatelessWidget {
                   title: 'Browse Products',
                   subtitle: 'View our catalog',
                   icon: Icons.shopping_bag,
-                  onPressed: () => _showMessage(context, 'Product catalog feature coming soon!'),
+                  onPressed: () => _showMessage(
+                      context, 'Product catalog feature coming soon!'),
                 ),
                 _ActionButton(
                   title: 'View Orders',
                   subtitle: 'Track your orders',
                   icon: Icons.receipt,
-                  onPressed: () => _showMessage(context, 'Order management feature coming soon!'),
+                  onPressed: () => _showMessage(
+                      context, 'Order management feature coming soon!'),
                 ),
                 _ActionButton(
                   title: 'AI Assistant',
@@ -357,7 +496,8 @@ class HomePage extends StatelessWidget {
                   title: 'Dashboard',
                   subtitle: 'View analytics',
                   icon: Icons.dashboard,
-                  onPressed: () => _showMessage(context, 'Dashboard feature coming soon!'),
+                  onPressed: () =>
+                      _showMessage(context, 'Dashboard feature coming soon!'),
                 ),
               ],
             ),

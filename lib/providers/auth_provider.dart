@@ -78,6 +78,8 @@ class AuthProvider with ChangeNotifier {
     String? displayName,
     String? phoneNumber,
     UserRole role = UserRole.customer,
+    String? gender,
+    DateTime? dateOfBirth,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -91,6 +93,8 @@ class AuthProvider with ChangeNotifier {
         displayName: displayName,
         phoneNumber: phoneNumber,
         role: role,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
       );
 
       _user = userCredential.user;
@@ -372,6 +376,8 @@ class AuthProvider with ChangeNotifier {
     String? displayName,
     String? phoneNumber,
     String? photoUrl,
+    String? gender,
+    DateTime? dateOfBirth,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -381,6 +387,8 @@ class AuthProvider with ChangeNotifier {
         displayName: displayName,
         phoneNumber: phoneNumber,
         photoUrl: photoUrl,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
       );
 
       // Reload user profile

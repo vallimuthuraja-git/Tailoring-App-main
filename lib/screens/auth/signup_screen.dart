@@ -37,6 +37,10 @@ class _SignupScreenState extends State<SignupScreen>
   final _cityController = TextEditingController();
   final _pincodeController = TextEditingController();
 
+  // State variables for gender and date of birth
+  String? _selectedGender;
+  DateTime? _selectedDateOfBirth;
+
   // State variables
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -1013,6 +1017,148 @@ class _SignupScreenState extends State<SignupScreen>
 
         const SizedBox(height: 24),
 
+        // Gender Selection
+        Text(
+          'Gender',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          ),
+        ),
+
+        SizedBox(height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: ['Male', 'Female', 'Other'].map((gender) {
+            final isSelected = _selectedGender == gender;
+            return ChoiceChip(
+              label: Text(gender),
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() {
+                    _selectedGender = gender;
+                  });
+                }
+              },
+              backgroundColor:
+                  isDarkMode ? DarkAppColors.surface : AppColors.surface,
+              selectedColor: isDarkMode
+                  ? DarkAppColors.primary.withValues(alpha: 0.2)
+                  : AppColors.primary.withValues(alpha: 0.2),
+              labelStyle: TextStyle(
+                color: isSelected
+                    ? (isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                    : (isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Date of Birth Field
+        Text(
+          'Date of Birth',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          ),
+        ),
+
+        SizedBox(height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+
+        InkWell(
+          onTap: () async {
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: _selectedDateOfBirth ??
+                  DateTime.now().subtract(const Duration(days: 365 * 18)),
+              firstDate:
+                  DateTime.now().subtract(const Duration(days: 365 * 120)),
+              lastDate: DateTime.now().subtract(const Duration(days: 365 * 0)),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: isDarkMode
+                        ? ColorScheme.dark(
+                            primary: DarkAppColors.primary,
+                            onPrimary: DarkAppColors.onPrimary,
+                            surface: DarkAppColors.surface,
+                            onSurface: DarkAppColors.onSurface,
+                          )
+                        : ColorScheme.light(
+                            primary: AppColors.primary,
+                            onPrimary: AppColors.onPrimary,
+                            surface: AppColors.surface,
+                            onSurface: AppColors.onSurface,
+                          ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (picked != null && picked != _selectedDateOfBirth) {
+              setState(() {
+                _selectedDateOfBirth = picked;
+              });
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.all(
+                ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                    : AppColors.onSurface.withValues(alpha: 0.3),
+              ),
+              borderRadius: BorderRadius.circular(16),
+              color: themeProvider.isGlassyMode
+                  ? Colors.transparent
+                  : (isDarkMode
+                      ? DarkAppColors.surface.withValues(alpha: 0.8)
+                      : AppColors.surface.withValues(alpha: 0.8)),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                      : AppColors.onSurface.withValues(alpha: 0.7),
+                ),
+                SizedBox(
+                    width: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+                Expanded(
+                  child: Text(
+                    _selectedDateOfBirth != null
+                        ? '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'
+                        : 'Select your date of birth',
+                    style: TextStyle(
+                      color: _selectedDateOfBirth != null
+                          ? (isDarkMode
+                              ? DarkAppColors.onSurface
+                              : AppColors.onSurface)
+                          : (isDarkMode
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                              : AppColors.onSurface.withValues(alpha: 0.5)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
         // First Name Field
         TextFormField(
           controller: _firstNameController,
@@ -1705,6 +1851,20 @@ class _SignupScreenState extends State<SignupScreen>
     final formKey = GlobalKey<FormState>();
     bool isValid = true;
 
+    if (_selectedGender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select your gender')),
+      );
+      isValid = false;
+    }
+
+    if (_selectedDateOfBirth == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select your date of birth')),
+      );
+      isValid = false;
+    }
+
     if (_firstNameController.text.isEmpty ||
         _firstNameController.text.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1970,6 +2130,8 @@ class _SignupScreenState extends State<SignupScreen>
         phoneNumber: _phoneNumber?.completeNumber ?? '',
         displayName: '${_firstNameController.text} ${_lastNameController.text}',
         role: _convertUserRole(_selectedRole),
+        gender: _selectedGender,
+        dateOfBirth: _selectedDateOfBirth,
       );
 
       if (success && mounted) {

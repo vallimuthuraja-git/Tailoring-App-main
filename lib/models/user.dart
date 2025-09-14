@@ -11,6 +11,8 @@ class UserModel {
   final bool isEmailVerified;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? gender;
+  final DateTime? dateOfBirth;
 
   const UserModel({
     required this.id,
@@ -22,6 +24,8 @@ class UserModel {
     required this.isEmailVerified,
     required this.createdAt,
     required this.updatedAt,
+    this.gender,
+    this.dateOfBirth,
   });
 
   // Factory constructor to create UserModel from JSON (Firestore data)
@@ -43,6 +47,12 @@ class UserModel {
       updatedAt: json['updatedAt'] is DateTime
           ? json['updatedAt']
           : DateTime.parse(json['updatedAt'] as String),
+      gender: json['gender'] as String?,
+      dateOfBirth: json['dateOfBirth'] != null
+          ? (json['dateOfBirth'] is DateTime
+              ? json['dateOfBirth']
+              : DateTime.parse(json['dateOfBirth'] as String))
+          : null,
     );
   }
 
@@ -58,6 +68,8 @@ class UserModel {
       'isEmailVerified': isEmailVerified,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      if (gender != null) 'gender': gender,
+      if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
     };
   }
 
@@ -72,6 +84,8 @@ class UserModel {
     bool? isEmailVerified,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? gender,
+    DateTime? dateOfBirth,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -83,6 +97,8 @@ class UserModel {
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      gender: gender ?? this.gender,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
     );
   }
 

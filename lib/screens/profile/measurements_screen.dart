@@ -5,6 +5,7 @@ import '../../providers/customer_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
 import '../../widgets/common_app_bar_actions.dart';
+import 'measurements_3d_screen.dart';
 
 class MeasurementsScreen extends StatefulWidget {
   const MeasurementsScreen({super.key});
@@ -26,7 +27,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
 
   Future<void> _loadMeasurements() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     if (authProvider.userProfile?.id != null) {
       setState(() => _isLoading = true);
@@ -35,8 +37,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
 
       setState(() {
         _measurements = Map<String, dynamic>.from(
-          customerProvider.currentCustomer?.measurements ?? {}
-        );
+            customerProvider.currentCustomer?.measurements ?? {});
         _isLoading = false;
         _isInitialized = true;
       });
@@ -48,7 +49,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
 
     setState(() => _isLoading = true);
 
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final success = await customerProvider.updateMeasurements(_measurements);
 
     setState(() => _isLoading = false);
@@ -63,7 +65,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(customerProvider.errorMessage ?? 'Failed to save measurements'),
+          content: Text(
+              customerProvider.errorMessage ?? 'Failed to save measurements'),
           backgroundColor: Colors.red,
         ),
       );
@@ -112,6 +115,17 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
             onPressed: _isLoading ? null : _saveMeasurements,
             child: const Text('Save'),
           ),
+          IconButton(
+            icon: const Icon(Icons.view_in_ar),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const Measurements3DScreen()),
+              );
+            },
+            tooltip: '3D View',
+          ),
           // Common app bar actions
           const CommonAppBarActions(
             showLogout: true,
@@ -159,7 +173,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                               ? LinearGradient(
                                   colors: [
                                     AppColors.primary.withValues(alpha: 0.8),
-                                    AppColors.primaryVariant.withValues(alpha: 0.9),
+                                    AppColors.primaryVariant
+                                        .withValues(alpha: 0.9),
                                   ],
                                 )
                               : const LinearGradient(
@@ -194,7 +209,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                                   Text(
                                     'Keep your measurements up to date for perfect fittings',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.9),
                                       fontSize: 14,
                                     ),
                                   ),
@@ -212,7 +228,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                         (category) => _buildMeasurementSection(
                           category.key,
                           category.value,
-                          CustomerProvider.standardMeasurements[category.key] ?? {},
+                          CustomerProvider.standardMeasurements[category.key] ??
+                              {},
                           themeProvider,
                         ),
                       ),
@@ -235,7 +252,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                               elevation: 2,
                             ),
                             child: _isLoading
-                                ? const CircularProgressIndicator(color: Colors.white)
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
                                 : const Text(
                                     'Save Measurements',
                                     style: TextStyle(
@@ -345,10 +363,10 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
             ),
             const SizedBox(height: 16),
             ...measurements.entries.map((measurement) => _buildMeasurementField(
-              measurement.key,
-              measurement.value,
-              themeProvider,
-            )),
+                  measurement.key,
+                  measurement.value,
+                  themeProvider,
+                )),
           ],
         ),
       ),
@@ -408,7 +426,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: 'Enter measurement (inches)',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 14),
                       border: InputBorder.none,
                       hintStyle: TextStyle(
                         color: themeProvider.isDarkMode
@@ -433,7 +452,8 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   child: Text(
                     'inches',
                     style: TextStyle(
@@ -460,8 +480,10 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
   bool _hasUnsavedChanges() {
     if (!_isInitialized) return false;
 
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
-    final currentMeasurements = customerProvider.currentCustomer?.measurements ?? {};
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    final currentMeasurements =
+        customerProvider.currentCustomer?.measurements ?? {};
 
     // Check if any measurement has changed
     for (final key in _measurements.keys) {

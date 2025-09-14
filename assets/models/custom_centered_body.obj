@@ -1,0 +1,99 @@
+# Custom centered body model with center at (0,0,0)
+# Torso centered at origin, head above, legs below
+
+# Torso vertices (box from y=-0.5 to y=0.5, centered at (0,0,0))
+v -0.2 0.5 0.1
+v 0.2 0.5 0.1
+v 0.2 -0.5 0.1
+v -0.2 -0.5 0.1
+v -0.2 0.5 -0.1
+v 0.2 0.5 -0.1
+v 0.2 -0.5 -0.1
+v -0.2 -0.5 -0.1
+
+# Head vertices (centered at (0,0.8,0))
+v 0 0.8 0
+v 0.15 0.7 0
+v -0.15 0.7 0
+v 0 0.7 0.15
+v 0 0.7 -0.15
+v 0 0.6 0
+
+# Left arm vertices
+v -0.4 0.3 0
+v -0.4 0.1 0
+v -0.4 0.3 0.05
+v -0.4 0.1 0.05
+v -0.4 0.3 -0.05
+v -0.4 0.1 -0.05
+
+# Right arm vertices
+v 0.4 0.3 0
+v 0.4 0.1 0
+v 0.4 0.3 0.05
+v 0.4 0.1 0.05
+v 0.4 0.3 -0.05
+v 0.4 0.1 -0.05
+
+# Left leg vertices
+v -0.1 -0.5 -0.05
+v -0.1 -0.9 -0.05
+v -0.1 -0.5 0.05
+v -0.1 -0.9 0.05
+
+# Right leg vertices
+v 0.1 -0.5 -0.05
+v 0.1 -0.9 -0.05
+v 0.1 -0.5 0.05
+v 0.1 -0.9 0.05
+
+# Torso faces
+f 1 2 3 4
+f 8 7 6 5
+f 4 3 7 8
+f 2 1 5 6
+f 1 2 6 5
+f 4 8 7 3
+
+# Head faces (approximated)
+f 9 10 11
+f 9 12 13
+f 9 10 12
+f 9 11 13
+f 9 12 14
+f 9 13 14
+f 10 11 14
+f 10 12 14
+f 11 13 14
+
+# Left arm faces
+f 15 16 18 17
+f 19 20 22 21
+f 17 18 20 19
+f 15 16 22 21
+f 15 17 21 19
+f 16 18 22 20
+
+# Right arm faces
+f 23 24 26 25
+f 27 28 30 29
+f 25 26 28 27
+f 23 24 30 29
+f 23 25 29 27
+f 24 26 30 28
+
+# Left leg faces
+f 31 32 34 33
+f 35 36 38 37
+f 33 34 36 35
+f 31 32 38 37
+f 31 33 37 35
+f 32 34 38 36
+
+# Right leg faces
+f 39 40 42 41
+f 43 44 46 45
+f 41 42 44 43
+f 39 40 46 45
+f 39 41 45 43
+f 40 42 46 44

@@ -27,6 +27,7 @@ dependencies:
   intl_phone_field: ^3.2.0
   google_sign_in: ^6.2.1
   flutter_facebook_auth: ^7.0.1
+  flutter_cube: ^0.1.0
 
   # Offline Storage & Sync
   sqflite: ^2.4.1
@@ -45,6 +46,9 @@ device_info_plus: ^11.2.0
 # Loading Animations
 shimmer: ^3.0.0
 
+# Carousel for banners
+carousel_slider: ^5.0.0
+
 # Platform-specific packages (updated versions)
 characters: ^1.4.1
 lints: ^6.0.0
@@ -62,3 +66,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/models/

@@ -25,6 +25,8 @@ class UserModel {
   final bool isEmailVerified;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? gender;
+  final DateTime? dateOfBirth;
 
   UserModel({
     required this.id,
@@ -36,6 +38,8 @@ class UserModel {
     required this.isEmailVerified,
     required this.createdAt,
     required this.updatedAt,
+    this.gender,
+    this.dateOfBirth,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -49,6 +53,10 @@ class UserModel {
       isEmailVerified: json['isEmailVerified'] ?? false,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      gender: json['gender'],
+      dateOfBirth: json['dateOfBirth'] != null
+          ? DateTime.parse(json['dateOfBirth'])
+          : null,
     );
   }
 
@@ -63,6 +71,8 @@ class UserModel {
       'isEmailVerified': isEmailVerified,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      if (gender != null) 'gender': gender,
+      if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
     };
   }
 }
@@ -84,6 +94,8 @@ class AuthService {
     String? displayName,
     String? phoneNumber,
     UserRole role = UserRole.customer,
+    String? gender,
+    DateTime? dateOfBirth,
   }) async {
     try {
       UserCredential userCredential =
@@ -98,7 +110,13 @@ class AuthService {
       }
 
       // Create user profile in Firestore
-      await _createUserProfile(userCredential.user!, role, phoneNumber);
+      await _createUserProfile(
+        userCredential.user!,
+        role,
+        phoneNumber,
+        gender,
+        dateOfBirth,
+      );
 
       return userCredential;
     } catch (e) {
@@ -300,6 +318,8 @@ class AuthService {
     String? displayName,
     String? phoneNumber,
     String? photoUrl,
+    String? gender,
+    DateTime? dateOfBirth,
   }) async {
     try {
       User? user = _auth.currentUser;
@@ -316,6 +336,8 @@ class AuthService {
           if (displayName != null) 'displayName': displayName,
           if (phoneNumber != null) 'phoneNumber': phoneNumber,
           if (photoUrl != null) 'photoUrl': photoUrl,
+          if (gender != null) 'gender': gender,
+          if (dateOfBirth != null) 'dateOfBirth': dateOfBirth.toIso8601String(),
           'updatedAt': DateTime.now().toIso8601String(),
         });
       }
@@ -374,7 +396,7 @@ class AuthService {
 
   // Create user profile in Firestore
   Future<void> _createUserProfile(User user, UserRole role,
-      [String? phoneNumber]) async {
+      [String? phoneNumber, String? gender, DateTime? dateOfBirth]) async {
     UserModel userModel = UserModel(
       id: user.uid,
       email: user.email!,
@@ -385,6 +407,8 @@ class AuthService {
       isEmailVerified: user.emailVerified,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      gender: gender,
+      dateOfBirth: dateOfBirth,
     );
 
     await _firestore.collection('users').doc(user.uid).set(userModel.toJson());
@@ -392,7 +416,7 @@ class AuthService {
 
   // Public method to create/update user profile
   Future<void> createUserProfile(User user, UserRole role,
-      [String? phoneNumber]) async {
+      [String? phoneNumber, String? gender, DateTime? dateOfBirth]) async {
     UserModel userModel = UserModel(
       id: user.uid,
       email: user.email ?? '',
@@ -403,6 +427,8 @@ class AuthService {
       isEmailVerified: user.emailVerified,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      gender: gender,
+      dateOfBirth: dateOfBirth,
     );
 
     await _firestore.collection('users').doc(user.uid).set(userModel.toJson());

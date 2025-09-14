@@ -1,16 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 enum UserRole {
   customer,
   shopOwner,
   admin,
   employee,
-  tailor,      // Master tailor/couturier
-  cutter,      // Fabric cutting specialist
-  finisher,    // Final touches and quality control
-  supervisor,  // Team supervisor/manager
-  apprentice   // Training/new employee
+  tailor, // Master tailor/couturier
+  cutter, // Fabric cutting specialist
+  finisher, // Final touches and quality control
+  supervisor, // Team supervisor/manager
+  apprentice // Training/new employee
 }
 
 class UserModel {
@@ -84,7 +86,8 @@ class AuthService {
     UserRole role = UserRole.customer,
   }) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -115,7 +118,8 @@ class AuthService {
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Auto-verification (for Android devices with SMS retriever)
-          UserCredential userCredential = await _auth.signInWithCredential(credential);
+          UserCredential userCredential =
+              await _auth.signInWithCredential(credential);
           onVerified(userCredential);
         },
         verificationFailed: (FirebaseAuthException e) {
@@ -144,7 +148,8 @@ class AuthService {
         smsCode: smsCode,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       return userCredential;
     } catch (e) {
       throw _handleAuthError(e);
@@ -197,9 +202,69 @@ class AuthService {
     }
   }
 
+  // Sign in with Google
+  Future<UserCredential> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      // Check if user profile exists, if not create one
+      final existingProfile = await getUserProfile(userCredential.user!.uid);
+      if (existingProfile == null) {
+        await _createUserProfile(userCredential.user!, UserRole.customer);
+      }
+
+      return userCredential;
+    } catch (e) {
+      throw _handleAuthError(e);
+    }
+  }
+
+  // Sign in with Facebook
+  Future<UserCredential> signInWithFacebook() async {
+    try {
+      // Trigger the sign-in flow
+      final LoginResult loginResult = await FacebookAuth.instance.login();
+
+      // Create a credential from the access token
+      final OAuthCredential facebookAuthCredential =
+          FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
+
+      // Once signed in, return the UserCredential
+      UserCredential userCredential =
+          await _auth.signInWithCredential(facebookAuthCredential);
+
+      // Check if user profile exists, if not create one
+      final existingProfile = await getUserProfile(userCredential.user!.uid);
+      if (existingProfile == null) {
+        await _createUserProfile(userCredential.user!, UserRole.customer);
+      }
+
+      return userCredential;
+    } catch (e) {
+      throw _handleAuthError(e);
+    }
+  }
+
   // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
+    await GoogleSignIn().signOut();
+    await FacebookAuth.instance.logOut();
   }
 
   // Password reset
@@ -263,17 +328,21 @@ class AuthService {
   Future<UserModel?> getUserProfile(String userId) async {
     try {
       print('🔍 Fetching user profile for ID: $userId');
-      DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(userId).get();
       if (doc.exists) {
-        final userModel = UserModel.fromJson(doc.data() as Map<String, dynamic>);
-        print('✅ User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
+        final userModel =
+            UserModel.fromJson(doc.data() as Map<String, dynamic>);
+        print(
+            '✅ User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
         if (userModel.email == 'admin@demo.com') {
           print('🔍 ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
         }
         return userModel;
       } else {
         print('❌ No user profile found for $userId');
-        if ('admin@demo.com' == 'admin@demo.com') { // placeholder, but actually check if this is admin id
+        if ('admin@demo.com' == 'admin@demo.com') {
+          // placeholder, but actually check if this is admin id
           print('❌ ADMIN PROFILE FETCH: No profile exists');
         }
         return null;
@@ -286,16 +355,12 @@ class AuthService {
 
   // Stream user profile
   Stream<UserModel?> getUserProfileStream(String userId) {
-    return _firestore
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .map((doc) {
-          if (doc.exists) {
-            return UserModel.fromJson(doc.data() as Map<String, dynamic>);
-          }
-          return null;
-        });
+    return _firestore.collection('users').doc(userId).snapshots().map((doc) {
+      if (doc.exists) {
+        return UserModel.fromJson(doc.data() as Map<String, dynamic>);
+      }
+      return null;
+    });
   }
 
   // Get current user profile
@@ -308,7 +373,8 @@ class AuthService {
   }
 
   // Create user profile in Firestore
-  Future<void> _createUserProfile(User user, UserRole role, [String? phoneNumber]) async {
+  Future<void> _createUserProfile(User user, UserRole role,
+      [String? phoneNumber]) async {
     UserModel userModel = UserModel(
       id: user.uid,
       email: user.email!,
@@ -325,7 +391,8 @@ class AuthService {
   }
 
   // Public method to create/update user profile
-  Future<void> createUserProfile(User user, UserRole role, [String? phoneNumber]) async {
+  Future<void> createUserProfile(User user, UserRole role,
+      [String? phoneNumber]) async {
     UserModel userModel = UserModel(
       id: user.uid,
       email: user.email ?? '',
@@ -342,7 +409,8 @@ class AuthService {
   }
 
   // Update user profile in Firestore
-  Future<void> _updateUserProfileInFirestore(String userId, Map<String, dynamic> updates) async {
+  Future<void> _updateUserProfileInFirestore(
+      String userId, Map<String, dynamic> updates) async {
     await _firestore.collection('users').doc(userId).update(updates);
   }
 
@@ -362,7 +430,8 @@ class AuthService {
   }
 
   // Change password
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     try {
       User? user = _auth.currentUser;
       if (user != null && user.email != null) {

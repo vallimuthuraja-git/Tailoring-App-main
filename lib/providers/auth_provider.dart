@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
-
+import '../utils/error_handler.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
-  
 
   User? _user;
   UserModel? _userProfile;
@@ -26,6 +25,7 @@ class AuthProvider with ChangeNotifier {
 
   // Constructor
   AuthProvider() {
+    initLogging();
     _initializeAuth();
   }
 
@@ -55,12 +55,18 @@ class AuthProvider with ChangeNotifier {
       try {
         _userProfile = await _authService.getUserProfile(_user!.uid);
         if (_userProfile?.email == 'admin@demo.com') {
-          print('🔍 AUTH PROVIDER LOAD: Admin user profile loaded with role: ${_userProfile?.role.name}');
+          print(
+              '🔍 AUTH PROVIDER LOAD: Admin user profile loaded with role: ${_userProfile?.role.name}');
         }
         notifyListeners();
+      } on FirebaseException catch (e) {
+        logError(e);
+        _errorMessage = getUserFriendlyErrorMessage(e);
+        throw FirebaseError('Failed to load user profile', originalError: e);
       } catch (e) {
-        _errorMessage = 'Failed to load user profile';
-        notifyListeners();
+        logError(e);
+        _errorMessage = getUserFriendlyErrorMessage(e);
+        throw AppException('Failed to load user profile');
       }
     }
   }
@@ -78,7 +84,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      UserCredential userCredential = await _authService.signUpWithEmailAndPassword(
+      UserCredential userCredential =
+          await _authService.signUpWithEmailAndPassword(
         email: email,
         password: password,
         displayName: displayName,
@@ -92,9 +99,72 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Sign in with Google
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      UserCredential userCredential = await _authService.signInWithGoogle();
+      _user = userCredential.user;
+      await _loadUserProfile();
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Sign in with Facebook
+  Future<bool> signInWithFacebook() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      UserCredential userCredential = await _authService.signInWithFacebook();
+      _user = userCredential.user;
+      await _loadUserProfile();
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -110,7 +180,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      UserCredential userCredential = await _authService.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await _authService.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -121,9 +192,16 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -151,9 +229,16 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -213,7 +298,6 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
-
 
   // Sign out
   Future<void> signOut() async {
@@ -305,9 +389,16 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -327,16 +418,24 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
       return false;
     }
   }
 
   // Change password
-  Future<bool> changePassword(String currentPassword, String newPassword) async {
+  Future<bool> changePassword(
+      String currentPassword, String newPassword) async {
     _isLoading = true;
     notifyListeners();
 
@@ -346,9 +445,16 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      logError(e);
+      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -437,14 +543,16 @@ class AuthProvider with ChangeNotifier {
 
     print('🔑 DEMO LOGIN START FOR: $accountKey');
     print('📧 Email: $email');
-    print('🔒 Password: ${password.replaceAll(RegExp(r'.'), '*')}'); // Hide actual password
+    print(
+        '🔒 Password: ${password.replaceAll(RegExp(r'.'), '*')}'); // Hide actual password
     print('👤 Display Name: $displayName');
     print('⚡ Role: $role');
 
     debugPrint('🔑 DEMO LOGIN START: $accountKey - Email: $email, Role: $role');
 
     try {
-      print('🚀 DEMO LOGIN START: Attempting to login as $displayName ($email)');
+      print(
+          '🚀 DEMO LOGIN START: Attempting to login as $displayName ($email)');
       _isLoading = true;
       _errorMessage = 'Logging in as $displayName...';
       notifyListeners();
@@ -454,34 +562,42 @@ class AuthProvider with ChangeNotifier {
 
       // First, try to sign in with existing demo account
       try {
-        debugPrint('🔍 DEMO LOGIN: Attempting to sign in existing demo account via AuthService');
-        UserCredential userCredential = await _authService.signInWithEmailAndPassword(
+        debugPrint(
+            '🔍 DEMO LOGIN: Attempting to sign in existing demo account via AuthService');
+        UserCredential userCredential =
+            await _authService.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
         _user = userCredential.user;
 
-        debugPrint('✅ DEMO LOGIN: Auth sign-in successful, now loading user profile');
+        debugPrint(
+            '✅ DEMO LOGIN: Auth sign-in successful, now loading user profile');
         await _loadUserProfile();
 
         if (_userProfile == null) {
-          debugPrint('❌ DEMO LOGIN: User profile not found after successful auth');
-          throw Exception('Demo account exists but profile not found in Firestore');
+          debugPrint(
+              '❌ DEMO LOGIN: User profile not found after successful auth');
+          throw Exception(
+              'Demo account exists but profile not found in Firestore');
         }
 
-        debugPrint('✅ DEMO LOGIN: Profile loaded. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
+        debugPrint(
+            '✅ DEMO LOGIN: Profile loaded. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
         if (_userProfile?.email == 'admin@demo.com') {
-          print('🔍 AUTH PROVIDER: Admin demo login - assigned role: ${_userProfile?.role.name}');
+          print(
+              '🔍 AUTH PROVIDER: Admin demo login - assigned role: ${_userProfile?.role.name}');
         }
-
       } catch (e) {
         // If sign-in fails (e.g., account doesn't exist), try to create the account
-        debugPrint('🚫 DEMO LOGIN: Sign in failed ($e), attempting to create new demo account');
+        debugPrint(
+            '🚫 DEMO LOGIN: Sign in failed ($e), attempting to create new demo account');
 
         try {
           debugPrint('🔧 DEMO LOGIN: Creating account via AuthService signup');
-          UserCredential userCredential = await _authService.signUpWithEmailAndPassword(
+          UserCredential userCredential =
+              await _authService.signUpWithEmailAndPassword(
             email: email,
             password: password,
             displayName: displayName,
@@ -490,7 +606,8 @@ class AuthProvider with ChangeNotifier {
 
           _user = userCredential.user;
 
-          debugPrint('✅ DEMO LOGIN: Account created successfully, loading profile');
+          debugPrint(
+              '✅ DEMO LOGIN: Account created successfully, loading profile');
           await _loadUserProfile();
 
           if (_userProfile == null) {
@@ -498,8 +615,8 @@ class AuthProvider with ChangeNotifier {
             throw Exception('Failed to create/load user profile in Firestore');
           }
 
-          debugPrint('✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
-
+          debugPrint(
+              '✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
         } catch (createError) {
           debugPrint('❌ DEMO LOGIN: Account creation failed: $createError');
           throw createError;
@@ -512,7 +629,6 @@ class AuthProvider with ChangeNotifier {
 
       debugPrint('🎉 DEMO LOGIN: Success! Navigating to home screen now');
       return true;
-
     } catch (e) {
       debugPrint('💥 DEMO LOGIN ERROR: $e');
       print('❌ DEMO LOGIN FAILURE: Detailed error: $e');

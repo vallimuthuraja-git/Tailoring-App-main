@@ -6,6 +6,7 @@ import '../models/customer.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/theme_constants.dart';
+import '../../widgets/user_avatar.dart';
 
 class DemoOverviewScreen extends StatefulWidget {
   const DemoOverviewScreen({super.key});
@@ -19,8 +20,10 @@ class _DemoOverviewScreenState extends State<DemoOverviewScreen>
   int _currentIndex = 0;
   late TabController _tabController;
 
-  final List<Product> _products = ComprehensiveDemoDataService.getDemoProducts();
-  final List<Customer> _customers = ComprehensiveDemoDataService.getDemoCustomers();
+  final List<Product> _products =
+      ComprehensiveDemoDataService.getDemoProducts();
+  final List<Customer> _customers =
+      ComprehensiveDemoDataService.getDemoCustomers();
   final List<Order> _orders = ComprehensiveDemoDataService.getDemoOrders();
 
   final List<Widget> _pages = [];
@@ -34,11 +37,13 @@ class _DemoOverviewScreenState extends State<DemoOverviewScreen>
 
   void _initializePages() {
     _pages.addAll([
-      DemoStatisticsTab(products: _products, orders: _orders, customers: _customers),
+      DemoStatisticsTab(
+          products: _products, orders: _orders, customers: _customers),
       DemoProductsTab(products: _products),
       DemoOrdersTab(orders: _orders),
       DemoCustomersTab(customers: _customers),
-      DemoAnalyticsTab(products: _products, orders: _orders, customers: _customers),
+      DemoAnalyticsTab(
+          products: _products, orders: _orders, customers: _customers),
     ]);
   }
 
@@ -130,7 +135,8 @@ class _DemoOverviewScreenState extends State<DemoOverviewScreen>
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               tabAlignment: TabAlignment.start,
               labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400),
+              unselectedLabelStyle:
+                  const TextStyle(fontWeight: FontWeight.w400),
               indicator: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -307,7 +313,8 @@ class DemoStatisticsTab extends StatelessWidget {
                 Expanded(
                   child: _MetricCard(
                     title: 'Revenue',
-                    value: '₹${orders.fold<double>(0, (sum, order) => sum + order.totalAmount).toStringAsFixed(0)}',
+                    value:
+                        '₹${orders.fold<double>(0, (sum, order) => sum + order.totalAmount).toStringAsFixed(0)}',
                     icon: Icons.money,
                     color: Colors.green,
                     themeProvider: themeProvider,
@@ -359,62 +366,62 @@ class DemoStatisticsTab extends StatelessWidget {
             const SizedBox(height: 16),
 
             ...orders.take(2).map((order) => Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: themeProvider.isDarkMode
-                    ? DarkAppColors.surface
-                    : AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: themeProvider.isDarkMode
-                      ? DarkAppColors.onSurface.withValues(alpha: 0.1)
-                      : AppColors.onSurface.withValues(alpha: 0.1),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade100.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.receipt, color: Colors.blue),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Order #${order.id.split('_').last}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: themeProvider.isDarkMode
-                                ? DarkAppColors.onSurface
-                                : AppColors.onSurface,
-                          ),
-                        ),
-                        Text(
-                          '₹${order.totalAmount.toStringAsFixed(0)}',
-                          style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? DarkAppColors.primary
-                                : AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.surface
+                        : AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                          : AppColors.onSurface.withValues(alpha: 0.1),
                     ),
                   ),
-                  Chip(
-                    label: Text(order.status.toString().split('.').last),
-                    backgroundColor: Colors.blue.shade100,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade100.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.receipt, color: Colors.blue),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Order #${order.id.split('_').last}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: themeProvider.isDarkMode
+                                    ? DarkAppColors.onSurface
+                                    : AppColors.onSurface,
+                              ),
+                            ),
+                            Text(
+                              '₹${order.totalAmount.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                color: themeProvider.isDarkMode
+                                    ? DarkAppColors.primary
+                                    : AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Chip(
+                        label: Text(order.status.toString().split('.').last),
+                        backgroundColor: Colors.blue.shade100,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )),
+                )),
           ],
         ),
       ),
@@ -635,21 +642,9 @@ class DemoCustomersTab extends StatelessWidget {
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: themeProvider.isDarkMode
-                      ? DarkAppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    customer.displayName[0].toUpperCase(),
-                    style: TextStyle(
-                      color: themeProvider.isDarkMode
-                          ? DarkAppColors.primary
-                          : AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+                UserAvatar(
+                  displayName: customer.displayName,
+                  radius: 30.0,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -774,7 +769,8 @@ class DemoAnalyticsTab extends StatelessWidget {
                 Expanded(
                   child: _MetricCard(
                     title: 'Data Points',
-                    value: '${((products.length + customers.length + orders.length) * 10)}',
+                    value:
+                        '${((products.length + customers.length + orders.length) * 10)}',
                     icon: Icons.data_usage,
                     color: Colors.blue,
                     themeProvider: themeProvider,

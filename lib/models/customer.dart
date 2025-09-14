@@ -1,9 +1,6 @@
-enum LoyaltyTier {
-  bronze,
-  silver,
-  gold,
-  platinum
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+enum LoyaltyTier { bronze, silver, gold, platinum }
 
 class Customer {
   final String id;
@@ -43,8 +40,12 @@ class Customer {
       photoUrl: json['photoUrl'],
       measurements: Map<String, dynamic>.from(json['measurements'] ?? {}),
       preferences: List<String>.from(json['preferences'] ?? []),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: json['createdAt'] is Timestamp
+          ? (json['createdAt'] as Timestamp).toDate()
+          : DateTime.parse(json['createdAt']),
+      updatedAt: json['updatedAt'] is Timestamp
+          ? (json['updatedAt'] as Timestamp).toDate()
+          : DateTime.parse(json['updatedAt']),
       totalSpent: (json['totalSpent'] ?? 0.0).toDouble(),
       loyaltyTier: LoyaltyTier.values[json['loyaltyTier'] ?? 0],
       isActive: json['isActive'] ?? true,

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_service.dart';
 import '../models/employee.dart' as emp;
+import '../utils/demo_constants.dart';
 
 class SetupDemoEmployees {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,26 +25,26 @@ class SetupDemoEmployees {
 
     final demoUsers = [
       {
-        'email': 'tailor@demo.com',
-        'password': 'password123',
+        'email': DemoConstants.tailorEmail,
+        'password': DemoConstants.demoPassword,
         'displayName': 'Demo Tailor',
         'role': UserRole.employee,
       },
       {
-        'email': 'cutter@demo.com',
-        'password': 'password123',
+        'email': DemoConstants.cutterEmail,
+        'password': DemoConstants.demoPassword,
         'displayName': 'Demo Cutter',
         'role': UserRole.employee,
       },
       {
-        'email': 'finisher@demo.com',
-        'password': 'password123',
+        'email': DemoConstants.finisherEmail,
+        'password': DemoConstants.demoPassword,
         'displayName': 'Demo Finisher',
         'role': UserRole.employee,
       },
       {
-        'email': 'helper@demo.com',
-        'password': 'password123',
+        'email': DemoConstants.helperEmail,
+        'password': DemoConstants.demoPassword,
         'displayName': 'Helper',
         'role': UserRole.employee,
       },
@@ -69,7 +70,8 @@ class SetupDemoEmployees {
         );
 
         // Update display name
-        await userCredential.user!.updateDisplayName(userData['displayName'] as String);
+        await userCredential.user!
+            .updateDisplayName(userData['displayName'] as String);
 
         // Create user profile in Firestore
         final userModel = UserModel(
@@ -82,13 +84,15 @@ class SetupDemoEmployees {
           updatedAt: DateTime.now(),
         );
 
-        await _firestore.collection('users').doc(userCredential.user!.uid).set(userModel.toJson());
+        await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(userModel.toJson());
 
         // print('✅ Created user: ${userData['email']}');
 
         // Sign out to avoid conflicts
         await _auth.signOut();
-
       } catch (e) {
         // print('❌ Error creating user ${userData['email']}: $e');
       }
@@ -100,15 +104,19 @@ class SetupDemoEmployees {
 
     final employeeProfiles = [
       {
-        'email': 'tailor@demo.com',
-        'skills': [emp.EmployeeSkill.stitching, emp.EmployeeSkill.alterations, emp.EmployeeSkill.embroidery],
+        'email': DemoConstants.tailorEmail,
+        'skills': [
+          emp.EmployeeSkill.stitching,
+          emp.EmployeeSkill.alterations,
+          emp.EmployeeSkill.embroidery
+        ],
         'displayName': 'Demo Tailor',
         'experienceYears': 8,
         'hourlyRate': 25.0,
         'availability': emp.EmployeeAvailability.fullTime,
       },
       {
-        'email': 'cutter@demo.com',
+        'email': DemoConstants.cutterEmail,
         'skills': [emp.EmployeeSkill.cutting, emp.EmployeeSkill.patternMaking],
         'displayName': 'Demo Cutter',
         'experienceYears': 5,
@@ -116,7 +124,7 @@ class SetupDemoEmployees {
         'availability': emp.EmployeeAvailability.fullTime,
       },
       {
-        'email': 'finisher@demo.com',
+        'email': DemoConstants.finisherEmail,
         'skills': [emp.EmployeeSkill.finishing, emp.EmployeeSkill.qualityCheck],
         'displayName': 'Demo Finisher',
         'experienceYears': 4,
@@ -124,7 +132,7 @@ class SetupDemoEmployees {
         'availability': emp.EmployeeAvailability.partTime,
       },
       {
-        'email': 'helper@demo.com',
+        'email': DemoConstants.helperEmail,
         'skills': [emp.EmployeeSkill.stitching, emp.EmployeeSkill.finishing],
         'displayName': 'Helper',
         'experienceYears': 2,
@@ -172,12 +180,19 @@ class SetupDemoEmployees {
           experienceYears: profile['experienceYears'] as int,
           certifications: ['Basic tailoring certification'],
           availability: profile['availability'] as emp.EmployeeAvailability,
-          preferredWorkDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          preferredWorkDays: [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday'
+          ],
           preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
           preferredEndTime: const emp.TimeOfDay(hour: 17, minute: 0),
           canWorkRemotely: false,
           location: 'Main Workshop',
-          totalOrdersCompleted: (profile['experienceYears'] as int) * 50, // Estimate based on experience
+          totalOrdersCompleted: (profile['experienceYears'] as int) *
+              50, // Estimate based on experience
           ordersInProgress: 0,
           averageRating: 4.5,
           completionRate: 0.95,
@@ -186,11 +201,15 @@ class SetupDemoEmployees {
           baseRatePerHour: profile['hourlyRate'] as double,
           performanceBonusRate: (profile['hourlyRate'] as double) * 0.1,
           paymentTerms: 'Bi-weekly',
-          totalEarnings: (profile['experienceYears'] as int) * 50 * (profile['hourlyRate'] as double) * 8, // Estimate
+          totalEarnings: (profile['experienceYears'] as int) *
+              50 *
+              (profile['hourlyRate'] as double) *
+              8, // Estimate
           recentAssignments: [],
           consecutiveDaysWorked: 5,
           isActive: true,
-          joinedDate: DateTime.now().subtract(Duration(days: (profile['experienceYears'] as int) * 365)),
+          joinedDate: DateTime.now().subtract(
+              Duration(days: (profile['experienceYears'] as int) * 365)),
           additionalInfo: {
             'demo_account': true,
             'special_notes': 'Demo account for testing employee features',
@@ -205,7 +224,6 @@ class SetupDemoEmployees {
         await _firestore.collection('employees').add(employeeData);
 
         // print('✅ Created employee profile: ${profile['email']}');
-
       } catch (e) {
         // print('❌ Error creating employee profile ${profile['email']}: $e');
       }
@@ -231,7 +249,8 @@ class SetupDemoEmployees {
       final userDocs = await _firestore.collection('users').get();
       for (final doc in userDocs.docs) {
         final data = doc.data();
-        if (AuthService.demoAccounts.containsKey(data['role']?.toString().split('.').last) &&
+        if (AuthService.demoAccounts
+                .containsKey(data['role']?.toString().split('.').last) &&
             data['email']?.contains('@demo.com') == true) {
           await doc.reference.delete();
           // print('✅ Deleted user: ${data['email']}');

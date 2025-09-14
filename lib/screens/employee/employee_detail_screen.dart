@@ -8,6 +8,7 @@ import '../../providers/employee_provider.dart';
 import '../../providers/auth_provider.dart';
 import 'employee_edit_screen.dart';
 import 'work_assignment_screen.dart';
+import '../../widgets/user_avatar.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {
   final Employee employee;
@@ -29,8 +30,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   Future<void> _loadEmployeeDetails() async {
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-    final updatedEmployee = await employeeProvider.getEmployeeById(_employee.id);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
+    final updatedEmployee =
+        await employeeProvider.getEmployeeById(_employee.id);
     if (updatedEmployee != null && mounted) {
       setState(() {
         _employee = updatedEmployee;
@@ -91,7 +94,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EmployeeEditScreen(employee: _employee),
+                        builder: (context) =>
+                            EmployeeEditScreen(employee: _employee),
                       ),
                     ).then((_) => _loadEmployeeDetails());
                   },
@@ -104,7 +108,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => WorkAssignmentScreen(employee: _employee),
+                      builder: (context) =>
+                          WorkAssignmentScreen(employee: _employee),
                     ),
                   );
                 },
@@ -170,8 +175,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
@@ -184,21 +189,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
         child: Row(
           children: [
             // Employee Avatar
-            CircleAvatar(
+            UserAvatar(
+              displayName: _employee.displayName,
+              imageUrl: _employee.photoUrl,
               radius: 40,
-              backgroundImage: _employee.photoUrl != null
-                  ? NetworkImage(_employee.photoUrl!)
-                  : null,
-              child: _employee.photoUrl == null
-                  ? Text(
-                      _employee.displayName[0].toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    )
-                  : null,
             ),
             const SizedBox(width: 20),
 
@@ -210,29 +204,34 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   Text(
                     _employee.displayName,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _employee.email,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                          color: Colors.grey[600],
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _employee.isActive ? Colors.green[100] : Colors.red[100],
+                          color: _employee.isActive
+                              ? Colors.green[100]
+                              : Colors.red[100],
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           _employee.isActive ? 'Active' : 'Inactive',
                           style: TextStyle(
-                            color: _employee.isActive ? Colors.green[800] : Colors.red[800],
+                            color: _employee.isActive
+                                ? Colors.green[800]
+                                : Colors.red[800],
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -241,8 +240,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                       Text(
                         '${_employee.experienceYears} years experience',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                              color: Colors.grey[600],
+                            ),
                       ),
                     ],
                   ),
@@ -332,7 +331,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     );
   }
 
-  Widget _buildMetricCard(String label, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -377,8 +377,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
             Text(
               'Skills',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -386,12 +386,19 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
               runSpacing: 8,
               children: _employee.skills.map((skill) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -412,8 +419,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
               Text(
                 'Specializations',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -435,8 +442,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
               Text(
                 'Certifications',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 8),
               Column(
@@ -446,7 +453,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Row(
                       children: [
-                        const Icon(Icons.verified, size: 16, color: Colors.green),
+                        const Icon(Icons.verified,
+                            size: 16, color: Colors.green),
                         const SizedBox(width: 8),
                         Text(cert),
                       ],
@@ -495,15 +503,16 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                       Text(
                         'Work Days',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
                         children: _employee.preferredWorkDays.map((day) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.green[50],
                               borderRadius: BorderRadius.circular(12),
@@ -538,11 +547,12 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                       Text(
                         'Preferred Hours',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 4),
-                      if (_employee.preferredStartTime != null && _employee.preferredEndTime != null) ...[
+                      if (_employee.preferredStartTime != null &&
+                          _employee.preferredEndTime != null) ...[
                         Text(
                           '${_employee.preferredStartTime!.formatTime()} - ${_employee.preferredEndTime!.formatTime()}',
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -550,9 +560,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                       ] else ...[
                         Text(
                           'Flexible hours',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                       ],
                     ],
@@ -568,11 +579,14 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
               children: [
                 Icon(
                   _employee.canWorkRemotely ? Icons.home_work : Icons.business,
-                  color: _employee.canWorkRemotely ? Colors.orange : Colors.blue,
+                  color:
+                      _employee.canWorkRemotely ? Colors.orange : Colors.blue,
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  _employee.canWorkRemotely ? 'Can work remotely' : 'On-site only',
+                  _employee.canWorkRemotely
+                      ? 'Can work remotely'
+                      : 'On-site only',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -599,8 +613,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                 Text(
                   'Recent Work',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -622,7 +636,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   title: Text('Order #${assignment.orderId}'),
                   subtitle: Text(assignment.taskDescription),
                   trailing: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: assignment.status == WorkStatus.completed
                           ? Colors.green[100]
@@ -663,8 +678,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                 Text(
                   'Contact Information',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -698,7 +713,9 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   onPressed: () {
                     // Make phone call
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Phone call functionality coming soon')),
+                      const SnackBar(
+                          content:
+                              Text('Phone call functionality coming soon')),
                     );
                   },
                 ),
@@ -717,7 +734,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   onPressed: () {
                     // Open map
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Map functionality coming soon')),
+                      const SnackBar(
+                          content: Text('Map functionality coming soon')),
                     );
                   },
                 ),
@@ -735,8 +753,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Delete Employee'),
         content: Text(
-          'Are you sure you want to delete ${_employee.displayName}? This action cannot be undone.'
-        ),
+            'Are you sure you want to delete ${_employee.displayName}? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -755,7 +772,8 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   void _deleteEmployee() async {
     Navigator.pop(context); // Close dialog
 
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
 
     // Show loading
     ScaffoldMessenger.of(context).showSnackBar(

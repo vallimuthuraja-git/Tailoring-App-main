@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 import '../../providers/employee_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/employee.dart' as emp;
+import '../../utils/responsive_utils.dart';
 
 class EmployeeDashboardScreen extends StatefulWidget {
   const EmployeeDashboardScreen({super.key});
 
   @override
-  State<EmployeeDashboardScreen> createState() => _EmployeeDashboardScreenState();
+  State<EmployeeDashboardScreen> createState() =>
+      _EmployeeDashboardScreenState();
 }
 
 class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
@@ -20,7 +22,8 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
 
   Future<void> _loadEmployeeData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
 
     if (authProvider.currentUser != null) {
       await employeeProvider.loadEmployees();
@@ -65,53 +68,81 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
           // Find current employee's data
           final currentUser = authProvider.currentUser;
           final employees = employeeProvider.employees;
-          final currentEmployee = employees.where((emp) => emp.userId == currentUser?.uid).cast<emp.Employee?>().firstWhere(
-            (element) => true,
-            orElse: () => null,
-          );
+          final currentEmployee = employees
+              .where((emp) => emp.userId == currentUser?.uid)
+              .cast<emp.Employee?>()
+              .firstWhere(
+                (element) => true,
+                orElse: () => null,
+              );
 
           if (currentEmployee == null) {
             return const Center(
-              child: Text('Employee profile not found. Please contact your administrator.'),
+              child: Text(
+                  'Employee profile not found. Please contact your administrator.'),
             );
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Employee Profile Card
-                _buildProfileCard(currentEmployee),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final deviceType =
+                  ResponsiveUtils.getDeviceType(constraints.maxWidth);
+              final isDesktop = deviceType == DeviceType.desktop;
 
-                const SizedBox(height: 24),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Employee Profile Card
+                    _buildProfileCard(currentEmployee, isDesktop: isDesktop),
 
-                // Quick Stats
-                _buildQuickStats(currentEmployee),
+                    const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+                    // Quick Stats
+                    _buildQuickStats(currentEmployee, isDesktop: isDesktop),
 
-                // Current Work Assignments
-                _buildCurrentAssignments(currentEmployee),
+                    const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+                    // Current Work Assignments and Performance Overview
+                    if (isDesktop)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildCurrentAssignments(currentEmployee,
+                                isDesktop: true),
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: _buildPerformanceOverview(currentEmployee,
+                                isDesktop: true),
+                          ),
+                        ],
+                      )
+                    else ...[
+                      _buildCurrentAssignments(currentEmployee,
+                          isDesktop: false),
+                      const SizedBox(height: 24),
+                      _buildPerformanceOverview(currentEmployee,
+                          isDesktop: false),
+                    ],
 
-                // Performance Overview
-                _buildPerformanceOverview(currentEmployee),
+                    const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
-
-                // Recent Activity
-                _buildRecentActivity(currentEmployee),
-              ],
-            ),
+                    // Recent Activity
+                    _buildRecentActivity(currentEmployee, isDesktop: isDesktop),
+                  ],
+                ),
+              );
+            },
           );
         },
       ),
     );
   }
 
-  Widget _buildProfileCard(emp.Employee employee) {
+  Widget _buildProfileCard(emp.Employee employee, {bool isDesktop = false}) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -144,7 +175,9 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
                   Row(
                     children: [
                       Icon(
-                        employee.isActive ? Icons.check_circle : Icons.pause_circle,
+                        employee.isActive
+                            ? Icons.check_circle
+                            : Icons.pause_circle,
                         color: employee.isActive ? Colors.green : Colors.orange,
                         size: 16,
                       ),
@@ -152,17 +185,22 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
                       Text(
                         employee.isActive ? 'Active' : 'Inactive',
                         style: TextStyle(
-                          color: employee.isActive ? Colors.green : Colors.orange,
+                          color:
+                              employee.isActive ? Colors.green : Colors.orange,
                         ),
                       ),
                       const SizedBox(width: 16),
                       Icon(
-                        employee.canWorkRemotely ? Icons.home_work : Icons.business,
+                        employee.canWorkRemotely
+                            ? Icons.home_work
+                            : Icons.business,
                         size: 16,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        employee.canWorkRemotely ? 'Remote Available' : 'On-site Only',
+                        employee.canWorkRemotely
+                            ? 'Remote Available'
+                            : 'On-site Only',
                       ),
                     ],
                   ),
@@ -175,7 +213,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
     );
   }
 
-  Widget _buildQuickStats(emp.Employee employee) {
+  Widget _buildQuickStats(emp.Employee employee, {bool isDesktop = false}) {
     return Row(
       children: [
         Expanded(
@@ -208,7 +246,8 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -231,7 +270,8 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
     );
   }
 
-  Widget _buildCurrentAssignments(emp.Employee employee) {
+  Widget _buildCurrentAssignments(emp.Employee employee,
+      {bool isDesktop = false}) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -245,11 +285,14 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
             ),
             const SizedBox(height: 16),
             if (employee.ordersInProgress > 0) ...[
-              Text('You have ${employee.ordersInProgress} assignments in progress'),
+              Text(
+                  'You have ${employee.ordersInProgress} assignments in progress'),
               const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: employee.totalOrdersCompleted > 0
-                    ? employee.totalOrdersCompleted / (employee.totalOrdersCompleted + employee.ordersInProgress)
+                    ? employee.totalOrdersCompleted /
+                        (employee.totalOrdersCompleted +
+                            employee.ordersInProgress)
                     : 0,
               ),
             ] else ...[
@@ -258,7 +301,8 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
                   padding: EdgeInsets.all(32),
                   child: Column(
                     children: [
-                      Icon(Icons.assignment_turned_in, size: 64, color: Colors.grey),
+                      Icon(Icons.assignment_turned_in,
+                          size: 64, color: Colors.grey),
                       SizedBox(height: 16),
                       Text('No current assignments'),
                       Text('You\'ll be notified when new work is assigned'),
@@ -273,7 +317,8 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
     );
   }
 
-  Widget _buildPerformanceOverview(emp.Employee employee) {
+  Widget _buildPerformanceOverview(emp.Employee employee,
+      {bool isDesktop = false}) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -289,7 +334,11 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
             _buildPerformanceMetric(
               'Completion Rate',
               '${(employee.completionRate * 100).toStringAsFixed(1)}%',
-              employee.completionRate >= 0.9 ? Colors.green : employee.completionRate >= 0.7 ? Colors.orange : Colors.red,
+              employee.completionRate >= 0.9
+                  ? Colors.green
+                  : employee.completionRate >= 0.7
+                      ? Colors.orange
+                      : Colors.red,
             ),
             const SizedBox(height: 12),
             _buildPerformanceMetric(
@@ -346,7 +395,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
     );
   }
 
-  Widget _buildRecentActivity(emp.Employee employee) {
+  Widget _buildRecentActivity(emp.Employee employee, {bool isDesktop = false}) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -375,12 +424,14 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen> {
                             : Colors.orange,
                   ),
                   title: Text(assignment.taskDescription),
-                  subtitle: Text('Assigned: ${assignment.assignedAt.toString().split(' ')[0]}'),
+                  subtitle: Text(
+                      'Assigned: ${assignment.assignedAt.toString().split(' ')[0]}'),
                   trailing: assignment.qualityRating != null
                       ? Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star, color: Colors.amber, size: 16),
+                            const Icon(Icons.star,
+                                color: Colors.amber, size: 16),
                             Text(assignment.qualityRating!.toStringAsFixed(1)),
                           ],
                         )

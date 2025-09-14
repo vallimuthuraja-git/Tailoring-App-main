@@ -8,6 +8,7 @@ import '../../providers/wishlist_provider.dart';
 import '../../providers/review_provider.dart';
 import '../../providers/service_provider.dart';
 import '../../utils/theme_constants.dart';
+import '../../widgets/user_avatar.dart';
 import 'service_booking_wizard.dart';
 
 class CustomerServiceDetailScreen extends StatefulWidget {
@@ -19,7 +20,8 @@ class CustomerServiceDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<CustomerServiceDetailScreen> createState() => _CustomerServiceDetailScreenState();
+  State<CustomerServiceDetailScreen> createState() =>
+      _CustomerServiceDetailScreenState();
 }
 
 class _ExpandableText extends StatefulWidget {
@@ -79,29 +81,29 @@ class _ExpandableTextState extends State<_ExpandableText> {
   }
 }
 
-class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScreen>
-    with TickerProviderStateMixin {
-   late PageController _imageController;
-   int _currentImageIndex = 0;
-   late AnimationController _fabAnimationController;
+class _CustomerServiceDetailScreenState
+    extends State<CustomerServiceDetailScreen> with TickerProviderStateMixin {
+  late PageController _imageController;
+  int _currentImageIndex = 0;
+  late AnimationController _fabAnimationController;
 
-   // State management for customizations
-   Map<String, dynamic> selectedCustomizations = {};
-   double customizationTotalPrice = 0.0;
+  // State management for customizations
+  Map<String, dynamic> selectedCustomizations = {};
+  double customizationTotalPrice = 0.0;
 
-   @override
-   void initState() {
-     super.initState();
-     _imageController = PageController();
-     _fabAnimationController = AnimationController(
-       duration: const Duration(milliseconds: 200),
-       vsync: this,
-     );
-     _fabAnimationController.forward();
+  @override
+  void initState() {
+    super.initState();
+    _imageController = PageController();
+    _fabAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _fabAnimationController.forward();
 
-     // Initialize customizations with defaults
-     _initializeCustomizations();
-   }
+    // Initialize customizations with defaults
+    _initializeCustomizations();
+  }
 
   @override
   void dispose() {
@@ -132,7 +134,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
     for (final customization in widget.service.customizations) {
       final selectedValue = selectedCustomizations[customization.id];
       if (selectedValue != null && customization.affectsPricing) {
-        if (customization.type == 'selection' && customization.options.isNotEmpty) {
+        if (customization.type == 'selection' &&
+            customization.options.isNotEmpty) {
           final index = customization.options.indexOf(selectedValue);
           if (index >= 0 && index < customization.options.length) {
             double priceIncrement = customization.additionalPrice * (index + 1);
@@ -148,7 +151,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
 
   bool _validateCustomizations() {
     for (final customization in widget.service.customizations) {
-      if (customization.isRequired && selectedCustomizations[customization.id] == null) {
+      if (customization.isRequired &&
+          selectedCustomizations[customization.id] == null) {
         return false;
       }
       // Additional validation using customization.validation rules
@@ -203,10 +207,12 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
         } else {
           return DropdownButtonFormField<String>(
             value: selectedValue?.toString(),
-            items: customization.options.map((option) => DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            )).toList(),
+            items: customization.options
+                .map((option) => DropdownMenuItem<String>(
+                      value: option,
+                      child: Text(option),
+                    ))
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 _updateCustomization(customization.id, value);
@@ -238,7 +244,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           children: [
             IconButton(
               onPressed: () {
-                final currentValue = (selectedValue ?? customization.defaultValue ?? 0) as int;
+                final currentValue =
+                    (selectedValue ?? customization.defaultValue ?? 0) as int;
                 if (currentValue > (customization.validation['min'] ?? 0)) {
                   _updateCustomization(customization.id, currentValue - 1);
                 }
@@ -258,7 +265,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
             ),
             IconButton(
               onPressed: () {
-                final currentValue = (selectedValue ?? customization.defaultValue ?? 0) as int;
+                final currentValue =
+                    (selectedValue ?? customization.defaultValue ?? 0) as int;
                 if (currentValue < (customization.validation['max'] ?? 100)) {
                   _updateCustomization(customization.id, currentValue + 1);
                 }
@@ -291,11 +299,13 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                 return 'Invalid format';
               }
             }
-            if (value != null && customization.validation['minLength'] != null &&
+            if (value != null &&
+                customization.validation['minLength'] != null &&
                 value.length < customization.validation['minLength']) {
               return 'Minimum length: ${customization.validation['minLength']}';
             }
-            if (value != null && customization.validation['maxLength'] != null &&
+            if (value != null &&
+                customization.validation['maxLength'] != null &&
                 value.length > customization.validation['maxLength']) {
               return 'Maximum length: ${customization.validation['maxLength']}';
             }
@@ -337,51 +347,53 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           ),
           const SizedBox(height: 16),
           ...widget.service.customizations.map((customization) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (customization.name.isNotEmpty)
-                  Text(
-                    '${customization.name}${customization.isRequired ? '*' : ''}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                if (customization.description.isNotEmpty)
-                  Text(
-                    customization.description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                          : AppColors.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                const SizedBox(height: 8),
-                _buildCustomizationWidget(customization),
-                if (customization.affectsPricing && customization.additionalPrice > 0)
-                  Text(
-                    '+${customization.additionalPrice.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: themeProvider.isDarkMode
-                          ? DarkAppColors.primary
-                          : AppColors.primary,
-                    ),
-                  ),
-              ],
-            ),
-          )),
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (customization.name.isNotEmpty)
+                      Text(
+                        '${customization.name}${customization.isRequired ? '*' : ''}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    if (customization.description.isNotEmpty)
+                      Text(
+                        customization.description,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                              : AppColors.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    _buildCustomizationWidget(customization),
+                    if (customization.affectsPricing &&
+                        customization.additionalPrice > 0)
+                      Text(
+                        '+${customization.additionalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
+                        ),
+                      ),
+                  ],
+                ),
+              )),
           if (customizationTotalPrice > 0)
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: (themeProvider.isDarkMode
-                    ? DarkAppColors.primary
-                    : AppColors.primary).withValues(alpha: 0.1),
+                        ? DarkAppColors.primary
+                        : AppColors.primary)
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -464,7 +476,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
 
   void _toggleWishlist() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
+    final wishlistProvider =
+        Provider.of<WishlistProvider>(context, listen: false);
 
     if (authProvider.user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -475,7 +488,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
 
     final success = await wishlistProvider.toggleWishlist(widget.service.id);
     if (success && mounted) {
-      final isInWishlist = wishlistProvider.isServiceInWishlist(widget.service.id);
+      final isInWishlist =
+          wishlistProvider.isServiceInWishlist(widget.service.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(isInWishlist
@@ -501,7 +515,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
     // Validate customizations before proceeding
     if (!_validateCustomizations()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required customizations')),
+        const SnackBar(
+            content: Text('Please complete all required customizations')),
       );
       return;
     }
@@ -518,7 +533,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
     );
   }
 
-  Widget _buildCustomerReviewsSection(ThemeProvider themeProvider, ReviewProvider reviewProvider) {
+  Widget _buildCustomerReviewsSection(
+      ThemeProvider themeProvider, ReviewProvider reviewProvider) {
     final summary = reviewProvider.getReviewSummary(widget.service.id);
     final reviews = reviewProvider.getReviewsForService(widget.service.id);
 
@@ -572,11 +588,14 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                               children: List.generate(5, (index) {
                                 final rating = summary?.averageRating ?? 0.0;
                                 if (index < rating.floor()) {
-                                  return const Icon(Icons.star, size: 16, color: Colors.amber);
+                                  return const Icon(Icons.star,
+                                      size: 16, color: Colors.amber);
                                 } else if (index < rating) {
-                                  return Icon(Icons.star_half, size: 16, color: Colors.amber);
+                                  return Icon(Icons.star_half,
+                                      size: 16, color: Colors.amber);
                                 } else {
-                                  return Icon(Icons.star_border, size: 16, color: Colors.grey[400]!);
+                                  return Icon(Icons.star_border,
+                                      size: 16, color: Colors.grey[400]!);
                                 }
                               }),
                             ),
@@ -586,8 +605,10 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                               style: TextStyle(
                                 fontSize: 12,
                                 color: themeProvider.isDarkMode
-                                    ? DarkAppColors.onSurface.withValues(alpha: 0.6)
-                                    : AppColors.onSurface.withValues(alpha: 0.6),
+                                    ? DarkAppColors.onSurface
+                                        .withValues(alpha: 0.6)
+                                    : AppColors.onSurface
+                                        .withValues(alpha: 0.6),
                               ),
                             ),
                           ],
@@ -600,9 +621,11 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                           child: Column(
                             children: List.generate(5, (index) {
                               final ratingValue = 5 - index;
-                              final count = summary?.ratingDistribution[ratingValue] ?? 0;
+                              final count =
+                                  summary?.ratingDistribution[ratingValue] ?? 0;
                               final total = reviews.length;
-                              final percentage = total > 0 ? (count / total) * 100 : 0.0;
+                              final percentage =
+                                  total > 0 ? (count / total) * 100 : 0.0;
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 4),
@@ -613,15 +636,21 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                                       style: const TextStyle(fontSize: 12),
                                     ),
                                     const SizedBox(width: 8),
-                                    const Icon(Icons.star, size: 10, color: Colors.amber),
+                                    const Icon(Icons.star,
+                                        size: 10, color: Colors.amber),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: LinearProgressIndicator(
                                         value: percentage / 100,
-                                        backgroundColor: themeProvider.isDarkMode
-                                            ? DarkAppColors.onSurface.withValues(alpha: 0.1)
-                                            : AppColors.onSurface.withValues(alpha: 0.1),
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                                        backgroundColor:
+                                            themeProvider.isDarkMode
+                                                ? DarkAppColors.onSurface
+                                                    .withValues(alpha: 0.1)
+                                                : AppColors.onSurface
+                                                    .withValues(alpha: 0.1),
+                                        valueColor:
+                                            const AlwaysStoppedAnimation<Color>(
+                                                Colors.amber),
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -680,27 +709,20 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Avatar
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: themeProvider.isDarkMode
-                                      ? DarkAppColors.surface
-                                      : AppColors.surface,
-                                  child: Text(
-                                    review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: themeProvider.isDarkMode
-                                          ? DarkAppColors.primary
-                                          : AppColors.primary,
-                                    ),
-                                  ),
+                                UserAvatar(
+                                  displayName: review.userName.isNotEmpty
+                                      ? review.userName
+                                      : '?',
+                                  imageUrl: null,
+                                  radius: 20.0,
                                 ),
                                 const SizedBox(width: 12),
 
                                 // Review Content
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -719,8 +741,10 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: themeProvider.isDarkMode
-                                                  ? DarkAppColors.onSurface.withValues(alpha: 0.6)
-                                                  : AppColors.onSurface.withValues(alpha: 0.6),
+                                                  ? DarkAppColors.onSurface
+                                                      .withValues(alpha: 0.6)
+                                                  : AppColors.onSurface
+                                                      .withValues(alpha: 0.6),
                                             ),
                                           ),
                                         ],
@@ -754,8 +778,10 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: themeProvider.isDarkMode
-                                                ? DarkAppColors.onSurface.withValues(alpha: 0.8)
-                                                : AppColors.onSurface.withValues(alpha: 0.8),
+                                                ? DarkAppColors.onSurface
+                                                    .withValues(alpha: 0.8)
+                                                : AppColors.onSurface
+                                                    .withValues(alpha: 0.8),
                                           ),
                                           maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
@@ -769,14 +795,13 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                           )),
                     ],
                   ],
-    ),
+                ),
     );
   }
 
   Widget _buildReviewShimmerLoader(ThemeProvider themeProvider) {
-    final baseColor = themeProvider.isDarkMode
-        ? DarkAppColors.surface
-        : AppColors.surface;
+    final baseColor =
+        themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface;
 
     return SizedBox(
       height: 200,
@@ -886,15 +911,16 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           // Phone
           InkWell(
             onTap: () async {
-              final Uri url = Uri(scheme: 'tel', path: '+1234567890'); // Placeholder
+              final Uri url =
+                  Uri(scheme: 'tel', path: '+1234567890'); // Placeholder
               await launchUrl(url);
             },
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.green.withValues(alpha: 0.1),
-                  child: const Icon(Icons.phone, color: Colors.green, size: 20),
+                UserAvatar(
+                  displayName: 'Phone',
+                  imageUrl: null,
+                  radius: 20.0,
                 ),
                 const SizedBox(width: 16),
                 const Text(
@@ -912,15 +938,17 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           // Email
           InkWell(
             onTap: () async {
-              final Uri url = Uri(scheme: 'mailto', path: 'contact@tailorapp.com'); // Placeholder
+              final Uri url = Uri(
+                  scheme: 'mailto',
+                  path: 'contact@tailorapp.com'); // Placeholder
               await launchUrl(url);
             },
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.blue.withValues(alpha: 0.1),
-                  child: const Icon(Icons.email, color: Colors.blue, size: 20),
+                UserAvatar(
+                  displayName: 'Email',
+                  imageUrl: null,
+                  radius: 20.0,
                 ),
                 const SizedBox(width: 16),
                 const Text(
@@ -938,16 +966,17 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           // Address
           InkWell(
             onTap: () async {
-              final Uri url = Uri.parse('geo:0,0?q=123 Main St, City, Country'); // Placeholder
+              final Uri url = Uri.parse(
+                  'geo:0,0?q=123 Main St, City, Country'); // Placeholder
               await launchUrl(url);
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.purple.withValues(alpha: 0.1),
-                  child: const Icon(Icons.location_on, color: Colors.purple, size: 20),
+                UserAvatar(
+                  displayName: 'Address',
+                  imageUrl: null,
+                  radius: 20.0,
                 ),
                 const SizedBox(width: 16),
                 const Expanded(
@@ -978,9 +1007,11 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Monday - Friday: 9:00 AM - 7:00 PM', style: TextStyle(fontSize: 14)),
+              Text('Monday - Friday: 9:00 AM - 7:00 PM',
+                  style: TextStyle(fontSize: 14)),
               SizedBox(height: 4),
-              Text('Saturday: 8:00 AM - 5:00 PM', style: TextStyle(fontSize: 14)),
+              Text('Saturday: 8:00 AM - 5:00 PM',
+                  style: TextStyle(fontSize: 14)),
               SizedBox(height: 4),
               Text('Sunday: Closed', style: TextStyle(fontSize: 14)),
             ],
@@ -990,27 +1021,27 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
     );
   }
 
-
   Widget _buildRecommendationShimmerLoader(ThemeProvider themeProvider) {
-    final baseColor = themeProvider.isDarkMode
-        ? DarkAppColors.surface
-        : AppColors.surface;
+    final baseColor =
+        themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface;
 
     return SizedBox(
       height: 200,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: List.generate(3, (index) => Container(
-            width: 200,
-            margin: const EdgeInsets.only(right: 12),
-            height: 180,
-            decoration: BoxDecoration(
-              color: baseColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Center(child: CircularProgressIndicator()),
-          )),
+          children: List.generate(
+              3,
+              (index) => Container(
+                    width: 200,
+                    margin: const EdgeInsets.only(right: 12),
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: baseColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Center(child: CircularProgressIndicator()),
+                  )),
         ),
       ),
     );
@@ -1018,9 +1049,12 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
 
   @override
   Widget build(BuildContext context) {
-    return Consumer4<ThemeProvider, WishlistProvider, ReviewProvider, ServiceProvider>(
-      builder: (context, themeProvider, wishlistProvider, reviewProvider, serviceProvider, child) {
-        final isInWishlist = wishlistProvider.isServiceInWishlist(widget.service.id);
+    return Consumer4<ThemeProvider, WishlistProvider, ReviewProvider,
+        ServiceProvider>(
+      builder: (context, themeProvider, wishlistProvider, reviewProvider,
+          serviceProvider, child) {
+        final isInWishlist =
+            wishlistProvider.isServiceInWishlist(widget.service.id);
 
         return Scaffold(
           backgroundColor: themeProvider.isDarkMode
@@ -1055,7 +1089,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                       const SizedBox(height: 16),
 
                       // Customer Reviews & Ratings Section
-                      _buildCustomerReviewsSection(themeProvider, reviewProvider),
+                      _buildCustomerReviewsSection(
+                          themeProvider, reviewProvider),
 
                       const SizedBox(height: 24),
 
@@ -1183,7 +1218,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
             widget.service.imageUrls.isNotEmpty
                 ? PageView.builder(
                     controller: _imageController,
-                    onPageChanged: (index) => setState(() => _currentImageIndex = index),
+                    onPageChanged: (index) =>
+                        setState(() => _currentImageIndex = index),
                     itemCount: widget.service.imageUrls.length,
                     itemBuilder: (context, index) {
                       return Hero(
@@ -1215,7 +1251,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                     },
                   )
                 : Container(
-                    color: _getServiceColor(widget.service.category).withValues(alpha: 0.1),
+                    color: _getServiceColor(widget.service.category)
+                        .withValues(alpha: 0.1),
                     child: Icon(
                       _getServiceIcon(widget.service.category),
                       size: 120,
@@ -1233,7 +1270,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(20),
@@ -1266,7 +1304,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
               top: 20,
               right: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: _getServiceColor(widget.service.category),
                   borderRadius: BorderRadius.circular(20),
@@ -1295,7 +1334,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                 top: 20,
                 left: 20,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.amber,
                     borderRadius: BorderRadius.circular(20),
@@ -1381,7 +1421,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                 } else if (index < rating) {
                   return Icon(Icons.star_half, size: 18, color: Colors.amber);
                 } else {
-                  return Icon(Icons.star_border, size: 18, color: Colors.grey[400]!);
+                  return Icon(Icons.star_border,
+                      size: 18, color: Colors.grey[400]!);
                 }
               }),
               const SizedBox(width: 8),
@@ -1430,7 +1471,8 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
     );
   }
 
-  Widget _buildStatItem(IconData icon, String value, String label, Color color, ThemeProvider themeProvider) {
+  Widget _buildStatItem(IconData icon, String value, String label, Color color,
+      ThemeProvider themeProvider) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -1531,30 +1573,31 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
             ),
             const SizedBox(height: 12),
             ...widget.service.tierPricing.entries.map((tier) => Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: themeProvider.isDarkMode
-                    ? DarkAppColors.background
-                    : AppColors.background,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Expanded(child: Text(tier.key)),
-                  Text(
-                    '\$${tier.value.toStringAsFixed(0)}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.background
+                        : AppColors.background,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-              ),
-            )),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(tier.key)),
+                      Text(
+                        '\$${tier.value.toStringAsFixed(0)}',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                )),
           ],
 
           const SizedBox(height: 16),
 
           // Price Range (if available)
-          if (widget.service.minPrice != null && widget.service.maxPrice != null) ...[
+          if (widget.service.minPrice != null &&
+              widget.service.maxPrice != null) ...[
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -1645,31 +1688,31 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           ),
           const SizedBox(height: 12),
           ...widget.service.features.map((feature) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  size: 16,
-                  color: themeProvider.isDarkMode
-                      ? DarkAppColors.primary
-                      : AppColors.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    feature,
-                    style: TextStyle(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      size: 16,
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha: 0.8)
-                          : AppColors.onSurface.withValues(alpha: 0.8),
+                          ? DarkAppColors.primary
+                          : AppColors.primary,
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        feature,
+                        style: TextStyle(
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.8)
+                              : AppColors.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
         ],
       ],
     );
@@ -1704,21 +1747,21 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
           ),
           const SizedBox(height: 12),
           ...widget.service.includedItems.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.check, size: 14, color: Colors.green),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 14),
-                  ),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.check, size: 14, color: Colors.green),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
         ],
       ),
     );
@@ -1755,21 +1798,21 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
 
           // Requirements
           ...widget.service.requirements.map((requirement) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.warning, size: 14, color: Colors.orange),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    requirement,
-                    style: const TextStyle(fontSize: 14),
-                  ),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.warning, size: 14, color: Colors.orange),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        requirement,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
 
           // Special Requirements
           if (widget.service.requiresMeasurement) ...[
@@ -1851,9 +1894,12 @@ class _CustomerServiceDetailScreenState extends State<CustomerServiceDetailScree
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: price > 0 ? Colors.green.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1),
+                    color: price > 0
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(

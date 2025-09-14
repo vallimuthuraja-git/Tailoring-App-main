@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../services/auth_service.dart';
 import '../../utils/theme_constants.dart';
+import '../../widgets/user_avatar.dart';
 import '../auth/login_screen.dart';
 import 'change_password_screen.dart';
 import 'personal_information_screen.dart';
@@ -30,13 +31,19 @@ class ProfileScreen extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Profile'),
             toolbarHeight: kToolbarHeight + 5,
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             elevation: 0,
             iconTheme: IconThemeData(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             titleTextStyle: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
@@ -44,7 +51,9 @@ class ProfileScreen extends StatelessWidget {
               IconButton(
                 icon: Icon(
                   Icons.logout,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
                 onPressed: () => _showLogoutDialog(context),
               ),
@@ -76,7 +85,8 @@ class ProfileScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1200), // Wider for 2-column layout
+                    constraints: const BoxConstraints(
+                        maxWidth: 1200), // Wider for 2-column layout
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Container(
@@ -106,11 +116,13 @@ class ProfileScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: themeProvider.isGlassyMode
                                     ? (themeProvider.isDarkMode
-                                            ? Colors.white.withValues(alpha: 0.1)
-                                            : Colors.white.withValues(alpha: 0.2))
-                                        : (themeProvider.isDarkMode
-                                            ? DarkAppColors.surface.withValues(alpha: 0.95)
-                                            : AppColors.surface.withValues(alpha: 0.95)),
+                                        ? Colors.white.withValues(alpha: 0.1)
+                                        : Colors.white.withValues(alpha: 0.2))
+                                    : (themeProvider.isDarkMode
+                                        ? DarkAppColors.surface
+                                            .withValues(alpha: 0.95)
+                                        : AppColors.surface
+                                            .withValues(alpha: 0.95)),
                                 borderRadius: BorderRadius.circular(24),
                                 border: Border.all(
                                   color: themeProvider.isDarkMode
@@ -131,77 +143,96 @@ class ProfileScreen extends StatelessWidget {
                                           ? LinearGradient(
                                               colors: [
                                                 themeProvider.isDarkMode
-                                                    ? DarkAppColors.primary.withValues(alpha: 0.8)
-                                                    : AppColors.primary.withValues(alpha: 0.8),
+                                                    ? DarkAppColors.primary
+                                                        .withValues(alpha: 0.8)
+                                                    : AppColors.primary
+                                                        .withValues(alpha: 0.8),
                                                 themeProvider.isDarkMode
-                                                    ? DarkAppColors.primaryVariant.withValues(alpha: 0.9)
-                                                    : AppColors.primaryVariant.withValues(alpha: 0.9),
+                                                    ? DarkAppColors
+                                                        .primaryVariant
+                                                        .withValues(alpha: 0.9)
+                                                    : AppColors.primaryVariant
+                                                        .withValues(alpha: 0.9),
                                               ],
                                             )
                                           : LinearGradient(
                                               colors: [
-                                                themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                                                themeProvider.isDarkMode ? DarkAppColors.primaryVariant : AppColors.primaryVariant,
+                                                themeProvider.isDarkMode
+                                                    ? DarkAppColors.primary
+                                                    : AppColors.primary,
+                                                themeProvider.isDarkMode
+                                                    ? DarkAppColors
+                                                        .primaryVariant
+                                                    : AppColors.primaryVariant,
                                               ],
                                             ),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            CircleAvatar(
-                                              radius: 40,
-                                              backgroundColor: Colors.white.withValues(alpha: 0.2),
-                                              backgroundImage: user?.photoUrl != null
-                                                  ? NetworkImage(user!.photoUrl!)
-                                                  : null,
-                                              child: user?.photoUrl == null
-                                                  ? Icon(
-                                                      Icons.person,
-                                                      size: 40,
-                                                      color: Colors.white.withValues(alpha: 0.9),
-                                                    )
-                                                  : null,
+                                            UserAvatar(
+                                              displayName:
+                                                  user?.displayName ?? 'User',
+                                              imageUrl: user?.photoUrl,
+                                              radius: 40.0,
                                             ),
                                             const SizedBox(width: 20),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     user?.displayName ?? 'User',
                                                     style: const TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 24,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Text(
                                                     user?.email ?? '',
                                                     style: TextStyle(
-                                                      color: Colors.white.withValues(alpha: 0.9),
+                                                      color: Colors.white
+                                                          .withValues(
+                                                              alpha: 0.9),
                                                       fontSize: 16,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 12),
                                                   Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6),
                                                     decoration: BoxDecoration(
-                                                      color: Colors.white.withValues(alpha: 0.2),
-                                                      borderRadius: BorderRadius.circular(16),
+                                                      color: Colors.white
+                                                          .withValues(
+                                                              alpha: 0.2),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
                                                     ),
                                                     child: Text(
-                                                      authProvider.userRole == UserRole.customer
+                                                      authProvider.userRole ==
+                                                              UserRole.customer
                                                           ? 'Customer'
-                                                          : authProvider.userRole == UserRole.shopOwner
+                                                          : authProvider
+                                                                      .userRole ==
+                                                                  UserRole
+                                                                      .shopOwner
                                                               ? 'Esther (Owner)'
                                                               : 'Admin',
                                                       style: const TextStyle(
                                                         color: Colors.white,
-                                                        fontWeight: FontWeight.w600,
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                         fontSize: 14,
                                                       ),
                                                     ),
@@ -215,7 +246,8 @@ class ProfileScreen extends StatelessWidget {
                                         Text(
                                           'Manage your account settings and preferences',
                                           style: TextStyle(
-                                            color: Colors.white.withValues(alpha: 0.9),
+                                            color: Colors.white
+                                                .withValues(alpha: 0.9),
                                             fontSize: 16,
                                           ),
                                         ),
@@ -228,10 +260,12 @@ class ProfileScreen extends StatelessWidget {
                                   // Responsive Profile Sections
                                   if (isLargeScreen) ...[
                                     // Large screen: 2-column layout
-                                    _buildLargeScreenLayout(context, authProvider, themeProvider),
+                                    _buildLargeScreenLayout(
+                                        context, authProvider, themeProvider),
                                   ] else ...[
                                     // Small screen: Single column layout
-                                    _buildSmallScreenLayout(context, authProvider, themeProvider),
+                                    _buildSmallScreenLayout(
+                                        context, authProvider, themeProvider),
                                   ],
                                 ],
                               ),
@@ -250,7 +284,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLargeScreenLayout(BuildContext context, AuthProvider authProvider, ThemeProvider themeProvider) {
+  Widget _buildLargeScreenLayout(BuildContext context,
+      AuthProvider authProvider, ThemeProvider themeProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -267,7 +302,9 @@ class ProfileScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onBackground
+                          : AppColors.onBackground,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -278,7 +315,8 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const PersonalInformationScreen(),
+                          builder: (context) =>
+                              const PersonalInformationScreen(),
                         ),
                       );
                     },
@@ -332,7 +370,9 @@ class ProfileScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onBackground
+                          : AppColors.onBackground,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -343,7 +383,9 @@ class ProfileScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onBackground
+                          : AppColors.onBackground,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -397,7 +439,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSmallScreenLayout(BuildContext context, AuthProvider authProvider, ThemeProvider themeProvider) {
+  Widget _buildSmallScreenLayout(BuildContext context,
+      AuthProvider authProvider, ThemeProvider themeProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -407,7 +450,9 @@ class ProfileScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onBackground
+                : AppColors.onBackground,
           ),
         ),
         const SizedBox(height: 12),
@@ -472,7 +517,9 @@ class ProfileScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onBackground
+                : AppColors.onBackground,
           ),
         ),
         const SizedBox(height: 12),
@@ -487,7 +534,9 @@ class ProfileScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onBackground
+                : AppColors.onBackground,
           ),
         ),
         const SizedBox(height: 12),
@@ -552,7 +601,8 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              final authProvider =
+                  Provider.of<AuthProvider>(context, listen: false);
               await authProvider.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
@@ -640,42 +690,46 @@ class _ProfileOption extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: themeProvider.isDarkMode
-                ? AppColors.primary.withValues(alpha:0.1)
-                : AppColors.primary.withValues(alpha:0.1),
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
             icon,
-            color: themeProvider.isDarkMode ? AppColors.primary : AppColors.primary,
+            color: themeProvider.isDarkMode
+                ? AppColors.primary
+                : AppColors.primary,
           ),
         ),
         title: Text(
           title,
           style: TextStyle(
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface
+                : AppColors.onSurface,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withValues(alpha:0.7)
-                : AppColors.onSurface.withValues(alpha:0.7),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                : AppColors.onSurface.withValues(alpha: 0.7),
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
           size: 16,
           color: themeProvider.isDarkMode
-              ? DarkAppColors.onSurface.withValues(alpha:0.5)
-              : AppColors.onSurface.withValues(alpha:0.5),
+              ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+              : AppColors.onSurface.withValues(alpha: 0.5),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withValues(alpha:0.2)
-                : AppColors.onSurface.withValues(alpha:0.2),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.2)
+                : AppColors.onSurface.withValues(alpha: 0.2),
           ),
         ),
         onTap: onTap,
@@ -709,9 +763,12 @@ class _ThemeOption extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isSelected ? color.withValues(alpha:0.1) : Colors.grey.shade50,
+            color:
+                isSelected ? color.withValues(alpha: 0.1) : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(8),
-            border: isSelected ? Border.all(color: color.withValues(alpha:0.3)) : null,
+            border: isSelected
+                ? Border.all(color: color.withValues(alpha: 0.3))
+                : null,
           ),
           child: Icon(
             icon,
@@ -732,7 +789,9 @@ class _ThemeOption extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: isSelected ? color.withValues(alpha:0.3) : Colors.grey.shade200,
+            color: isSelected
+                ? color.withValues(alpha: 0.3)
+                : Colors.grey.shade200,
           ),
         ),
         onTap: onTap,

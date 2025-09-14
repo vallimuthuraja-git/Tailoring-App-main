@@ -5,6 +5,7 @@ import '../../providers/theme_provider.dart';
 import '../../models/customer.dart';
 import '../../utils/theme_constants.dart';
 import '../../services/firebase_service.dart';
+import '../../widgets/user_avatar.dart';
 
 class CustomerDetailScreen extends StatefulWidget {
   final Customer customer;
@@ -48,18 +49,20 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        actions: widget.editable ? [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => _navigateToEdit(),
-            tooltip: 'Edit Customer',
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () => _showMoreOptions(),
-            tooltip: 'More Options',
-          ),
-        ] : null,
+        actions: widget.editable
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _navigateToEdit(),
+                  tooltip: 'Edit Customer',
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () => _showMoreOptions(),
+                  tooltip: 'More Options',
+                ),
+              ]
+            : null,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -85,11 +88,12 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 _buildInfoRow('Email', customer.email),
                 _buildInfoRow('Phone', customer.formattedPhone),
                 _buildInfoRow('Member Since',
-                  '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}'),
-                _buildInfoRow('Status',
-                  customer.isActive ? 'Active' : 'Inactive',
-                  valueColor: customer.isActive ? Colors.green : Colors.red),
-                _buildInfoRow('Loyalty Tier', customer.loyaltyTier.name.capitalize()),
+                    '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}'),
+                _buildInfoRow(
+                    'Status', customer.isActive ? 'Active' : 'Inactive',
+                    valueColor: customer.isActive ? Colors.green : Colors.red),
+                _buildInfoRow(
+                    'Loyalty Tier', customer.loyaltyTier.name.capitalize()),
               ],
             ),
 
@@ -117,18 +121,27 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     runSpacing: 8,
                     children: customer.preferences.map((preference) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: (isDark ? DarkAppColors.primary : AppColors.primary).withOpacity(0.1),
+                          color: (isDark
+                                  ? DarkAppColors.primary
+                                  : AppColors.primary)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: (isDark ? DarkAppColors.primary : AppColors.primary).withOpacity(0.2),
+                            color: (isDark
+                                    ? DarkAppColors.primary
+                                    : AppColors.primary)
+                                .withOpacity(0.2),
                           ),
                         ),
                         child: Text(
                           preference,
                           style: TextStyle(
-                            color: isDark ? DarkAppColors.primary : AppColors.primary,
+                            color: isDark
+                                ? DarkAppColors.primary
+                                : AppColors.primary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -158,27 +171,17 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         color: isDark ? DarkAppColors.surface : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? DarkAppColors.onSurface.withOpacity(0.1) : AppColors.onSurface.withOpacity(0.1),
+          color: isDark
+              ? DarkAppColors.onSurface.withOpacity(0.1)
+              : AppColors.onSurface.withOpacity(0.1),
         ),
       ),
       child: Column(
         children: [
-          CircleAvatar(
+          UserAvatar(
+            displayName: customer.name,
+            imageUrl: customer.photoUrl,
             radius: 50,
-            backgroundImage: customer.photoUrl != null
-                ? NetworkImage(customer.photoUrl!)
-                : null,
-            backgroundColor: (isDark ? DarkAppColors.primary : AppColors.primary).withOpacity(0.2),
-            child: customer.photoUrl == null
-                ? Text(
-                    customer.name[0].toUpperCase(),
-                    style: TextStyle(
-                      color: isDark ? DarkAppColors.primary : AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 36,
-                    ),
-                  )
-                : null,
           ),
           const SizedBox(height: 16),
           Text(
@@ -202,7 +205,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             child: Text(
               customer.isActive ? 'Active Customer' : 'Inactive Customer',
               style: TextStyle(
-                color: customer.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                color: customer.isActive
+                    ? Colors.green.shade700
+                    : Colors.red.shade700,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -214,9 +219,18 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   Widget _buildStatisticsCard(bool isDark) {
     final stats = [
-      {'label': 'Total Spent', 'value': '₹${customer.totalSpent.toStringAsFixed(0)}'},
-      {'label': 'Loyalty Tier', 'value': customer.loyaltyTier.name.capitalize()},
-      {'label': 'Measurements', 'value': customer.measurements.length.toString()},
+      {
+        'label': 'Total Spent',
+        'value': '₹${customer.totalSpent.toStringAsFixed(0)}'
+      },
+      {
+        'label': 'Loyalty Tier',
+        'value': customer.loyaltyTier.name.capitalize()
+      },
+      {
+        'label': 'Measurements',
+        'value': customer.measurements.length.toString()
+      },
       {'label': 'Preferences', 'value': customer.preferences.length.toString()},
     ];
 
@@ -226,7 +240,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         color: isDark ? DarkAppColors.surface : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? DarkAppColors.onSurface.withOpacity(0.1) : AppColors.onSurface.withOpacity(0.1),
+          color: isDark
+              ? DarkAppColors.onSurface.withOpacity(0.1)
+              : AppColors.onSurface.withOpacity(0.1),
         ),
       ),
       child: Column(
@@ -242,9 +258,12 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
           ),
           const SizedBox(height: 16),
           Row(
-            children: stats.map((stat) => Expanded(
-              child: _buildStatItem(stat['label']!, stat['value']!, isDark),
-            )).toList(),
+            children: stats
+                .map((stat) => Expanded(
+                      child: _buildStatItem(
+                          stat['label']!, stat['value']!, isDark),
+                    ))
+                .toList(),
           ),
         ],
       ),
@@ -267,7 +286,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isDark ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7),
+            color: isDark
+                ? DarkAppColors.onSurface.withOpacity(0.7)
+                : AppColors.onSurface.withOpacity(0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -287,7 +308,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         color: isDark ? DarkAppColors.surface : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? DarkAppColors.onSurface.withOpacity(0.1) : AppColors.onSurface.withOpacity(0.1),
+          color: isDark
+              ? DarkAppColors.onSurface.withOpacity(0.1)
+              : AppColors.onSurface.withOpacity(0.1),
         ),
       ),
       child: Column(
@@ -308,7 +331,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color:
+                        isDark ? DarkAppColors.onSurface : AppColors.onSurface,
                   ),
                 ),
               ],
@@ -366,10 +390,12 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
 
     // Convert measurement name to readable format
-    final readableName = measurement.replaceAllMapped(
-      RegExp(r'([A-Z])'),
-      (match) => ' ${match.group(0)}',
-    ).capitalize();
+    final readableName = measurement
+        .replaceAllMapped(
+          RegExp(r'([A-Z])'),
+          (match) => ' ${match.group(0)}',
+        )
+        .capitalize();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -390,7 +416,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: (isDark ? DarkAppColors.primary : AppColors.primary).withOpacity(0.1),
+                color: (isDark ? DarkAppColors.primary : AppColors.primary)
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -423,8 +450,10 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 icon: const Icon(Icons.edit),
                 label: const Text('Edit Profile'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isDark ? DarkAppColors.primary : AppColors.primary,
-                  foregroundColor: isDark ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                  backgroundColor:
+                      isDark ? DarkAppColors.primary : AppColors.primary,
+                  foregroundColor:
+                      isDark ? DarkAppColors.onPrimary : AppColors.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
@@ -439,7 +468,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                   side: BorderSide(
                     color: isDark ? DarkAppColors.primary : AppColors.primary,
                   ),
-                  foregroundColor: isDark ? DarkAppColors.primary : AppColors.primary,
+                  foregroundColor:
+                      isDark ? DarkAppColors.primary : AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
@@ -458,7 +488,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   void _showMoreOptions() {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     showModalBottomSheet(
       context: context,
@@ -470,7 +501,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: Icon(Icons.edit, color: isDark ? DarkAppColors.primary : AppColors.primary),
+            leading: Icon(Icons.edit,
+                color: isDark ? DarkAppColors.primary : AppColors.primary),
             title: const Text('Edit Customer'),
             onTap: () {
               Navigator.pop(context);
@@ -482,7 +514,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
               customer.isActive ? Icons.person_off : Icons.person,
               color: customer.isActive ? Colors.red : Colors.green,
             ),
-            title: Text(customer.isActive ? 'Mark as Inactive' : 'Mark as Active'),
+            title:
+                Text(customer.isActive ? 'Mark as Inactive' : 'Mark as Active'),
             onTap: () {
               Navigator.pop(context);
               _toggleCustomerStatus();
@@ -505,7 +538,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   }
 
   void _toggleCustomerStatus() async {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final firebaseService = FirebaseService();
 
     showDialog(
@@ -544,7 +578,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         customerProvider.loadAllCustomers();
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Customer ${customer.isActive ? 'activated' : 'deactivated'} successfully')),
+          SnackBar(
+              content: Text(
+                  'Customer ${customer.isActive ? 'activated' : 'deactivated'} successfully')),
         );
       }
     } catch (e) {
@@ -562,7 +598,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Customer'),
-        content: Text('Are you sure you want to delete ${customer.name}? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete ${customer.name}? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -578,7 +615,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     );
 
     if (confirmed == true) {
-      final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+      final customerProvider =
+          Provider.of<CustomerProvider>(context, listen: false);
       final firebaseService = FirebaseService();
 
       showDialog(

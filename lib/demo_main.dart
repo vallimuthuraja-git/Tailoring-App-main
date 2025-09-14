@@ -3,6 +3,7 @@ import 'services/demo_data_service.dart';
 import 'models/product.dart';
 import 'models/order.dart';
 import 'models/customer.dart';
+import '../widgets/user_avatar.dart';
 
 void main() {
   runApp(const DemoApp());
@@ -54,8 +55,10 @@ class DemoHomeScreen extends StatefulWidget {
 
 class _DemoHomeScreenState extends State<DemoHomeScreen> {
   int _currentIndex = 0;
-  final List<Product> _products = ComprehensiveDemoDataService.getDemoProducts();
-  final List<Customer> _customers = ComprehensiveDemoDataService.getDemoCustomers();
+  final List<Product> _products =
+      ComprehensiveDemoDataService.getDemoProducts();
+  final List<Customer> _customers =
+      ComprehensiveDemoDataService.getDemoCustomers();
   final List<Order> _orders = ComprehensiveDemoDataService.getDemoOrders();
 
   final List<Widget> _screens = [];
@@ -131,7 +134,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text('Please wait while we populate the database with comprehensive demo data...'),
+            Text(
+                'Please wait while we populate the database with comprehensive demo data...'),
           ],
         ),
       ),
@@ -147,16 +151,15 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           builder: (context) => AlertDialog(
             title: const Text('✅ Success!'),
             content: const Text(
-              'Demo data has been successfully populated in the database!\n\n'
-              '📊 Generated:\n'
-              '• 35 customers with all loyalty tiers\n'
-              '• 28 products across all categories\n'
-              '• 18 employees with diverse skill sets\n'
-              '• 22 services with all types & complexities\n'
-              '• 35 work assignments linking employees to orders\n'
-              '• 25 chat conversations for customer support\n\n'
-              'Excellent coverage for comprehensive testing!'
-            ),
+                'Demo data has been successfully populated in the database!\n\n'
+                '📊 Generated:\n'
+                '• 35 customers with all loyalty tiers\n'
+                '• 28 products across all categories\n'
+                '• 18 employees with diverse skill sets\n'
+                '• 22 services with all types & complexities\n'
+                '• 35 work assignments linking employees to orders\n'
+                '• 25 chat conversations for customer support\n\n'
+                'Excellent coverage for comprehensive testing!'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -219,7 +222,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 child: ListView(
                   children: const [
                     ChatBubble(
-                      message: "Hello! I'm your AI tailoring assistant. How can I help you today?",
+                      message:
+                          "Hello! I'm your AI tailoring assistant. How can I help you today?",
                       isUser: false,
                     ),
                     ChatBubble(
@@ -227,7 +231,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       isUser: true,
                     ),
                     ChatBubble(
-                      message: "I'd be happy to help you with suit measurements! For a proper fit, we'll need to measure: chest, waist, shoulder, length, and inseam. Would you like me to guide you through the process?",
+                      message:
+                          "I'd be happy to help you with suit measurements! For a proper fit, we'll need to measure: chest, waist, shoulder, length, and inseam. Would you like me to guide you through the process?",
                       isUser: false,
                     ),
                   ],
@@ -441,7 +446,8 @@ class HomeTab extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(order.status).withValues(alpha: 0.1),
+                            color: _getStatusColor(order.status)
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
@@ -472,9 +478,11 @@ class HomeTab extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(order.status).withValues(alpha: 0.1),
+                            color: _getStatusColor(order.status)
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -626,7 +634,6 @@ class ProductsTab extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class OrdersTab extends StatelessWidget {
@@ -660,9 +667,11 @@ class OrdersTab extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(order.status).withValues(alpha: 0.1),
+                          color: _getStatusColor(order.status)
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
@@ -789,20 +798,10 @@ class CustomersTab extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  UserAvatar(
+                    displayName: customer.displayName,
+                    imageUrl: customer.photoUrl,
                     radius: 30,
-                    backgroundImage: customer.photoUrl != null
-                        ? NetworkImage(customer.photoUrl!)
-                        : null,
-                    child: customer.photoUrl == null
-                        ? Text(
-                            customer.displayName[0].toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -836,7 +835,8 @@ class CustomersTab extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.blue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
@@ -962,14 +962,20 @@ class AnalyticsTab extends StatelessWidget {
           const SizedBox(height: 12),
           _PerformanceIndicator(
             label: 'Average Order Value',
-            value: stats['totalOrders'] > 0 ? stats['totalRevenue'] / stats['totalOrders'] : 0,
+            value: stats['totalOrders'] > 0
+                ? stats['totalRevenue'] / stats['totalOrders']
+                : 0,
             color: Colors.blue,
             isCurrency: true,
           ),
           const SizedBox(height: 12),
           _PerformanceIndicator(
             label: 'Customer Retention',
-            value: customers.isNotEmpty ? (customers.where((c) => c.isActive).length / customers.length) * 100 : 0,
+            value: customers.isNotEmpty
+                ? (customers.where((c) => c.isActive).length /
+                        customers.length) *
+                    100
+                : 0,
             color: Colors.purple,
             isPercentage: true,
           ),
@@ -1155,7 +1161,9 @@ class _PerformanceIndicator extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
-              value: isPercentage ? value / 100 : (value > 100 ? 1.0 : value / 100),
+              value: isPercentage
+                  ? value / 100
+                  : (value > 100 ? 1.0 : value / 100),
               backgroundColor: Colors.grey.shade200,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),

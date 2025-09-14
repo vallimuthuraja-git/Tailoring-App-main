@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/employee_provider.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common_app_bar_actions.dart';
+import '../../utils/responsive_utils.dart';
 import 'employee_list_simple.dart';
 import 'employee_performance_dashboard.dart';
 import 'employee_dashboard_screen.dart';
@@ -51,18 +52,23 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
     if (_tabs.isEmpty) {
       debugPrint('📝 EmployeeManagementHome: Tabs are empty, setting up...');
       _setupTabs();
-      debugPrint('✅ EmployeeManagementHome: Setup complete, tabs length: ${_tabs.length}');
+      debugPrint(
+          '✅ EmployeeManagementHome: Setup complete, tabs length: ${_tabs.length}');
     } else {
-      debugPrint('🚦 EmployeeManagementHome: Tabs already setup (${_tabs.length} tabs)');
+      debugPrint(
+          '🚦 EmployeeManagementHome: Tabs already setup (${_tabs.length} tabs)');
     }
   }
 
   void _setupTabs() {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      debugPrint('🔐 EmployeeManagementHome: Auth provider user: ${authProvider.user?.email}');
-      debugPrint('👑 EmployeeManagementHome: isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
-      debugPrint('🎭 EmployeeManagementHome: userRole: ${authProvider.userRole}');
+      debugPrint(
+          '🔐 EmployeeManagementHome: Auth provider user: ${authProvider.user?.email}');
+      debugPrint(
+          '👑 EmployeeManagementHome: isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
+      debugPrint(
+          '🎭 EmployeeManagementHome: userRole: ${authProvider.userRole}');
 
       final isShopOwnerOrAdmin = authProvider.isShopOwnerOrAdmin;
 
@@ -99,8 +105,8 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
       }
 
       setState(() {}); // Trigger rebuild after setting up tabs
-      debugPrint('📱 EmployeeManagementHome: Tabs setup complete with ${_tabs.length} tabs');
-
+      debugPrint(
+          '📱 EmployeeManagementHome: Tabs setup complete with ${_tabs.length} tabs');
     } catch (e) {
       debugPrint('❌ EmployeeManagementHome: Error setting up tabs: $e');
 
@@ -109,9 +115,7 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
       _tabs = [
         const EmployeeListSimple(),
       ];
-      _tabTitles = [
-        'Employee List'
-      ];
+      _tabTitles = ['Employee List'];
       _tabIcons = [
         Icons.people,
       ];
@@ -123,9 +127,6 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
   @override
   Widget build(BuildContext context) {
     debugPrint('🔄 EmployeeManagementHome: Building widget');
-
-    // Ensure tabs are setup every build for safety
-    _ensureTabsAreSetup();
 
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
@@ -139,7 +140,8 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
             authProvider.hasRole(UserRole.supervisor) ||
             authProvider.hasRole(UserRole.apprentice);
 
-        debugPrint('🔑 EmployeeManagementHome: hasEmployeeManagementAccess: $hasEmployeeManagementAccess');
+        debugPrint(
+            '🔑 EmployeeManagementHome: hasEmployeeManagementAccess: $hasEmployeeManagementAccess');
 
         if (!hasEmployeeManagementAccess) {
           debugPrint('❌ EmployeeManagementHome: Access denied');
@@ -175,77 +177,192 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
           );
         }
 
-        debugPrint('✅ EmployeeManagementHome: Building main scaffold with ${_tabs.length} tabs');
+        debugPrint(
+            '✅ EmployeeManagementHome: Building main scaffold with ${_tabs.length} tabs');
 
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Employee Management'),
-            toolbarHeight: kToolbarHeight + 5,
-            backgroundColor: Theme.of(context).primaryColor,
-            foregroundColor: Colors.white,
-            actions: const [CommonAppBarActions()],
-          ),
-          body: (_tabs.isEmpty || _selectedTab >= _tabs.length)
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 16),
-                      const Text('Setting up employee management...'),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          debugPrint('🔄 EmployeeManagementHome: Manual retry triggered');
-                          _ensureTabsAreSetup();
-                        },
-                        child: const Text('Retry Setup'),
-                      ),
-                    ],
-                  ),
-                )
-              : _tabs[_selectedTab],
-          bottomNavigationBar: _tabs.isEmpty
-              ? null
-              : BottomNavigationBar(
-                  currentIndex: _selectedTab,
-                  onTap: (index) {
-                    setState(() {
-                      _selectedTab = index;
-                    });
-                  },
-                  items: List.generate(
-                    _tabs.length,
-                    (index) => BottomNavigationBarItem(
-                      icon: Icon(_tabIcons[index]),
-                      label: _tabTitles[index],
-                    ),
-                  ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final deviceType =
+                ResponsiveUtils.getDeviceType(constraints.maxWidth);
+
+            if (deviceType == DeviceType.desktop) {
+              // Desktop layout with side navigation
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Employee Management'),
+                  toolbarHeight: kToolbarHeight + 5,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: Colors.white,
+                  actions: const [CommonAppBarActions()],
                 ),
-          floatingActionButton: _selectedTab == 0 && authProvider.isShopOwnerOrAdmin
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    // Capture the provider before the async operation
-                    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-
-                    // Navigate to add employee screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EmployeeCreateScreen(),
+                body: Row(
+                  children: [
+                    // Side Navigation
+                    Container(
+                      width: 250,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        border: Border(
+                          right: BorderSide(
+                            color: Theme.of(context).dividerColor,
+                            width: 1,
+                          ),
+                        ),
                       ),
-                    ).then((_) async {
-                      // Refresh data when returning from create screen
-                      if (mounted && _selectedTab == 0) {
-                        // If we're on the list tab, refresh the provider
-                        await employeeProvider.loadEmployees();
-                      }
-                    });
-                  },
-                  icon: const Icon(Icons.person_add),
-                  label: const Text('Add Employee'),
-                )
-              : null,
+                      child: Column(
+                        children: [
+                          // Add Employee Button for desktop
+                          if (_selectedTab == 0 &&
+                              authProvider.isShopOwnerOrAdmin)
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  final employeeProvider =
+                                      Provider.of<EmployeeProvider>(context,
+                                          listen: false);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const EmployeeCreateScreen(),
+                                    ),
+                                  ).then((_) async {
+                                    if (mounted && _selectedTab == 0) {
+                                      await employeeProvider.loadEmployees();
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.person_add),
+                                label: const Text('Add Employee'),
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(double.infinity, 48),
+                                ),
+                              ),
+                            ),
+                          // Navigation items
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: _tabs.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  leading: Icon(_tabIcons[index]),
+                                  title: Text(_tabTitles[index]),
+                                  selected: _selectedTab == index,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedTab = index;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Main Content
+                    Expanded(
+                      child: (_tabs.isEmpty || _selectedTab >= _tabs.length)
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircularProgressIndicator(),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                      'Setting up employee management...'),
+                                  const SizedBox(height: 24),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      debugPrint(
+                                          '🔄 EmployeeManagementHome: Manual retry triggered');
+                                      _ensureTabsAreSetup();
+                                    },
+                                    child: const Text('Retry Setup'),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : _tabs[_selectedTab],
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              // Mobile and tablet layout with bottom navigation
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Employee Management'),
+                  toolbarHeight: kToolbarHeight + 5,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: Colors.white,
+                  actions: const [CommonAppBarActions()],
+                ),
+                body: (_tabs.isEmpty || _selectedTab >= _tabs.length)
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 16),
+                            const Text('Setting up employee management...'),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed: () {
+                                debugPrint(
+                                    '🔄 EmployeeManagementHome: Manual retry triggered');
+                                _ensureTabsAreSetup();
+                              },
+                              child: const Text('Retry Setup'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : _tabs[_selectedTab],
+                bottomNavigationBar: _tabs.isEmpty
+                    ? null
+                    : BottomNavigationBar(
+                        currentIndex: _selectedTab,
+                        onTap: (index) {
+                          setState(() {
+                            _selectedTab = index;
+                          });
+                        },
+                        items: List.generate(
+                          _tabs.length,
+                          (index) => BottomNavigationBarItem(
+                            icon: Icon(_tabIcons[index]),
+                            label: _tabTitles[index],
+                          ),
+                        ),
+                      ),
+                floatingActionButton:
+                    _selectedTab == 0 && authProvider.isShopOwnerOrAdmin
+                        ? FloatingActionButton.extended(
+                            onPressed: () {
+                              final employeeProvider =
+                                  Provider.of<EmployeeProvider>(context,
+                                      listen: false);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const EmployeeCreateScreen(),
+                                ),
+                              ).then((_) async {
+                                if (mounted && _selectedTab == 0) {
+                                  await employeeProvider.loadEmployees();
+                                }
+                              });
+                            },
+                            icon: const Icon(Icons.person_add),
+                            label: const Text('Add Employee'),
+                          )
+                        : null,
+              );
+            }
+          },
         );
       },
     );

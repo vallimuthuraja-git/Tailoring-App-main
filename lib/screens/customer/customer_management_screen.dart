@@ -7,6 +7,7 @@ import '../../models/customer.dart';
 import '../../utils/theme_constants.dart';
 import '../../services/demo_data_service.dart';
 import '../../services/firebase_service.dart';
+import '../../widgets/user_avatar.dart';
 import 'customer_create_screen.dart';
 import 'customer_detail_screen.dart';
 import 'customer_analytics_screen.dart';
@@ -15,7 +16,8 @@ class CustomerManagementScreen extends StatefulWidget {
   const CustomerManagementScreen({super.key});
 
   @override
-  State<CustomerManagementScreen> createState() => _CustomerManagementScreenState();
+  State<CustomerManagementScreen> createState() =>
+      _CustomerManagementScreenState();
 }
 
 class _CustomerManagementScreenState extends State<CustomerManagementScreen>
@@ -45,7 +47,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _loadCustomers() {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     customerProvider.loadAllCustomers();
   }
 
@@ -57,13 +60,19 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       appBar: AppBar(
         title: const Text('Customer Management'),
         toolbarHeight: kToolbarHeight + 5,
-        backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        backgroundColor: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         elevation: 0,
         iconTheme: IconThemeData(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
         ),
         titleTextStyle: TextStyle(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
@@ -79,7 +88,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           IconButton(
             icon: Icon(
               Icons.analytics,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             onPressed: () => _navigateToAnalytics(context),
             tooltip: 'Customer Analytics',
@@ -87,7 +98,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           IconButton(
             icon: Icon(
               Icons.refresh,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             onPressed: _loadCustomers,
             tooltip: 'Refresh',
@@ -96,7 +109,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           PopupMenuButton<String>(
             icon: Icon(
               Icons.more_vert,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             tooltip: 'More Actions',
             onSelected: (value) {
@@ -113,37 +128,37 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
               }
             },
             itemBuilder: (context) => [
-               const PopupMenuItem(
-                 value: 'test_customer',
-                 child: Row(
-                   children: [
-                     Icon(Icons.bug_report),
-                     SizedBox(width: 8),
-                     Text('🔧 Test Customer Creation'),
-                   ],
-                 ),
-               ),
-               const PopupMenuItem(
-                 value: 'add_demo_customer',
-                 child: Row(
-                   children: [
-                     Icon(Icons.person),
-                     SizedBox(width: 8),
-                     Text('Add Demo Customer'),
-                   ],
-                 ),
-               ),
-               const PopupMenuItem(
-                 value: 'populate_demo',
-                 child: Row(
-                   children: [
-                     Icon(Icons.group_add),
-                     SizedBox(width: 8),
-                     Text('Add All Demo Customers'),
-                   ],
-                 ),
-               ),
-             ],
+              const PopupMenuItem(
+                value: 'test_customer',
+                child: Row(
+                  children: [
+                    Icon(Icons.bug_report),
+                    SizedBox(width: 8),
+                    Text('🔧 Test Customer Creation'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'add_demo_customer',
+                child: Row(
+                  children: [
+                    Icon(Icons.person),
+                    SizedBox(width: 8),
+                    Text('Add Demo Customer'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'populate_demo',
+                child: Row(
+                  children: [
+                    Icon(Icons.group_add),
+                    SizedBox(width: 8),
+                    Text('Add All Demo Customers'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
         bottom: PreferredSize(
@@ -152,11 +167,14 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             children: [
               // Search Bar
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: TextField(
                   controller: _searchController,
                   style: TextStyle(
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search customers...',
@@ -171,7 +189,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                             icon: Icon(
                               Icons.clear,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                  ? DarkAppColors.onSurface
+                                      .withValues(alpha: 0.7)
                                   : AppColors.onSurface.withValues(alpha: 0.7),
                             ),
                             onPressed: () {
@@ -189,7 +208,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                       ),
                     ),
                     filled: true,
-                    fillColor: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                    fillColor: themeProvider.isDarkMode
+                        ? DarkAppColors.background
+                        : AppColors.background,
                   ),
                   onChanged: (value) => setState(() => _searchQuery = value),
                 ),
@@ -199,8 +220,12 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
-                indicatorColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                labelColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                indicatorColor: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
+                labelColor: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
                 unselectedLabelColor: themeProvider.isDarkMode
                     ? DarkAppColors.onSurface.withValues(alpha: 0.6)
                     : AppColors.onSurface.withValues(alpha: 0.6),
@@ -256,7 +281,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           }
 
           // Get filtered and searched customers
-          final filteredCustomers = _getFilteredCustomers(customerProvider.customers);
+          final filteredCustomers =
+              _getFilteredCustomers(customerProvider.customers);
 
           return Column(
             children: [
@@ -315,15 +341,16 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       final lowerQuery = _searchQuery.toLowerCase();
       filtered = filtered.where((customer) {
         return customer.name.toLowerCase().contains(lowerQuery) ||
-               customer.email.toLowerCase().contains(lowerQuery) ||
-               customer.phone.contains(lowerQuery);
+            customer.email.toLowerCase().contains(lowerQuery) ||
+            customer.phone.contains(lowerQuery);
       }).toList();
     }
 
     return filtered;
   }
 
-  Widget _buildStatisticsCards(CustomerProvider customerProvider, ThemeProvider themeProvider) {
+  Widget _buildStatisticsCards(
+      CustomerProvider customerProvider, ThemeProvider themeProvider) {
     final stats = _calculateCustomerStats(customerProvider.customers);
 
     return Container(
@@ -371,15 +398,20 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, ThemeProvider themeProvider, {Color? color}) {
-    final cardColor = color ?? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary);
+  Widget _buildStatCard(
+      String title, String value, IconData icon, ThemeProvider themeProvider,
+      {Color? color}) {
+    final cardColor = color ??
+        (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary);
 
     return Container(
       width: 140,
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: themeProvider.isDarkMode
@@ -410,7 +442,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
           ),
           Text(
@@ -447,7 +481,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                 : 'No customers found',
             style: TextStyle(
               fontSize: 18,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             textAlign: TextAlign.center,
           ),
@@ -478,7 +514,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     );
   }
 
-  Widget _buildCustomerList(List<Customer> customers, ThemeProvider themeProvider) {
+  Widget _buildCustomerList(
+      List<Customer> customers, ThemeProvider themeProvider) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: customers.length,
@@ -490,7 +527,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _showQuickCustomerAdd(BuildContext context) async {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final firebaseService = FirebaseService();
 
     // Simple customer creation for testing
@@ -521,13 +559,11 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       customerProvider.loadAllCustomers();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Quick customer added successfully!'))
-      );
+          const SnackBar(content: Text('Quick customer added successfully!')));
     } catch (e) {
       debugPrint('❌ Quick customer creation failed: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add customer: $e'))
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to add customer: $e')));
     }
   }
 
@@ -549,24 +585,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
               // Customer Header
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundImage: customer.photoUrl != null
-                        ? NetworkImage(customer.photoUrl!)
-                        : null,
-                    backgroundColor: themeProvider.isDarkMode
-                        ? DarkAppColors.primary.withValues(alpha: 0.2)
-                        : AppColors.primary.withValues(alpha: 0.2),
-                    child: customer.photoUrl == null
-                        ? Text(
-                            customer.name[0].toUpperCase(),
-                            style: TextStyle(
-                              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          )
-                        : null,
+                  UserAvatar(
+                    displayName: customer.name,
+                    imageUrl: customer.photoUrl,
+                    radius: 24.0,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -578,7 +600,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface
+                                : AppColors.onSurface,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -599,7 +623,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                     children: [
                       _buildStatusChip(customer.isActive, themeProvider),
                       const SizedBox(height: 4),
-                      _buildLoyaltyChip(customer.loyaltyTier.name, themeProvider),
+                      _buildLoyaltyChip(
+                          customer.loyaltyTier.name, themeProvider),
                     ],
                   ),
                 ],
@@ -618,7 +643,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                           'Phone: ${customer.formattedPhone}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface
+                                : AppColors.onSurface,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -627,7 +654,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.primary
+                                : AppColors.primary,
                           ),
                         ),
                       ],
@@ -650,7 +679,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface
+                              : AppColors.onSurface,
                         ),
                       ),
                     ],
@@ -677,7 +708,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                   spacing: 6,
                   children: customer.topPreferences.map((preference) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: themeProvider.isDarkMode
                             ? DarkAppColors.primary.withValues(alpha: 0.1)
@@ -688,7 +720,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                         preference,
                         style: TextStyle(
                           fontSize: 11,
-                          color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
                         ),
                       ),
                     );
@@ -726,17 +760,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive
-            ? Colors.green.shade100
-            : Colors.red.shade100,
+        color: isActive ? Colors.green.shade100 : Colors.red.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         isActive ? 'Active' : 'Inactive',
         style: TextStyle(
-          color: isActive
-              ? Colors.green.shade800
-              : Colors.red.shade800,
+          color: isActive ? Colors.green.shade800 : Colors.red.shade800,
           fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
@@ -787,7 +817,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     final total = customers.length;
     final active = customers.where((c) => c.isActive).length;
     final inactive = total - active;
-    final totalRevenue = customers.fold<double>(0, (sum, c) => sum + c.totalSpent);
+    final totalRevenue =
+        customers.fold<double>(0, (sum, c) => sum + c.totalSpent);
     final avgOrderValue = total > 0 ? totalRevenue / total : 0;
 
     return {
@@ -810,7 +841,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   // Show detailed customer information
   void _showCustomerDetails(Customer customer) {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     showDialog(
       context: context,
@@ -823,22 +855,23 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             children: [
               _buildDetailRow('Email', customer.email),
               _buildDetailRow('Phone', customer.formattedPhone),
-              _buildDetailRow('Status', customer.isActive ? 'Active' : 'Inactive'),
-              _buildDetailRow('Loyalty Tier', customer.loyaltyTier.name.toUpperCase()),
-              _buildDetailRow('Total Spent', '₹${customer.totalSpent.toStringAsFixed(0)}'),
-              _buildDetailRow('Member Since', '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}'),
+              _buildDetailRow(
+                  'Status', customer.isActive ? 'Active' : 'Inactive'),
+              _buildDetailRow(
+                  'Loyalty Tier', customer.loyaltyTier.name.toUpperCase()),
+              _buildDetailRow(
+                  'Total Spent', '₹${customer.totalSpent.toStringAsFixed(0)}'),
+              _buildDetailRow('Member Since',
+                  '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}'),
               const SizedBox(height: 16),
               const Text(
                 'Measurements:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
-              ...customer.measurements.entries.map((measurement) =>
-                _buildDetailRow(
+              ...customer.measurements.entries.map((measurement) => _buildDetailRow(
                   measurement.key,
-                  '${measurement.value}${measurement.key == 'neck' || measurement.key.contains('height') ? ' inch' : ''}'
-                )
-              ),
+                  '${measurement.value}${measurement.key == 'neck' || measurement.key.contains('height') ? ' inch' : ''}')),
               const SizedBox(height: 16),
               const Text(
                 'Preferences:',
@@ -874,7 +907,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   // Edit customer basic information
   void _editCustomerDialog(BuildContext context, Customer customer) {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final nameController = TextEditingController(text: customer.name);
     final emailController = TextEditingController(text: customer.email);
     final phoneController = TextEditingController(text: customer.phone);
@@ -936,7 +970,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                 if (success) {
                   customerProvider.loadAllCustomers(); // Refresh list
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Customer updated successfully!')),
+                    const SnackBar(
+                        content: Text('Customer updated successfully!')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -953,7 +988,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   // Toggle customer active status
-  void _toggleCustomerStatus(Customer customer, CustomerProvider customerProvider) async {
+  void _toggleCustomerStatus(
+      Customer customer, CustomerProvider customerProvider) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -979,7 +1015,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
         customerProvider.loadAllCustomers(); // Refresh list
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Customer ${!customer.isActive ? 'enabled' : 'disabled'} successfully!')),
+          SnackBar(
+              content: Text(
+                  'Customer ${!customer.isActive ? 'enabled' : 'disabled'} successfully!')),
         );
       }
     } catch (e) {
@@ -994,7 +1032,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   // Edit customer measurements
   void _editMeasurementsDialog(BuildContext context, Customer customer) {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final measurements = customer.measurements;
 
     // Create controllers for each measurement
@@ -1012,13 +1051,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               ...measurements.keys.map((key) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: TextField(
-                  controller: controllers[key],
-                  decoration: InputDecoration(labelText: '$key (inches)'),
-                  keyboardType: TextInputType.number,
-                ),
-              )),
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: TextField(
+                      controller: controllers[key],
+                      decoration: InputDecoration(labelText: '$key (inches)'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  )),
             ],
           ),
         ),
@@ -1049,7 +1088,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                 }
               });
 
-              final success = await customerProvider.updateMeasurements(updatedMeasurements);
+              final success = await customerProvider
+                  .updateMeasurements(updatedMeasurements);
 
               if (context.mounted) {
                 Navigator.of(context).pop(); // Close loading dialog
@@ -1057,11 +1097,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                 if (success) {
                   customerProvider.loadAllCustomers(); // Refresh list
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Measurements updated successfully!')),
+                    const SnackBar(
+                        content: Text('Measurements updated successfully!')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to update measurements')),
+                    const SnackBar(
+                        content: Text('Failed to update measurements')),
                   );
                 }
               }
@@ -1075,8 +1117,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   // Edit customer preferences
   void _editPreferencesDialog(BuildContext context, Customer customer) {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
-    final preferencesController = TextEditingController(text: customer.preferences.join(', '));
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    final preferencesController =
+        TextEditingController(text: customer.preferences.join(', '));
 
     showDialog(
       context: context,
@@ -1124,11 +1168,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                 if (success) {
                   customerProvider.loadAllCustomers(); // Refresh list
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Preferences updated successfully!')),
+                    const SnackBar(
+                        content: Text('Preferences updated successfully!')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to update preferences')),
+                    const SnackBar(
+                        content: Text('Failed to update preferences')),
                   );
                 }
               }
@@ -1151,7 +1197,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _showCustomerActions(BuildContext context, Customer customer) {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     showModalBottomSheet(
       context: context,
@@ -1266,7 +1313,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Customer'),
-        content: Text('Are you sure you want to delete ${customer.name}? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete ${customer.name}? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -1286,7 +1334,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _deleteCustomer(Customer customer) async {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final firebaseService = FirebaseService();
 
     // Show confirmation dialog
@@ -1294,7 +1343,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Customer'),
-        content: Text('Are you sure you want to delete ${customer.name}? This action cannot be undone.\n\nThis will also remove all associated data including measurements and preferences.'),
+        content: Text(
+            'Are you sure you want to delete ${customer.name}? This action cannot be undone.\n\nThis will also remove all associated data including measurements and preferences.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -1347,7 +1397,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _showAddCustomerDialog(BuildContext context) {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     Navigator.push(
       context,
@@ -1362,7 +1413,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   // Test function to add a simple customer for debugging
   void _addTestCustomerEvenIfBroken(BuildContext context) async {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
     final firebaseService = FirebaseService();
 
     try {
@@ -1408,7 +1460,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('✅ Test Customer Created!'),
-          content: const Text('Test customer added to database\nRefresh the screen to see it'),
+          content: const Text(
+              'Test customer added to database\nRefresh the screen to see it'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -1417,7 +1470,6 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           ],
         ),
       );
-
     } catch (e) {
       debugPrint('❌ Test customer creation failed: $e');
       Navigator.of(context).pop(); // Close loading dialog
@@ -1440,7 +1492,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   // Add specific Demo Customer with detailed information
   void _addDemoCustomer(BuildContext context) async {
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     // Create comprehensive demo customer data
     final demoData = {
@@ -1457,9 +1510,16 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         'sleeveLength': 26.0,
         'inseam': 33.0,
         'hips': 40.0,
-        'sholder': 18.5, // Note: using this instead of 'shoulder' for consistency with existing code
+        'sholder':
+            18.5, // Note: using this instead of 'shoulder' for consistency with existing code
       },
-      'preferences': ['Business Wear', 'Cotton', 'Formal Attire', 'Classic Design', 'Professional'],
+      'preferences': [
+        'Business Wear',
+        'Cotton',
+        'Formal Attire',
+        'Classic Design',
+        'Professional'
+      ],
     };
 
     showDialog(
@@ -1472,7 +1532,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text('Please wait while we create the Demo Customer with complete profile...'),
+            Text(
+                'Please wait while we create the Demo Customer with complete profile...'),
           ],
         ),
       ),
@@ -1501,14 +1562,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             builder: (context) => AlertDialog(
               title: const Text('✅ Demo Customer Created!'),
               content: const Text(
-                'Demo Customer has been successfully added to the database with:\n\n'
-                '• Complete profile information\n'
-                '• Body measurements\n'
-                '• Customer preferences\n'
-                '• Contact details\n'
-                '• Active status\n\n'
-                'You can now edit, update, and manage this customer using the action buttons.'
-              ),
+                  'Demo Customer has been successfully added to the database with:\n\n'
+                  '• Complete profile information\n'
+                  '• Body measurements\n'
+                  '• Customer preferences\n'
+                  '• Contact details\n'
+                  '• Active status\n\n'
+                  'You can now edit, update, and manage this customer using the action buttons.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -1522,7 +1582,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             context: context,
             builder: (context) => AlertDialog(
               title: const Text('❌ Error'),
-              content: const Text('Failed to create Demo Customer. Please try again.'),
+              content: const Text(
+                  'Failed to create Demo Customer. Please try again.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -1561,14 +1622,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       builder: (context) => AlertDialog(
         title: const Text('Add Demo Customers'),
         content: const Text(
-          'This will add 35 demo customers with sample data to your database.\n\n'
-          'Features included:\n'
-          '• Diverse customer profiles\n'
-          '• Multiple loyalty tiers\n'
-          '• Body measurements\n'
-          '• Purchase history\n\n'
-          'Proceed with adding demo data?'
-        ),
+            'This will add 35 demo customers with sample data to your database.\n\n'
+            'Features included:\n'
+            '• Diverse customer profiles\n'
+            '• Multiple loyalty tiers\n'
+            '• Body measurements\n'
+            '• Purchase history\n\n'
+            'Proceed with adding demo data?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -1601,7 +1661,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Please wait while we populate the database with 35 demo customers...'),
+              Text(
+                  'Please wait while we populate the database with 35 demo customers...'),
             ],
           ),
         ),
@@ -1651,14 +1712,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           builder: (context) => AlertDialog(
             title: const Text('✅ Demo Data Added Successfully!'),
             content: Text(
-              'Successfully added $successCount demo customers to your database!\n\n'
-              'Demo customers include:\n'
-              '• Diverse loyalty tiers (Bronze, Silver, Gold, Platinum)\n'
-              '• Realistic contact information\n'
-              '• Body measurements and preferences\n'
-              '• Purchase history and spending patterns\n\n'
-              'These customers are now visible in your customer management system!'
-            ),
+                'Successfully added $successCount demo customers to your database!\n\n'
+                'Demo customers include:\n'
+                '• Diverse loyalty tiers (Bronze, Silver, Gold, Platinum)\n'
+                '• Realistic contact information\n'
+                '• Body measurements and preferences\n'
+                '• Purchase history and spending patterns\n\n'
+                'These customers are now visible in your customer management system!'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),

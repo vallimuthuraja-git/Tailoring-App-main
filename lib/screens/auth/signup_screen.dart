@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../../providers/auth_provider.dart' as app_auth;
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
+import '../../utils/responsive_utils.dart';
 import '../../services/auth_service.dart';
+import '../../models/user_role.dart' as user_role;
+import '../../services/auth_service.dart' as auth_service;
 import '../home/home_screen.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -14,7 +20,8 @@ class SignupScreen extends StatefulWidget {
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMixin {
+class _SignupScreenState extends State<SignupScreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   final _formKey = GlobalKey<FormState>();
 
@@ -22,7 +29,6 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _phoneController = TextEditingController();
 
   // Controllers for Step 2
   final _firstNameController = TextEditingController();
@@ -37,18 +43,19 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
   bool _isLoading = false;
   bool _acceptTerms = false;
   bool _emailVerificationSent = false;
+  bool _emailVerified = false;
   bool _phoneVerificationMode = false;
+  bool _phoneVerified = false;
   String _verificationId = '';
   String _smsCode = '';
+  PhoneNumber? _phoneNumber;
   int _currentStep = 0;
 
-  UserRole _selectedRole = UserRole.customer;
-  final List<UserRole> _availableRoles = [
-    UserRole.customer,
-    UserRole.employee,
-    UserRole.tailor,
-    UserRole.cutter,
-    UserRole.finisher,
+  user_role.UserRole _selectedRole = user_role.UserRole.customer;
+  final List<user_role.UserRole> _availableRoles = [
+    user_role.UserRole.customer,
+    user_role.UserRole.employee,
+    user_role.UserRole.shopOwner,
   ];
 
   // Password strength
@@ -82,7 +89,6 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _phoneController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _addressController.dispose();
@@ -116,8 +122,12 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) score++;
 
     // Common patterns (negative)
-    if (RegExp(r'(.)\1{2,}').hasMatch(password)) score = score > 0 ? score - 1 : 0;
-    if (RegExp(r'(?:012|123|234|345|456|567|678|789|890)').hasMatch(password)) score = score > 0 ? score - 1 : 0;
+    if (RegExp(r'(.)\1{2,}').hasMatch(password)) {
+      score = score > 0 ? score - 1 : 0;
+    }
+    if (RegExp(r'(?:012|123|234|345|456|567|678|789|890)').hasMatch(password)) {
+      score = score > 0 ? score - 1 : 0;
+    }
 
     final strength = score / 6.0;
     setState(() {
@@ -170,155 +180,219 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                       ],
                     ),
             ),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 450),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: themeProvider.isGlassyMode
-                              ? [
-                                  BoxShadow(
-                                    color: (isDarkMode
-                                            ? Colors.white
-                                            : Colors.black)
-                                        .withValues(alpha: 0.1),
-                                    blurRadius: 20,
-                                    spreadRadius: 5,
-                                  ),
-                                ]
-                              : null,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final deviceType =
+                    ResponsiveUtils.getDeviceType(constraints.maxWidth);
+                final isDesktop = deviceType == DeviceType.desktop;
+                final isMobile = deviceType == DeviceType.mobile;
+
+                return SafeArea(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: isDesktop
+                              ? 800
+                              : (isMobile ? double.infinity : 500),
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: BackdropFilter(
-                            filter: themeProvider.isGlassyMode
-                                ? ImageFilter.blur(sigmaX: 10, sigmaY: 10)
-                                : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-                            child: Container(
-                              padding: const EdgeInsets.all(32),
-                              decoration: BoxDecoration(
-                                color: themeProvider.isGlassyMode
-                                    ? (isDarkMode
-                                            ? Colors.white.withValues(alpha: 0.1)
-                                            : Colors.white.withValues(alpha: 0.2))
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: ResponsiveUtils.responsiveSpacing(
+                                24.0, deviceType),
+                            vertical: ResponsiveUtils.responsiveSpacing(
+                                32.0, deviceType),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: themeProvider.isGlassyMode
+                                  ? [
+                                      BoxShadow(
+                                        color: (isDarkMode
+                                                ? Colors.white
+                                                : Colors.black)
+                                            .withValues(alpha: 0.1),
+                                        blurRadius: 20,
+                                        spreadRadius: 5,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: BackdropFilter(
+                                filter: themeProvider.isGlassyMode
+                                    ? ImageFilter.blur(sigmaX: 10, sigmaY: 10)
+                                    : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                                child: Container(
+                                  padding: EdgeInsets.all(
+                                      ResponsiveUtils.responsiveSpacing(
+                                          32.0, deviceType)),
+                                  decoration: BoxDecoration(
+                                    color: themeProvider.isGlassyMode
+                                        ? (isDarkMode
+                                            ? Colors.white
+                                                .withValues(alpha: 0.1)
+                                            : Colors.white
+                                                .withValues(alpha: 0.2))
                                         : (isDarkMode
-                                            ? DarkAppColors.surface.withValues(alpha: 0.95)
-                                            : AppColors.surface.withValues(alpha: 0.95)),
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: isDarkMode
-                                      ? Colors.white.withValues(alpha: 0.2)
-                                      : Colors.white.withValues(alpha: 0.3),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: FadeTransition(
-                                opacity: _fadeAnimation,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    // Progress Indicator
-                                    Row(
-                                      children: List.generate(3, (index) {
-                                        return Expanded(
-                                          child: Container(
-                                            height: 4,
-                                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                                            decoration: BoxDecoration(
-                                              color: index <= _currentStep
-                                                  ? (isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                                                  : Colors.grey.shade300,
-                                              borderRadius: BorderRadius.circular(2),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                    ),
-
-                                    const SizedBox(height: 32),
-
-                                    // Header
-                                    Icon(
-                                      Icons.person_add,
-                                      size: 64,
+                                            ? DarkAppColors.surface
+                                                .withValues(alpha: 0.95)
+                                            : AppColors.surface
+                                                .withValues(alpha: 0.95)),
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
                                       color: isDarkMode
-                                          ? DarkAppColors.primary
-                                          : AppColors.primary,
+                                          ? Colors.white.withValues(alpha: 0.2)
+                                          : Colors.white.withValues(alpha: 0.3),
+                                      width: 1.5,
                                     ),
-
-                                    const SizedBox(height: 24),
-
-                                    Text(
-                                      _getStepTitle(),
-                                      style: TextStyle(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDarkMode
-                                            ? DarkAppColors.onBackground
-                                            : AppColors.onBackground,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-
-                                    const SizedBox(height: 8),
-
-                                    Text(
-                                      _getStepSubtitle(),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: isDarkMode
-                                            ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                                            : AppColors.onSurface.withValues(alpha: 0.7),
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-
-                                    const SizedBox(height: 40),
-
-                                    // Step Content
-                                    _buildStepContent(isDarkMode),
-
-                                    const SizedBox(height: 24),
-
-                                    // Navigation Buttons
-                                    _buildNavigationButtons(isDarkMode),
-
-                                    const SizedBox(height: 16),
-
-                                    // Login Link
-                                    if (_currentStep == 0) ...[
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Already have an account? ',
-                                            style: TextStyle(
-                                              color: isDarkMode
-                                                  ? DarkAppColors.onSurface
-                                                  : AppColors.onSurface,
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(context),
-                                            child: Text(
-                                              'Sign In',
-                                              style: TextStyle(
-                                                color: isDarkMode
-                                                    ? DarkAppColors.primary
-                                                    : AppColors.primary,
-                                                fontWeight: FontWeight.w600,
+                                  ),
+                                  child: FadeTransition(
+                                    opacity: _fadeAnimation,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        // Progress Indicator
+                                        Row(
+                                          children: List.generate(3, (index) {
+                                            return Expanded(
+                                              child: Container(
+                                                height: 4,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 4),
+                                                decoration: BoxDecoration(
+                                                  color: index <= _currentStep
+                                                      ? (isDarkMode
+                                                          ? DarkAppColors
+                                                              .primary
+                                                          : AppColors.primary)
+                                                      : Colors.grey.shade300,
+                                                  borderRadius:
+                                                      BorderRadius.circular(2),
+                                                ),
                                               ),
-                                            ),
+                                            );
+                                          }),
+                                        ),
+
+                                        SizedBox(
+                                            height: ResponsiveUtils
+                                                .responsiveSpacing(
+                                                    32.0, deviceType)),
+
+                                        // Header
+                                        Icon(
+                                          Icons.person_add,
+                                          size: ResponsiveUtils
+                                              .responsiveFontSize(
+                                                  64.0, deviceType),
+                                          color: isDarkMode
+                                              ? DarkAppColors.primary
+                                              : AppColors.primary,
+                                        ),
+
+                                        SizedBox(
+                                            height: ResponsiveUtils
+                                                .responsiveSpacing(
+                                                    24.0, deviceType)),
+
+                                        Text(
+                                          _getStepTitle(),
+                                          style: TextStyle(
+                                            fontSize: ResponsiveUtils
+                                                .responsiveFontSize(
+                                                    28.0, deviceType),
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? DarkAppColors.onBackground
+                                                : AppColors.onBackground,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                        SizedBox(
+                                            height: ResponsiveUtils
+                                                .responsiveSpacing(
+                                                    8.0, deviceType)),
+
+                                        Text(
+                                          _getStepSubtitle(),
+                                          style: TextStyle(
+                                            fontSize: ResponsiveUtils
+                                                .responsiveFontSize(
+                                                    16.0, deviceType),
+                                            color: isDarkMode
+                                                ? DarkAppColors.onSurface
+                                                    .withValues(alpha: 0.7)
+                                                : AppColors.onSurface
+                                                    .withValues(alpha: 0.7),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                        SizedBox(
+                                            height: ResponsiveUtils
+                                                .responsiveSpacing(
+                                                    40.0, deviceType)),
+
+                                        // Step Content
+                                        _buildStepContent(
+                                            isDarkMode, deviceType),
+
+                                        SizedBox(
+                                            height: ResponsiveUtils
+                                                .responsiveSpacing(
+                                                    24.0, deviceType)),
+
+                                        // Navigation Buttons
+                                        _buildNavigationButtons(
+                                            isDarkMode, deviceType),
+
+                                        SizedBox(
+                                            height: ResponsiveUtils
+                                                .responsiveSpacing(
+                                                    16.0, deviceType)),
+
+                                        // Login Link
+                                        if (_currentStep == 0) ...[
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Already have an account? ',
+                                                style: TextStyle(
+                                                  color: isDarkMode
+                                                      ? DarkAppColors.onSurface
+                                                      : AppColors.onSurface,
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: Text(
+                                                  'Sign In',
+                                                  style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? DarkAppColors.primary
+                                                        : AppColors.primary,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
-                                      ),
-                                    ],
-                                  ],
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -327,8 +401,8 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                       ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         );
@@ -362,65 +436,76 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     }
   }
 
-  Widget _buildStepContent(bool isDarkMode) {
+  Widget _buildStepContent(bool isDarkMode, DeviceType deviceType) {
     switch (_currentStep) {
       case 0:
-        return _buildAccountSetupStep(isDarkMode);
+        return _buildAccountSetupStep(isDarkMode, deviceType);
       case 1:
-        return _buildPersonalInfoStep(isDarkMode);
+        return _buildPersonalInfoStep(isDarkMode, deviceType);
       case 2:
-        return _buildVerificationStep(isDarkMode);
+        return _buildVerificationStep(isDarkMode, deviceType);
       default:
-        return _buildAccountSetupStep(isDarkMode);
+        return _buildAccountSetupStep(isDarkMode, deviceType);
     }
   }
 
-  Widget _buildNavigationButtons(bool isDarkMode) {
+  Widget _buildNavigationButtons(bool isDarkMode, DeviceType deviceType) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Row(
       children: [
         if (_currentStep > 0)
           Expanded(
-            child: OutlinedButton(
-              onPressed: _goToPreviousStep,
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
+            child: SizedBox(
+              height: 48,
+              child: OutlinedButton(
+                onPressed: _goToPreviousStep,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color:
+                        isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  foregroundColor:
+                      isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  backgroundColor:
+                      themeProvider.isGlassyMode ? Colors.transparent : null,
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: const Text('Back'),
+              ),
+            ),
+          ),
+        if (_currentStep > 0)
+          SizedBox(width: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _handleStepNavigation,
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                foregroundColor:
+                    isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                foregroundColor: isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                backgroundColor: themeProvider.isGlassyMode ? Colors.transparent : null,
+                elevation: themeProvider.isGlassyMode ? 0 : 4,
               ),
-              child: const Text('Back'),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      _currentStep == 2 ? 'Complete Registration' : 'Continue'),
             ),
-          ),
-        if (_currentStep > 0) const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _handleStepNavigation,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isDarkMode ? DarkAppColors.primary : AppColors.primary,
-              foregroundColor: isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: themeProvider.isGlassyMode ? 0 : 4,
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text(_currentStep == 2 ? 'Complete Registration' : 'Continue'),
           ),
         ),
       ],
@@ -466,7 +551,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
   }
 
   // Step 1: Account Setup
-  Widget _buildAccountSetupStep(bool isDarkMode) {
+  Widget _buildAccountSetupStep(bool isDarkMode, DeviceType deviceType) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Form(
@@ -479,15 +564,17 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
-              color: isDarkMode
-                  ? DarkAppColors.onSurface
-                  : AppColors.onSurface,
+              fontSize: ResponsiveUtils.responsiveFontSize(16.0, deviceType),
+              color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
             ),
             decoration: InputDecoration(
+              contentPadding:
+                  ResponsiveUtils.responsiveInsets(16.0, deviceType),
               labelText: 'Email Address',
               hintText: 'Enter your email address',
               prefixIcon: Icon(
                 Icons.email,
+                size: ResponsiveUtils.responsiveFontSize(20.0, deviceType),
                 color: isDarkMode
                     ? DarkAppColors.onSurface.withValues(alpha: 0.7)
                     : AppColors.onSurface.withValues(alpha: 0.7),
@@ -511,9 +598,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                  color: isDarkMode
-                      ? DarkAppColors.primary
-                      : AppColors.primary,
+                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
                   width: 2,
                 ),
               ),
@@ -524,11 +609,13 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                       ? DarkAppColors.surface.withValues(alpha: 0.8)
                       : AppColors.surface.withValues(alpha: 0.8)),
               labelStyle: TextStyle(
+                fontSize: ResponsiveUtils.responsiveFontSize(14.0, deviceType),
                 color: isDarkMode
                     ? DarkAppColors.onSurface.withValues(alpha: 0.7)
                     : AppColors.onSurface.withValues(alpha: 0.7),
               ),
               hintStyle: TextStyle(
+                fontSize: ResponsiveUtils.responsiveFontSize(14.0, deviceType),
                 color: isDarkMode
                     ? DarkAppColors.onSurface.withValues(alpha: 0.5)
                     : AppColors.onSurface.withValues(alpha: 0.5),
@@ -538,34 +625,25 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                  .hasMatch(value)) {
                 return 'Please enter a valid email';
               }
               return null;
             },
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
 
           // Phone Field
-          TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            maxLength: 10,
+          IntlPhoneField(
+            initialCountryCode: 'IN',
             style: TextStyle(
-              color: isDarkMode
-                  ? DarkAppColors.onSurface
-                  : AppColors.onSurface,
+              color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
             ),
             decoration: InputDecoration(
               labelText: 'Phone Number',
               hintText: 'Enter your phone number',
-              prefixIcon: Icon(
-                Icons.phone,
-                color: isDarkMode
-                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                    : AppColors.onSurface.withValues(alpha: 0.7),
-              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
@@ -585,9 +663,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                  color: isDarkMode
-                      ? DarkAppColors.primary
-                      : AppColors.primary,
+                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
                   width: 2,
                 ),
               ),
@@ -607,20 +683,24 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                     ? DarkAppColors.onSurface.withValues(alpha: 0.5)
                     : AppColors.onSurface.withValues(alpha: 0.5),
               ),
-              counterText: '',
             ),
+            onChanged: (phone) {
+              setState(() {
+                _phoneNumber = phone;
+              });
+            },
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (value == null || value.number.isEmpty) {
                 return 'Please enter your phone number';
               }
-              if (value.length < 10) {
+              if (!value.isValidNumber()) {
                 return 'Please enter a valid phone number';
               }
               return null;
             },
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
 
           // Password Field with Strength Indicator
           Column(
@@ -645,7 +725,9 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       color: isDarkMode
                           ? DarkAppColors.onSurface.withValues(alpha: 0.7)
                           : AppColors.onSurface.withValues(alpha: 0.7),
@@ -711,7 +793,6 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                   return null;
                 },
               ),
-
               if (_passwordController.text.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Row(
@@ -720,7 +801,8 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                       child: LinearProgressIndicator(
                         value: _passwordStrength,
                         backgroundColor: Colors.grey.shade300,
-                        valueColor: AlwaysStoppedAnimation<Color>(_passwordStrengthColor),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            _passwordStrengthColor),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -738,19 +820,32 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             ],
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
 
           // Confirm Password Field
           TextFormField(
             controller: _confirmPasswordController,
             obscureText: _obscureConfirmPassword,
+            style: TextStyle(
+              color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            ),
             decoration: InputDecoration(
               labelText: 'Confirm Password',
               hintText: 'Re-enter your password',
-              prefixIcon: const Icon(Icons.lock_outline),
+              prefixIcon: Icon(
+                Icons.lock_outline,
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
+              ),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                  _obscureConfirmPassword
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                      : AppColors.onSurface.withValues(alpha: 0.7),
                 ),
                 onPressed: () {
                   setState(() {
@@ -759,12 +854,44 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                 },
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  width: 2,
+                ),
               ),
               filled: true,
-              fillColor: isDarkMode
-                  ? DarkAppColors.surface.withValues(alpha: 0.5)
-                  : AppColors.surface.withValues(alpha: 0.5),
+              fillColor: themeProvider.isGlassyMode
+                  ? Colors.transparent
+                  : (isDarkMode
+                      ? DarkAppColors.surface.withValues(alpha: 0.8)
+                      : AppColors.surface.withValues(alpha: 0.8)),
+              labelStyle: TextStyle(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
+              ),
+              hintStyle: TextStyle(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                    : AppColors.onSurface.withValues(alpha: 0.5),
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -777,7 +904,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             },
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: ResponsiveUtils.responsiveSpacing(24.0, deviceType)),
 
           // Terms and Conditions
           Row(
@@ -808,7 +935,8 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                               : AppColors.primary,
                           fontWeight: FontWeight.w500,
                         ),
-                        // Add onTap for terms and conditions
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = _showTermsAndConditionsDialog,
                       ),
                       const TextSpan(text: ' and '),
                       TextSpan(
@@ -819,7 +947,8 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                               : AppColors.primary,
                           fontWeight: FontWeight.w500,
                         ),
-                        // Add onTap for privacy policy
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = _showPrivacyPolicyDialog,
                       ),
                     ],
                   ),
@@ -833,7 +962,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
   }
 
   // Step 2: Personal Information
-  Widget _buildPersonalInfoStep(bool isDarkMode) {
+  Widget _buildPersonalInfoStep(bool isDarkMode, DeviceType deviceType) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Column(
@@ -845,13 +974,11 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: isDarkMode
-                ? DarkAppColors.onSurface
-                : AppColors.onSurface,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
           ),
         ),
 
-        const SizedBox(height: 12),
+        SizedBox(height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
 
         Wrap(
           spacing: 8,
@@ -868,16 +995,17 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
                   });
                 }
               },
-              backgroundColor: isDarkMode
-                  ? DarkAppColors.surface
-                  : AppColors.surface,
+              backgroundColor:
+                  isDarkMode ? DarkAppColors.surface : AppColors.surface,
               selectedColor: isDarkMode
                   ? DarkAppColors.primary.withValues(alpha: 0.2)
                   : AppColors.primary.withValues(alpha: 0.2),
               labelStyle: TextStyle(
                 color: isSelected
                     ? (isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                    : (isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface),
+                    : (isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface),
               ),
             );
           }).toList(),
@@ -889,9 +1017,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
         TextFormField(
           controller: _firstNameController,
           style: TextStyle(
-            color: isDarkMode
-                ? DarkAppColors.onSurface
-                : AppColors.onSurface,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
           ),
           decoration: InputDecoration(
             labelText: 'First Name',
@@ -921,9 +1047,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: isDarkMode
-                    ? DarkAppColors.primary
-                    : AppColors.primary,
+                color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
                 width: 2,
               ),
             ),
@@ -961,9 +1085,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
         TextFormField(
           controller: _lastNameController,
           style: TextStyle(
-            color: isDarkMode
-                ? DarkAppColors.onSurface
-                : AppColors.onSurface,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
           ),
           decoration: InputDecoration(
             labelText: 'Last Name',
@@ -993,9 +1115,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: isDarkMode
-                    ? DarkAppColors.primary
-                    : AppColors.primary,
+                color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
                 width: 2,
               ),
             ),
@@ -1034,9 +1154,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
           controller: _addressController,
           maxLines: 3,
           style: TextStyle(
-            color: isDarkMode
-                ? DarkAppColors.onSurface
-                : AppColors.onSurface,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
           ),
           decoration: InputDecoration(
             labelText: 'Address',
@@ -1066,9 +1184,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: isDarkMode
-                    ? DarkAppColors.primary
-                    : AppColors.primary,
+                color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
                 width: 2,
               ),
             ),
@@ -1102,162 +1218,298 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
 
         const SizedBox(height: 16),
 
-        // City and Pincode Row
-        Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: TextFormField(
-                controller: _cityController,
-                style: TextStyle(
+        // City and Pincode Fields
+        if (deviceType == DeviceType.mobile) ...[
+          // City Field (full width)
+          TextFormField(
+            controller: _cityController,
+            style: TextStyle(
+              color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            ),
+            decoration: InputDecoration(
+              labelText: 'City',
+              hintText: 'Enter your city',
+              prefixIcon: Icon(
+                Icons.location_city,
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
                   color: isDarkMode
-                      ? DarkAppColors.onSurface
-                      : AppColors.onSurface,
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
                 ),
-                decoration: InputDecoration(
-                  labelText: 'City',
-                  hintText: 'Enter your city',
-                  prefixIcon: Icon(
-                    Icons.location_city,
-                    color: isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                        : AppColors.onSurface.withValues(alpha: 0.7),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha: 0.3)
-                          : AppColors.onSurface.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha: 0.3)
-                          : AppColors.onSurface.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDarkMode
-                          ? DarkAppColors.primary
-                          : AppColors.primary,
-                      width: 2,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: themeProvider.isGlassyMode
-                      ? Colors.transparent
-                      : (isDarkMode
-                          ? DarkAppColors.surface.withValues(alpha: 0.8)
-                          : AppColors.surface.withValues(alpha: 0.8)),
-                  labelStyle: TextStyle(
-                    color: isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                        : AppColors.onSurface.withValues(alpha: 0.7),
-                  ),
-                  hintStyle: TextStyle(
-                    color: isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.5)
-                        : AppColors.onSurface.withValues(alpha: 0.5),
-                  ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your city';
-                  }
-                  return null;
-                },
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: themeProvider.isGlassyMode
+                  ? Colors.transparent
+                  : (isDarkMode
+                      ? DarkAppColors.surface.withValues(alpha: 0.8)
+                      : AppColors.surface.withValues(alpha: 0.8)),
+              labelStyle: TextStyle(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
+              ),
+              hintStyle: TextStyle(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                    : AppColors.onSurface.withValues(alpha: 0.5),
               ),
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your city';
+              }
+              return null;
+            },
+          ),
 
-            const SizedBox(width: 12),
+          SizedBox(height: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
 
-            Expanded(
-              flex: 1,
-              child: TextFormField(
-                controller: _pincodeController,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                style: TextStyle(
-                  color: isDarkMode
-                      ? DarkAppColors.onSurface
-                      : AppColors.onSurface,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Pincode',
-                  hintText: 'Enter pincode',
-                  prefixIcon: Icon(
-                    Icons.pin,
-                    color: isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                        : AppColors.onSurface.withValues(alpha: 0.7),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha: 0.3)
-                          : AppColors.onSurface.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha: 0.3)
-                          : AppColors.onSurface.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDarkMode
-                          ? DarkAppColors.primary
-                          : AppColors.primary,
-                      width: 2,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: themeProvider.isGlassyMode
-                      ? Colors.transparent
-                      : (isDarkMode
-                          ? DarkAppColors.surface.withValues(alpha: 0.8)
-                          : AppColors.surface.withValues(alpha: 0.8)),
-                  labelStyle: TextStyle(
-                    color: isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.7)
-                        : AppColors.onSurface.withValues(alpha: 0.7),
-                  ),
-                  hintStyle: TextStyle(
-                    color: isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha: 0.5)
-                        : AppColors.onSurface.withValues(alpha: 0.5),
-                  ),
-                  counterText: '',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter pincode';
-                  }
-                  if (value.length != 6) {
-                    return 'Pincode must be 6 digits';
-                  }
-                  return null;
-                },
-              ),
+          // Pincode Field (full width)
+          TextFormField(
+            controller: _pincodeController,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            style: TextStyle(
+              color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
             ),
-          ],
-        ),
+            decoration: InputDecoration(
+              labelText: 'Pincode',
+              hintText: 'Enter pincode',
+              prefixIcon: Icon(
+                Icons.pin,
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: themeProvider.isGlassyMode
+                  ? Colors.transparent
+                  : (isDarkMode
+                      ? DarkAppColors.surface.withValues(alpha: 0.8)
+                      : AppColors.surface.withValues(alpha: 0.8)),
+              labelStyle: TextStyle(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
+              ),
+              hintStyle: TextStyle(
+                color: isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                    : AppColors.onSurface.withValues(alpha: 0.5),
+              ),
+              counterText: '',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter pincode';
+              }
+              if (value.length != 6) {
+                return 'Pincode must be 6 digits';
+              }
+              return null;
+            },
+          ),
+        ] else ...[
+          // City and Pincode Row (tablet/desktop)
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: TextFormField(
+                  controller: _cityController,
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'City',
+                    hintText: 'Enter your city',
+                    prefixIcon: Icon(
+                      Icons.location_city,
+                      color: isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                          : AppColors.onSurface.withValues(alpha: 0.7),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDarkMode
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                            : AppColors.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDarkMode
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                            : AppColors.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: themeProvider.isGlassyMode
+                        ? Colors.transparent
+                        : (isDarkMode
+                            ? DarkAppColors.surface.withValues(alpha: 0.8)
+                            : AppColors.surface.withValues(alpha: 0.8)),
+                    labelStyle: TextStyle(
+                      color: isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                          : AppColors.onSurface.withValues(alpha: 0.7),
+                    ),
+                    hintStyle: TextStyle(
+                      color: isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                          : AppColors.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your city';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              SizedBox(
+                  width: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+              Expanded(
+                flex: 1,
+                child: TextFormField(
+                  controller: _pincodeController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 6,
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Pincode',
+                    hintText: 'Enter pincode',
+                    prefixIcon: Icon(
+                      Icons.pin,
+                      color: isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                          : AppColors.onSurface.withValues(alpha: 0.7),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDarkMode
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                            : AppColors.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDarkMode
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                            : AppColors.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: themeProvider.isGlassyMode
+                        ? Colors.transparent
+                        : (isDarkMode
+                            ? DarkAppColors.surface.withValues(alpha: 0.8)
+                            : AppColors.surface.withValues(alpha: 0.8)),
+                    labelStyle: TextStyle(
+                      color: isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                          : AppColors.onSurface.withValues(alpha: 0.7),
+                    ),
+                    hintStyle: TextStyle(
+                      color: isDarkMode
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                          : AppColors.onSurface.withValues(alpha: 0.5),
+                    ),
+                    counterText: '',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter pincode';
+                    }
+                    if (value.length != 6) {
+                      return 'Pincode must be 6 digits';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
 
   // Step 3: Verification
-  Widget _buildVerificationStep(bool isDarkMode) {
+  Widget _buildVerificationStep(bool isDarkMode, DeviceType deviceType) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Column(
@@ -1269,9 +1521,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: isDarkMode
-                ? DarkAppColors.onSurface
-                : AppColors.onSurface,
+            color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
           ),
         ),
 
@@ -1279,22 +1529,32 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
 
         // Email Verification Option
         Card(
-          color: isDarkMode
-              ? DarkAppColors.surface
-              : AppColors.surface,
+          color: isDarkMode ? DarkAppColors.surface : AppColors.surface,
           child: ListTile(
             leading: Icon(
               Icons.email,
-              color: isDarkMode
-                  ? DarkAppColors.primary
-                  : AppColors.primary,
+              color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
             ),
             title: const Text('Email Verification'),
-            subtitle: Text('Send verification link to ${_emailController.text}'),
-            trailing: _emailVerificationSent
+            subtitle: _emailVerified
+                ? const Text('Email verified successfully')
+                : _emailVerificationSent
+                    ? const Text('Check verification status or resend link')
+                    : Text(
+                        'Send verification link to ${_emailController.text}'),
+            trailing: _emailVerified
                 ? const Icon(Icons.check_circle, color: Colors.green)
-                : const Icon(Icons.arrow_forward_ios),
-            onTap: _emailVerificationSent ? null : () => _sendEmailVerification(),
+                : _emailVerificationSent
+                    ? IconButton(
+                        icon: const Icon(Icons.refresh),
+                        onPressed: () => _checkEmailVerification(),
+                      )
+                    : const Icon(Icons.arrow_forward_ios),
+            onTap: _emailVerificationSent && !_emailVerified
+                ? () => _checkEmailVerification()
+                : !_emailVerificationSent
+                    ? () => _sendEmailVerification()
+                    : null,
           ),
         ),
 
@@ -1302,22 +1562,25 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
 
         // Phone Verification Option
         Card(
-          color: isDarkMode
-              ? DarkAppColors.surface
-              : AppColors.surface,
+          color: isDarkMode ? DarkAppColors.surface : AppColors.surface,
           child: ListTile(
             leading: Icon(
               Icons.phone,
-              color: isDarkMode
-                  ? DarkAppColors.primary
-                  : AppColors.primary,
+              color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
             ),
             title: const Text('Phone Verification'),
-            subtitle: Text('Send OTP to ${_phoneController.text}'),
-            trailing: _phoneVerificationMode
+            subtitle: _phoneVerified
+                ? const Text('Phone verified successfully')
+                : _phoneVerificationMode
+                    ? const Text('Enter OTP sent to your phone')
+                    : Text(
+                        'Send OTP to ${_phoneNumber?.completeNumber ?? 'your phone number'}'),
+            trailing: _phoneVerified
                 ? const Icon(Icons.check_circle, color: Colors.green)
-                : const Icon(Icons.arrow_forward_ios),
-            onTap: () => _sendPhoneVerification(),
+                : _phoneVerificationMode
+                    ? const Icon(Icons.edit, color: Colors.orange)
+                    : const Icon(Icons.arrow_forward_ios),
+            onTap: _phoneVerified ? null : () => _sendPhoneVerification(),
           ),
         ),
 
@@ -1329,9 +1592,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
             keyboardType: TextInputType.number,
             maxLength: 6,
             style: TextStyle(
-              color: isDarkMode
-                  ? DarkAppColors.onSurface
-                  : AppColors.onSurface,
+              color: isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
             ),
             decoration: InputDecoration(
               labelText: 'Enter OTP',
@@ -1361,9 +1622,7 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                  color: isDarkMode
-                      ? DarkAppColors.primary
-                      : AppColors.primary,
+                  color: isDarkMode ? DarkAppColors.primary : AppColors.primary,
                   width: 2,
                 ),
               ),
@@ -1412,22 +1671,14 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     );
   }
 
-  String _getRoleDisplayName(UserRole role) {
+  String _getRoleDisplayName(user_role.UserRole role) {
     switch (role) {
-      case UserRole.customer:
+      case user_role.UserRole.customer:
         return 'Customer';
-      case UserRole.employee:
+      case user_role.UserRole.employee:
         return 'Employee';
-      case UserRole.tailor:
-        return 'Master Tailor';
-      case UserRole.cutter:
-        return 'Fabric Cutter';
-      case UserRole.finisher:
-        return 'Finisher';
-      case UserRole.supervisor:
-        return 'Supervisor';
-      case UserRole.apprentice:
-        return 'Apprentice';
+      case user_role.UserRole.shopOwner:
+        return 'Shop Owner';
       default:
         return 'Customer';
     }
@@ -1454,21 +1705,24 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     final formKey = GlobalKey<FormState>();
     bool isValid = true;
 
-    if (_firstNameController.text.isEmpty || _firstNameController.text.length < 2) {
+    if (_firstNameController.text.isEmpty ||
+        _firstNameController.text.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid first name')),
       );
       isValid = false;
     }
 
-    if (_lastNameController.text.isEmpty || _lastNameController.text.length < 2) {
+    if (_lastNameController.text.isEmpty ||
+        _lastNameController.text.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid last name')),
       );
       isValid = false;
     }
 
-    if (_addressController.text.isEmpty || _addressController.text.length < 10) {
+    if (_addressController.text.isEmpty ||
+        _addressController.text.length < 10) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a complete address')),
       );
@@ -1482,7 +1736,8 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
       isValid = false;
     }
 
-    if (_pincodeController.text.isEmpty || _pincodeController.text.length != 6) {
+    if (_pincodeController.text.isEmpty ||
+        _pincodeController.text.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid 6-digit pincode')),
       );
@@ -1524,13 +1779,62 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     }
   }
 
+  Future<void> _checkEmailVerification() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = AuthService();
+      final isVerified = await authService.isEmailVerified();
+
+      setState(() => _emailVerified = isVerified);
+
+      if (isVerified) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email verified successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+        // If both verifications are complete, proceed automatically
+        if (_phoneVerified) {
+          _handleFinalSignup();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Email not yet verified. Please check your inbox and click the verification link.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to check verification status: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   Future<void> _sendPhoneVerification() async {
     setState(() => _isLoading = true);
 
     try {
       final authService = AuthService();
       await authService.verifyPhoneNumber(
-        phoneNumber: '+91${_phoneController.text}',
+        phoneNumber: _phoneNumber?.completeNumber ?? '',
         onCodeSent: (verificationId) {
           setState(() {
             _verificationId = verificationId;
@@ -1562,9 +1866,23 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
           // Auto-verification successful
           setState(() {
             _phoneVerificationMode = true;
+            _phoneVerified = true;
             _isLoading = false;
           });
-          _handleFinalSignup();
+          // Check if email verification is also completed
+          if (_emailVerified) {
+            _handleFinalSignup();
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'Phone verified! Please also verify your email to complete registration.'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
         },
       );
     } catch (e) {
@@ -1598,9 +1916,21 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
 
         // OTP verified, now create account
         await _createAccount();
-            } else {
-        // Email verification or skip verification
-        await _createAccount();
+      } else {
+        // Require at least one verification method
+        if (_emailVerified || _phoneVerified) {
+          await _createAccount();
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Please verify your email or phone number before completing registration.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -1618,16 +1948,28 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     }
   }
 
+  auth_service.UserRole _convertUserRole(user_role.UserRole role) {
+    switch (role) {
+      case user_role.UserRole.customer:
+        return auth_service.UserRole.customer;
+      case user_role.UserRole.employee:
+        return auth_service.UserRole.employee;
+      case user_role.UserRole.shopOwner:
+        return auth_service.UserRole.shopOwner;
+    }
+  }
+
   Future<void> _createAccount() async {
     try {
-      final authProvider = Provider.of<app_auth.AuthProvider>(context, listen: false);
+      final authProvider =
+          Provider.of<app_auth.AuthProvider>(context, listen: false);
 
       final success = await authProvider.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
-        phoneNumber: _phoneController.text,
+        phoneNumber: _phoneNumber?.completeNumber ?? '',
         displayName: '${_firstNameController.text} ${_lastNameController.text}',
-        role: _selectedRole,
+        role: _convertUserRole(_selectedRole),
       );
 
       if (success && mounted) {
@@ -1654,5 +1996,79 @@ class _SignupScreenState extends State<SignupScreen> with TickerProviderStateMix
     }
   }
 
+  void _showTermsAndConditionsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Terms and Conditions'),
+          content: SingleChildScrollView(
+            child: const Text(
+              'Welcome to our Tailoring App! By using our app, you agree to the following terms and conditions:\n\n'
+              '1. Acceptance of Terms\n'
+              'By accessing and using this app, you accept and agree to be bound by the terms and conditions of this agreement.\n\n'
+              '2. Use License\n'
+              'Permission is granted to temporarily use the app for personal, non-commercial transitory viewing only.\n\n'
+              '3. Disclaimer\n'
+              'The information on this app is provided on an "as is" basis. The app gives no warranties.\n\n'
+              '4. Account Responsibility\n'
+              'You are responsible for maintaining the confidentiality of your account and password.\n\n'
+              '5. Service Modifications\n'
+              'We reserve the right to modify or discontinue the service with or without notice.\n\n'
+              '6. Governing Law\n'
+              'These terms and conditions are governed by and construed in accordance with the laws.\n\n'
+              'Please read these terms carefully before using our services.',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  void _showPrivacyPolicyDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Privacy Policy'),
+          content: SingleChildScrollView(
+            child: const Text(
+              'Your privacy is important to us. This privacy policy explains how we collect, use, and protect your information:\n\n'
+              '1. Information We Collect\n'
+              'We may collect personal information such as your name, email address, phone number, and address when you register.\n\n'
+              '2. How We Use Your Information\n'
+              'The information is used to provide our tailoring services, process payments, and communicate with you.\n\n'
+              '3. Information Sharing\n'
+              'We do not sell, trade, or otherwise transfer your personal information to third parties without your consent.\n\n'
+              '4. Data Security\n'
+              'We implement appropriate security measures to protect your personal information against unauthorized access.\n\n'
+              '5. Cookies and Tracking\n'
+              'We may use cookies to enhance your experience on our app.\n\n'
+              '6. Your Rights\n'
+              'You have the right to access, update, or delete your personal information.\n\n'
+              '7. Changes to This Policy\n'
+              'We may update this privacy policy from time to time. We will notify you of any changes.\n\n'
+              'If you have any questions about this privacy policy, please contact us.',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

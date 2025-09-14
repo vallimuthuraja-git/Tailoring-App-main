@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_service.dart';
+import '../utils/demo_constants.dart';
 
 class SetupDemoUsers {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -13,8 +14,8 @@ class SetupDemoUsers {
     // Demo customer
     try {
       await _createDemoUser(
-        email: 'customer@demo.com',
-        password: 'password123',
+        email: DemoConstants.customerEmail,
+        password: DemoConstants.demoPassword,
         displayName: 'Demo Customer',
         role: UserRole.customer,
       );
@@ -25,8 +26,8 @@ class SetupDemoUsers {
     // Demo shop owner
     try {
       await _createDemoUser(
-        email: 'shop@demo.com',
-        password: 'password123',
+        email: DemoConstants.shopOwnerEmail,
+        password: DemoConstants.demoPassword,
         displayName: 'Esther',
         role: UserRole.shopOwner,
       );
@@ -37,8 +38,8 @@ class SetupDemoUsers {
     // Demo admin
     try {
       await _createDemoUser(
-        email: 'admin@demo.com',
-        password: 'password123',
+        email: DemoConstants.adminEmail,
+        password: DemoConstants.demoPassword,
         displayName: 'Admin',
         role: UserRole.admin,
       );
@@ -57,11 +58,12 @@ class SetupDemoUsers {
     required UserRole role,
   }) async {
     try {
-       print('🔍 Checking if user $email already exists...');
+      print('🔍 Checking if user $email already exists...');
 
-       // First, try to check if user exists by attempting to create
+      // First, try to check if user exists by attempting to create
       try {
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -85,12 +87,13 @@ class SetupDemoUsers {
             .doc(userCredential.user!.uid)
             .set(userModel.toJson());
 
-        print('✅ Successfully created demo user: $email with role ${role.name}');
+        print(
+            '✅ Successfully created demo user: $email with role ${role.name}');
         if (email == 'admin@demo.com') {
-          print('🔍 ADMIN CREATION: User role set to ${role.name} in Firestore');
+          print(
+              '🔍 ADMIN CREATION: User role set to ${role.name} in Firestore');
         }
         return;
-
       } catch (e) {
         if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
           print('⚠️ User $email already exists in Auth, checking profile...');
@@ -101,7 +104,6 @@ class SetupDemoUsers {
           rethrow;
         }
       }
-
     } catch (e) {
       // print('❌ Error in demo user creation process for $email: $e');
       rethrow;
@@ -109,16 +111,16 @@ class SetupDemoUsers {
   }
 
   // Ensure user profile exists in Firestore
-  Future<void> _ensureUserProfileExists(String email, String displayName, UserRole role) async {
+  Future<void> _ensureUserProfileExists(
+      String email, String displayName, UserRole role) async {
     try {
       // Since we know user exists (from email-already-in-use error), try to sign in
-      final user = await _auth.signInWithEmailAndPassword(email: email, password: 'password123');
+      final user = await _auth.signInWithEmailAndPassword(
+          email: email, password: DemoConstants.demoPassword);
 
       // Check if profile exists in Firestore
-      final existingProfile = await _firestore
-          .collection('users')
-          .doc(user.user!.uid)
-          .get();
+      final existingProfile =
+          await _firestore.collection('users').doc(user.user!.uid).get();
 
       if (!existingProfile.exists) {
         // Create profile
@@ -138,14 +140,16 @@ class SetupDemoUsers {
             .set(userModel.toJson());
 
         // print('✅ Created missing profile for existing user: $email');
-        print('✅ Created missing profile for existing user: $email with role ${role.name}');
+        print(
+            '✅ Created missing profile for existing user: $email with role ${role.name}');
         if (email == 'admin@demo.com') {
-          print('🔍 ADMIN PROFILE: Created missing admin profile with role ${role.name}');
+          print(
+              '🔍 ADMIN PROFILE: Created missing admin profile with role ${role.name}');
         }
       }
 
       await _auth.signOut();
-        } catch (e) {
+    } catch (e) {
       // print('❌ Error ensuring user profile exists: $e');
     }
   }
@@ -156,18 +160,19 @@ class SetupDemoUsers {
       print('🔍 Checking if demo users exist in Firebase Auth...');
 
       // Check customer
-      bool customerExists = await _userExistsInAuth('customer@demo.com');
+      bool customerExists =
+          await _userExistsInAuth(DemoConstants.customerEmail);
       print('Customer exists in Auth: $customerExists');
 
       // Check shop owner
-      bool shopExists = await _userExistsInAuth('shop@demo.com');
+      bool shopExists = await _userExistsInAuth(DemoConstants.shopOwnerEmail);
       print('Shop owner exists in Auth: $shopExists');
 
       // Check admin
-      bool adminExists = await _userExistsInAuth('admin@demo.com');
+      bool adminExists = await _userExistsInAuth(DemoConstants.adminEmail);
       print('Admin exists in Auth: $adminExists');
       if (adminExists) {
-        final adminInfo = await getDemoUserInfo('admin@demo.com');
+        final adminInfo = await getDemoUserInfo(DemoConstants.adminEmail);
         if (adminInfo != null) {
           print('🔍 ADMIN EXISTENCE: Role in Firestore: ${adminInfo['role']}');
         } else {
@@ -194,7 +199,7 @@ class SetupDemoUsers {
       // This will throw 'email-already-in-use' if user exists
       await _auth.createUserWithEmailAndPassword(
         email: email,
-        password: 'temp_password_123',
+        password: DemoConstants.tempPassword,
       );
 
       // If we reach here, user didn't exist, so delete the temp user

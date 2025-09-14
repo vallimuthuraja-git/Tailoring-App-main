@@ -5,12 +5,15 @@ import '../../providers/order_provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../models/customer.dart';
+import '../../utils/responsive_utils.dart';
+import '../../widgets/user_avatar.dart';
 
 class AnalyticsDashboardScreen extends StatefulWidget {
   const AnalyticsDashboardScreen({super.key});
 
   @override
-  State<AnalyticsDashboardScreen> createState() => _AnalyticsDashboardScreenState();
+  State<AnalyticsDashboardScreen> createState() =>
+      _AnalyticsDashboardScreenState();
 }
 
 class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
@@ -31,8 +34,10 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer4<OrderProvider, CustomerProvider, ProductProvider, AuthProvider>(
-      builder: (context, orderProvider, customerProvider, productProvider, authProvider, child) {
+    return Consumer4<OrderProvider, CustomerProvider, ProductProvider,
+        AuthProvider>(
+      builder: (context, orderProvider, customerProvider, productProvider,
+          authProvider, child) {
         final isShopOwner = authProvider.isShopOwnerOrAdmin;
 
         // Redirect non-shop owners
@@ -91,12 +96,17 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
             ),
             actions: [
               IconButton(
+                icon: const Icon(Icons.filter_list),
+                onPressed: () => _showFilters(context),
+              ),
+              IconButton(
                 icon: const Icon(Icons.download),
                 onPressed: () => _exportAnalytics(context),
               ),
               IconButton(
                 icon: const Icon(Icons.refresh),
-                onPressed: () => _refreshData(context, orderProvider, customerProvider, productProvider),
+                onPressed: () => _refreshData(
+                    context, orderProvider, customerProvider, productProvider),
               ),
             ],
             bottom: PreferredSize(
@@ -119,6 +129,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
               ),
             ),
           ),
+          drawer: _buildFiltersDrawer(context),
           body: TabBarView(
             controller: _tabController,
             children: [
@@ -133,566 +144,694 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     );
   }
 
-  Widget _buildOverviewTab(Map<String, dynamic> stats, List customers, List products) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Business Overview',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
+  Widget _buildOverviewTab(
+      Map<String, dynamic> stats, List customers, List products) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final deviceType = ResponsiveUtils.getDeviceType(constraints.maxWidth);
+        final crossAxisCount = deviceType == DeviceType.mobile
+            ? 2
+            : (deviceType == DeviceType.tablet ? 2 : 3);
+        final spacing = ResponsiveUtils.responsiveSpacing(16.0, deviceType);
 
-          // Key Metrics Grid
-          Row(
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(
+              ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Orders',
-                  value: '${stats['totalOrders']}',
-                  icon: Icons.receipt_long,
-                  color: Colors.blue,
-                  trend: '+${stats['thisMonthOrders']} this month',
+              Text(
+                'Business Overview',
+                style: TextStyle(
+                  fontSize:
+                      ResponsiveUtils.responsiveFontSize(24.0, deviceType),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Revenue',
-                  value: '₹${stats['totalRevenue'].toStringAsFixed(0)}',
-                  icon: Icons.attach_money,
-                  color: Colors.green,
-                  trend: '+${((stats['thisMonthOrders'] / stats['totalOrders']) * 100).toStringAsFixed(1)}%',
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Key Metrics Grid
+              GridView.count(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _MetricCard(
+                    title: 'Total Orders',
+                    value: '${stats['totalOrders']}',
+                    icon: Icons.receipt_long,
+                    color: Colors.blue,
+                    trend: '+${stats['thisMonthOrders']} this month',
+                  ),
+                  _MetricCard(
+                    title: 'Revenue',
+                    value: '₹${stats['totalRevenue'].toStringAsFixed(0)}',
+                    icon: Icons.attach_money,
+                    color: Colors.green,
+                    trend:
+                        '+${((stats['thisMonthOrders'] / stats['totalOrders']) * 100).toStringAsFixed(1)}%',
+                  ),
+                  _MetricCard(
+                    title: 'Customers',
+                    value: '${customers.length}',
+                    icon: Icons.people,
+                    color: Colors.purple,
+                    trend:
+                        '${customers.where((c) => c.isActive).length} active',
+                  ),
+                  _MetricCard(
+                    title: 'Products',
+                    value: '${products.length}',
+                    icon: Icons.inventory,
+                    color: Colors.orange,
+                    trend: '${products.where((p) => p.isActive).length} active',
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(32.0, deviceType)),
+
+              // Performance Indicators
+              Text(
+                'Performance Indicators',
+                style: TextStyle(
+                  fontSize:
+                      ResponsiveUtils.responsiveFontSize(20.0, deviceType),
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
+
+              _PerformanceIndicator(
+                label: 'Completion Rate',
+                value: stats['completionRate'],
+                color: Colors.green,
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+              _PerformanceIndicator(
+                label: 'Average Order Value',
+                value: stats['totalOrders'] > 0
+                    ? stats['totalRevenue'] / stats['totalOrders']
+                    : 0,
+                color: Colors.blue,
+                isCurrency: true,
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+              _PerformanceIndicator(
+                label: 'Customer Retention',
+                value: customers.isNotEmpty
+                    ? (customers.where((c) => c.isActive).length /
+                            customers.length) *
+                        100
+                    : 0,
+                color: Colors.purple,
+                isPercentage: true,
+              ),
+
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(32.0, deviceType)),
+
+              // Recent Activity
+              Text(
+                'Quick Insights',
+                style: TextStyle(
+                  fontSize:
+                      ResponsiveUtils.responsiveFontSize(20.0, deviceType),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(16.0, deviceType)),
+
+              const _InsightCard(
+                icon: Icons.trending_up,
+                title: 'Revenue Growth',
+                description: 'Revenue increased by 25% compared to last month',
+                color: Colors.green,
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+              const _InsightCard(
+                icon: Icons.people,
+                title: 'Customer Engagement',
+                description: 'New customer acquisition rate is improving',
+                color: Colors.blue,
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(12.0, deviceType)),
+              const _InsightCard(
+                icon: Icons.inventory,
+                title: 'Product Performance',
+                description: 'Top products are driving 60% of revenue',
+                color: Colors.orange,
               ),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Customers',
-                  value: '${customers.length}',
-                  icon: Icons.people,
-                  color: Colors.purple,
-                  trend: '${customers.where((c) => c.isActive).length} active',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Products',
-                  value: '${products.length}',
-                  icon: Icons.inventory,
-                  color: Colors.orange,
-                  trend: '${products.where((p) => p.isActive).length} active',
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 32),
-
-          // Performance Indicators
-          const Text(
-            'Performance Indicators',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          _PerformanceIndicator(
-            label: 'Completion Rate',
-            value: stats['completionRate'],
-            color: Colors.green,
-          ),
-          const SizedBox(height: 12),
-          _PerformanceIndicator(
-            label: 'Average Order Value',
-            value: stats['totalOrders'] > 0 ? stats['totalRevenue'] / stats['totalOrders'] : 0,
-            color: Colors.blue,
-            isCurrency: true,
-          ),
-          const SizedBox(height: 12),
-          _PerformanceIndicator(
-            label: 'Customer Retention',
-            value: customers.isNotEmpty ? (customers.where((c) => c.isActive).length / customers.length) * 100 : 0,
-            color: Colors.purple,
-            isPercentage: true,
-          ),
-
-          const SizedBox(height: 32),
-
-          // Recent Activity
-          const Text(
-            'Quick Insights',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          const _InsightCard(
-            icon: Icons.trending_up,
-            title: 'Revenue Growth',
-            description: 'Revenue increased by 25% compared to last month',
-            color: Colors.green,
-          ),
-          const SizedBox(height: 12),
-          const _InsightCard(
-            icon: Icons.people,
-            title: 'Customer Engagement',
-            description: 'New customer acquisition rate is improving',
-            color: Colors.blue,
-          ),
-          const SizedBox(height: 12),
-          const _InsightCard(
-            icon: Icons.inventory,
-            title: 'Product Performance',
-            description: 'Top products are driving 60% of revenue',
-            color: Colors.orange,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildRevenueTab(Map<String, dynamic> stats) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Revenue Analytics',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final deviceType = ResponsiveUtils.getDeviceType(constraints.maxWidth);
+        final crossAxisCount = deviceType == DeviceType.mobile
+            ? 1
+            : (deviceType == DeviceType.tablet ? 2 : 2);
+        final spacing = ResponsiveUtils.responsiveSpacing(16.0, deviceType);
 
-          // Revenue Cards
-          Row(
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(
+              ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _RevenueCard(
-                  title: 'Total Revenue',
-                  amount: stats['totalRevenue'],
-                  period: 'All Time',
-                  color: Colors.green,
+              Text(
+                'Revenue Analytics',
+                style: TextStyle(
+                  fontSize:
+                      ResponsiveUtils.responsiveFontSize(24.0, deviceType),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _RevenueCard(
-                  title: 'Pending Payments',
-                  amount: stats['pendingPayments'],
-                  period: 'Outstanding',
-                  color: Colors.orange,
-                ),
-              ),
-            ],
-          ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
 
-          const SizedBox(height: 20),
-
-          // Revenue Breakdown
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // Revenue Cards
+              GridView.count(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  const Text(
-                    'Revenue Breakdown',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _RevenueBreakdownItem(
-                    label: 'This Month',
-                    amount: (stats['totalRevenue'] * 0.3).toStringAsFixed(0), // Mock data
-                    percentage: 30,
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(height: 8),
-                  _RevenueBreakdownItem(
-                    label: 'Last Month',
-                    amount: (stats['totalRevenue'] * 0.25).toStringAsFixed(0), // Mock data
-                    percentage: 25,
+                  _RevenueCard(
+                    title: 'Total Revenue',
+                    amount: stats['totalRevenue'],
+                    period: 'All Time',
                     color: Colors.green,
                   ),
-                  const SizedBox(height: 8),
-                  _RevenueBreakdownItem(
-                    label: 'Older',
-                    amount: (stats['totalRevenue'] * 0.45).toStringAsFixed(0), // Mock data
-                    percentage: 45,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Monthly Trends (Mock Data)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Monthly Revenue Trend',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ..._generateMonthlyTrends().map((trend) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(trend['month']),
-                            ),
-                            Text('₹${trend['revenue']}'),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: LinearProgressIndicator(
-                                value: trend['percentage'] / 100,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCustomersTab(List customers, Map<String, dynamic> stats) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Customer Analytics',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Customer Metrics
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Customers',
-                  value: '${customers.length}',
-                  icon: Icons.people,
-                  color: Colors.blue,
-                  trend: '${customers.where((c) => c.isActive).length} active',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Avg Order Value',
-                  value: '₹${stats['averageOrderValue'].toStringAsFixed(0)}',
-                  icon: Icons.attach_money,
-                  color: Colors.green,
-                  trend: 'Per customer',
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          // Customer Segments
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Customer Segments',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _CustomerSegmentItem(
-                    segment: 'Loyal Customers',
-                    count: customers.where((c) => c.loyaltyTier == LoyaltyTier.gold || c.loyaltyTier == LoyaltyTier.platinum).length,
-                    percentage: customers.isNotEmpty ? (customers.where((c) => c.loyaltyTier == LoyaltyTier.gold || c.loyaltyTier == LoyaltyTier.platinum).length / customers.length) * 100 : 0,
-                    color: Colors.purple,
-                  ),
-                  const SizedBox(height: 8),
-                  _CustomerSegmentItem(
-                    segment: 'Regular Customers',
-                    count: customers.where((c) => c.loyaltyTier == LoyaltyTier.silver).length,
-                    percentage: customers.isNotEmpty ? (customers.where((c) => c.loyaltyTier == LoyaltyTier.silver).length / customers.length) * 100 : 0,
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(height: 8),
-                  _CustomerSegmentItem(
-                    segment: 'New Customers',
-                    count: customers.where((c) => c.loyaltyTier == LoyaltyTier.bronze).length,
-                    percentage: customers.isNotEmpty ? (customers.where((c) => c.loyaltyTier == LoyaltyTier.bronze).length / customers.length) * 100 : 0,
+                  _RevenueCard(
+                    title: 'Pending Payments',
+                    amount: stats['pendingPayments'],
+                    period: 'Outstanding',
                     color: Colors.orange,
                   ),
                 ],
               ),
-            ),
-          ),
 
-          const SizedBox(height: 20),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
 
-          // Top Customers
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Top Customers',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ...customers.take(5).map((customer) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundImage: customer.photoUrl != null
-                                  ? NetworkImage(customer.photoUrl!)
-                                  : null,
-                              child: customer.photoUrl == null
-                                  ? Text(customer.displayName[0].toUpperCase())
-                                  : null,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    customer.displayName,
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                  Text(
-                                    customer.loyaltyTier,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              '₹${customer.totalSpent.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
+              // Revenue Breakdown
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Revenue Breakdown',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                              18.0, deviceType),
+                          fontWeight: FontWeight.bold,
                         ),
-                      )),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductsTab(List products, Map<String, dynamic> stats) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Product Analytics',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Product Metrics
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Products',
-                  value: '${products.length}',
-                  icon: Icons.inventory,
-                  color: Colors.orange,
-                  trend: '${products.where((p) => p.isActive).length} active',
+                      ),
+                      const SizedBox(height: 16),
+                      _RevenueBreakdownItem(
+                        label: 'This Month',
+                        amount: (stats['totalRevenue'] * 0.3)
+                            .toStringAsFixed(0), // Mock data
+                        percentage: 30,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 8),
+                      _RevenueBreakdownItem(
+                        label: 'Last Month',
+                        amount: (stats['totalRevenue'] * 0.25)
+                            .toStringAsFixed(0), // Mock data
+                        percentage: 25,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(height: 8),
+                      _RevenueBreakdownItem(
+                        label: 'Older',
+                        amount: (stats['totalRevenue'] * 0.45)
+                            .toStringAsFixed(0), // Mock data
+                        percentage: 45,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Categories',
-                  value: '${products.map((p) => p.category).toSet().length}',
-                  icon: Icons.category,
-                  color: Colors.purple,
-                  trend: 'Product types',
+
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Monthly Trends (Mock Data)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Monthly Revenue Trend',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                              18.0, deviceType),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ..._generateMonthlyTrends().map((trend) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(trend['month']),
+                                ),
+                                Text('₹${trend['revenue']}'),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: ResponsiveUtils.responsiveSpacing(
+                                        8.0, deviceType),
+                                    child: LinearProgressIndicator(
+                                      value: trend['percentage'] / 100,
+                                      backgroundColor: Colors.grey.shade200,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.blue.shade600),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
+        );
+      },
+    );
+  }
 
-          const SizedBox(height: 20),
+  Widget _buildCustomersTab(List customers, Map<String, dynamic> stats) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final deviceType = ResponsiveUtils.getDeviceType(constraints.maxWidth);
+        final crossAxisCount = deviceType == DeviceType.mobile
+            ? 1
+            : (deviceType == DeviceType.tablet ? 2 : 2);
+        final spacing = ResponsiveUtils.responsiveSpacing(16.0, deviceType);
 
-          // Product Categories
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(
+              ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Customer Analytics',
+                style: TextStyle(
+                  fontSize:
+                      ResponsiveUtils.responsiveFontSize(24.0, deviceType),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Customer Metrics
+              GridView.count(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  const Text(
-                    'Product Categories',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  _MetricCard(
+                    title: 'Total Customers',
+                    value: '${customers.length}',
+                    icon: Icons.people,
+                    color: Colors.blue,
+                    trend:
+                        '${customers.where((c) => c.isActive).length} active',
                   ),
-                  const SizedBox(height: 16),
-                  ..._getCategoryDistribution(products).entries.map((entry) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(entry.key),
-                            ),
-                            Text('${entry.value} products'),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: LinearProgressIndicator(
-                                value: entry.value / products.length,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                  _MetricCard(
+                    title: 'Avg Order Value',
+                    value: '₹${stats['averageOrderValue'].toStringAsFixed(0)}',
+                    icon: Icons.attach_money,
+                    color: Colors.green,
+                    trend: 'Per customer',
+                  ),
                 ],
               ),
-            ),
-          ),
 
-          const SizedBox(height: 20),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
 
-          // Top Products
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Top Products',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+              // Customer Segments
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Customer Segments',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                              18.0, deviceType),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _CustomerSegmentItem(
+                        segment: 'Loyal Customers',
+                        count: customers
+                            .where((c) =>
+                                c.loyaltyTier == LoyaltyTier.gold ||
+                                c.loyaltyTier == LoyaltyTier.platinum)
+                            .length,
+                        percentage: customers.isNotEmpty
+                            ? (customers
+                                        .where((c) =>
+                                            c.loyaltyTier == LoyaltyTier.gold ||
+                                            c.loyaltyTier ==
+                                                LoyaltyTier.platinum)
+                                        .length /
+                                    customers.length) *
+                                100
+                            : 0,
+                        color: Colors.purple,
+                      ),
+                      const SizedBox(height: 8),
+                      _CustomerSegmentItem(
+                        segment: 'Regular Customers',
+                        count: customers
+                            .where((c) => c.loyaltyTier == LoyaltyTier.silver)
+                            .length,
+                        percentage: customers.isNotEmpty
+                            ? (customers
+                                        .where((c) =>
+                                            c.loyaltyTier == LoyaltyTier.silver)
+                                        .length /
+                                    customers.length) *
+                                100
+                            : 0,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 8),
+                      _CustomerSegmentItem(
+                        segment: 'New Customers',
+                        count: customers
+                            .where((c) => c.loyaltyTier == LoyaltyTier.bronze)
+                            .length,
+                        percentage: customers.isNotEmpty
+                            ? (customers
+                                        .where((c) =>
+                                            c.loyaltyTier == LoyaltyTier.bronze)
+                                        .length /
+                                    customers.length) *
+                                100
+                            : 0,
+                        color: Colors.orange,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  ...products.take(5).map((product) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image: NetworkImage(product.imageUrls.isNotEmpty
-                                      ? product.imageUrls.first
-                                      : 'https://via.placeholder.com/50x50?text=No+Image'),
-                                  fit: BoxFit.cover,
+                ),
+              ),
+
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Top Customers
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Top Customers',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                              18.0, deviceType),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ...customers.take(5).map((customer) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              children: [
+                                UserAvatar(
+                                  displayName: customer.displayName,
+                                  imageUrl: customer.photoUrl,
+                                  radius: ResponsiveUtils.responsiveSpacing(
+                                      20.0, deviceType),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    product.name,
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        customer.displayName,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      Text(
+                                        customer.loyaltyTier,
+                                        style: TextStyle(
+                                          fontSize: ResponsiveUtils
+                                              .responsiveFontSize(
+                                                  12.0, deviceType),
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    product.categoryName,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
+                                ),
+                                Text(
+                                  '₹${customer.totalSpent.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProductsTab(List products, Map<String, dynamic> stats) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final deviceType = ResponsiveUtils.getDeviceType(constraints.maxWidth);
+        final crossAxisCount = deviceType == DeviceType.mobile
+            ? 1
+            : (deviceType == DeviceType.tablet ? 2 : 2);
+        final spacing = ResponsiveUtils.responsiveSpacing(16.0, deviceType);
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(
+              ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Product Analytics',
+                style: TextStyle(
+                  fontSize:
+                      ResponsiveUtils.responsiveFontSize(24.0, deviceType),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Product Metrics
+              GridView.count(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _MetricCard(
+                    title: 'Total Products',
+                    value: '${products.length}',
+                    icon: Icons.inventory,
+                    color: Colors.orange,
+                    trend: '${products.where((p) => p.isActive).length} active',
+                  ),
+                  _MetricCard(
+                    title: 'Categories',
+                    value: '${products.map((p) => p.category).toSet().length}',
+                    icon: Icons.category,
+                    color: Colors.purple,
+                    trend: 'Product types',
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Product Categories
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Product Categories',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                              18.0, deviceType),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ..._getCategoryDistribution(products)
+                          .entries
+                          .map((entry) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(entry.key),
+                                    ),
+                                    Text('${entry.value} products'),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: SizedBox(
+                                        height:
+                                            ResponsiveUtils.responsiveSpacing(
+                                                8.0, deviceType),
+                                        child: LinearProgressIndicator(
+                                          value: entry.value / products.length,
+                                          backgroundColor: Colors.grey.shade200,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.blue.shade600),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(20.0, deviceType)),
+
+              // Top Products
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Top Products',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                              18.0, deviceType),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ...products.take(5).map((product) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: ResponsiveUtils.responsiveSpacing(
+                                      50.0, deviceType),
+                                  height: ResponsiveUtils.responsiveSpacing(
+                                      50.0, deviceType),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: NetworkImage(product
+                                              .imageUrls.isNotEmpty
+                                          ? product.imageUrls.first
+                                          : 'https://via.placeholder.com/50x50?text=No+Image'),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product.name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      Text(
+                                        product.categoryName,
+                                        style: TextStyle(
+                                          fontSize: ResponsiveUtils
+                                              .responsiveFontSize(
+                                                  12.0, deviceType),
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  '₹${product.basePrice.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '₹${product.basePrice.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
+                          )),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -722,8 +861,11 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     );
   }
 
-  void _refreshData(BuildContext context, OrderProvider orderProvider,
-      CustomerProvider customerProvider, ProductProvider productProvider) async {
+  void _refreshData(
+      BuildContext context,
+      OrderProvider orderProvider,
+      CustomerProvider customerProvider,
+      ProductProvider productProvider) async {
     await orderProvider.loadOrders();
     await customerProvider.loadAllCustomers();
     await productProvider.loadProducts();
@@ -733,6 +875,105 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
         const SnackBar(content: Text('Data refreshed successfully!')),
       );
     }
+  }
+
+  void _showFilters(BuildContext context) {
+    if (ResponsiveUtils.isMobile(context)) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => _buildFiltersBottomSheet(context),
+      );
+    } else {
+      Scaffold.of(context).openDrawer();
+    }
+  }
+
+  Widget _buildFiltersDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text(
+              'Filters',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.date_range),
+            title: const Text('Date Range'),
+            onTap: () {
+              // Handle date range filter
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.category),
+            title: const Text('Category'),
+            onTap: () {
+              // Handle category filter
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.clear),
+            title: const Text('Clear Filters'),
+            onTap: () {
+              // Handle clear filters
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFiltersBottomSheet(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Filters',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(Icons.date_range),
+            title: const Text('Date Range'),
+            onTap: () {
+              // Handle date range filter
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.category),
+            title: const Text('Category'),
+            onTap: () {
+              // Handle category filter
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.clear),
+            title: const Text('Clear Filters'),
+            onTap: () {
+              // Handle clear filters
+            },
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -906,7 +1147,9 @@ class _PerformanceIndicator extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
-              value: isPercentage ? value / 100 : (value > 100 ? 1.0 : value / 100),
+              value: isPercentage
+                  ? value / 100
+                  : (value > 100 ? 1.0 : value / 100),
               backgroundColor: Colors.grey.shade200,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),

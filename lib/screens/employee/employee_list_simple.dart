@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/employee.dart' as emp;
+import '../../widgets/user_avatar.dart';
 import '../../models/user_role.dart';
 import '../../services/firebase_service.dart';
 import '../../providers/auth_provider.dart';
@@ -19,7 +20,8 @@ class EmployeeManagementHelper {
   // Use regular instance, not const
   static final FirebaseService _firebaseService = FirebaseService();
 
-  static Future<void> populateDemoEmployees(BuildContext context, {bool silent = false}) async {
+  static Future<void> populateDemoEmployees(BuildContext context,
+      {bool silent = false}) async {
     try {
       if (!silent) {
         await showDialog(
@@ -51,7 +53,8 @@ class EmployeeManagementHelper {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('✅ Success!'),
-            content: const Text('Added 5 demo employees to the database!\n\nEmployees added:\n• Esther (Owner)\n• Rajesh Kumar (Tailor)\n• Priya Sharma (Designer)\n• Amit Patel (Cutter)\n• Sneha Gupta (Finisher)'),
+            content: const Text(
+                'Added 5 demo employees to the database!\n\nEmployees added:\n• Esther (Owner)\n• Rajesh Kumar (Tailor)\n• Priya Sharma (Designer)\n• Amit Patel (Cutter)\n• Sneha Gupta (Finisher)'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -104,7 +107,8 @@ class EmployeeManagementHelper {
   }
 
   // Force refresh employees
-  static Future<void> forceRefreshEmployees(BuildContext context, Function onRefresh) async {
+  static Future<void> forceRefreshEmployees(
+      BuildContext context, Function onRefresh) async {
     await onRefresh();
   }
 
@@ -119,11 +123,22 @@ class EmployeeManagementHelper {
         phoneNumber: '+91-9876543210',
         role: UserRole.shopOwner,
         skills: [emp.EmployeeSkill.qualityCheck, emp.EmployeeSkill.alterations],
-        specializations: ['Shop Management', 'Quality Assurance', 'Customer Service', 'Business Operations'],
+        specializations: [
+          'Shop Management',
+          'Quality Assurance',
+          'Customer Service',
+          'Business Operations'
+        ],
         experienceYears: 8,
         certifications: ['Certified Master Tailor'],
         availability: emp.EmployeeAvailability.fullTime,
-        preferredWorkDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        preferredWorkDays: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday'
+        ],
         preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
         preferredEndTime: const emp.TimeOfDay(hour: 18, minute: 0),
         canWorkRemotely: false,
@@ -153,11 +168,21 @@ class EmployeeManagementHelper {
         email: 'priya@designer.com',
         phoneNumber: '+91-9876543211',
         skills: [emp.EmployeeSkill.patternMaking, emp.EmployeeSkill.embroidery],
-        specializations: ['Design Consultation', 'Bespoke Patterns', 'Traditional Embroidery'],
+        specializations: [
+          'Design Consultation',
+          'Bespoke Patterns',
+          'Traditional Embroidery'
+        ],
         experienceYears: 12,
         certifications: ['Fashion Design Diploma', 'Master Embroidery Artist'],
         availability: emp.EmployeeAvailability.fullTime,
-        preferredWorkDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        preferredWorkDays: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday'
+        ],
         preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
         preferredEndTime: const emp.TimeOfDay(hour: 17, minute: 0),
         canWorkRemotely: true,
@@ -187,7 +212,11 @@ class EmployeeManagementHelper {
         email: 'amit@cutter.com',
         phoneNumber: '+91-9876543212',
         skills: [emp.EmployeeSkill.cutting, emp.EmployeeSkill.qualityCheck],
-        specializations: ['Fabric Cutting', 'Material Optimization', 'Quality Inspection'],
+        specializations: [
+          'Fabric Cutting',
+          'Material Optimization',
+          'Quality Inspection'
+        ],
         experienceYears: 6,
         certifications: ['Precision Cutting Specialist'],
         availability: emp.EmployeeAvailability.partTime,
@@ -221,11 +250,22 @@ class EmployeeManagementHelper {
         email: 'sneha@finisher.com',
         phoneNumber: '+91-9876543213',
         skills: [emp.EmployeeSkill.finishing],
-        specializations: ['Final Inspection', 'Button Attachment', 'Hem Finishing', 'Pressing'],
+        specializations: [
+          'Final Inspection',
+          'Button Attachment',
+          'Hem Finishing',
+          'Pressing'
+        ],
         experienceYears: 5,
         certifications: ['Finishing Expert Certification'],
         availability: emp.EmployeeAvailability.fullTime,
-        preferredWorkDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        preferredWorkDays: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday'
+        ],
         preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
         preferredEndTime: const emp.TimeOfDay(hour: 17, minute: 0),
         canWorkRemotely: false,
@@ -279,19 +319,22 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
       if (mounted) {
         _initializeSimple();
       } else {
-        debugPrint('⚠️ EmployeeListSimple not mounted during delayed initialization');
+        debugPrint(
+            '⚠️ EmployeeListSimple not mounted during delayed initialization');
       }
     });
   }
 
   void _initializeSimple() {
-    debugPrint('🚀 EmployeeListSimple _initializeSimple - starting simple initialization');
+    debugPrint(
+        '🚀 EmployeeListSimple _initializeSimple - starting simple initialization');
     // Simple synchronous initialization first
     setState(() {
       _loading = false;
       _initComplete = true;
     });
-    debugPrint('✅ EmployeeListSimple simple initialization complete, now loading data');
+    debugPrint(
+        '✅ EmployeeListSimple simple initialization complete, now loading data');
 
     // Then try to load data asynchronously
     _loadEmployeeData();
@@ -299,9 +342,11 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
   Future<void> _loadEmployeeData() async {
     try {
-      debugPrint('🚀 EmployeeListSimple _loadEmployeeData - starting data load');
+      debugPrint(
+          '🚀 EmployeeListSimple _loadEmployeeData - starting data load');
       debugPrint('📦 Checking EmployeeProvider availability');
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
       debugPrint('✅ EmployeeProvider obtained successfully');
 
       // Simple load with timeout
@@ -322,7 +367,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
           _initError = null;
         });
       } else {
-        debugPrint('⚠️ EmployeeListSimple not mounted when setting success state');
+        debugPrint(
+            '⚠️ EmployeeListSimple not mounted when setting success state');
       }
     } catch (e) {
       debugPrint('❌ EmployeeListSimple failed to load employee data: $e');
@@ -332,7 +378,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
           _initError = 'Failed to load employees: $e';
         });
       } else {
-        debugPrint('⚠️ EmployeeListSimple not mounted when setting error state');
+        debugPrint(
+            '⚠️ EmployeeListSimple not mounted when setting error state');
       }
     }
   }
@@ -342,11 +389,13 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     debugPrint('🔄 EmployeeListSimple build - rebuilding widget');
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        debugPrint('🔐 EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
+        debugPrint(
+            '🔐 EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
         debugPrint('👑 isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
         // Check if user has permission to view employee list
         if (!authProvider.isShopOwnerOrAdmin) {
-          debugPrint('❌ EmployeeListSimple access denied - user is not shop owner or admin');
+          debugPrint(
+              '❌ EmployeeListSimple access denied - user is not shop owner or admin');
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -372,173 +421,203 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
           );
         }
 
-  debugPrint('✅ EmployeeListSimple access granted - building main content');
-  return Expanded(
-    child: Consumer<EmployeeProvider>(
-      builder: (context, employeeProvider, child) {
-        debugPrint('📊 EmployeeListSimple building with provider state:');
-        debugPrint('  - _initComplete: $_initComplete');
-        debugPrint('  - employeeProvider.isLoading: ${employeeProvider.isLoading}');
-        debugPrint('  - _initError: $_initError');
-        debugPrint('  - employeeProvider.errorMessage: ${employeeProvider.errorMessage}');
-        debugPrint('  - employeeProvider.employees.length: ${employeeProvider.employees.length}');
+        debugPrint(
+            '✅ EmployeeListSimple access granted - building main content');
+        return Expanded(
+          child: Consumer<EmployeeProvider>(
+            builder: (context, employeeProvider, child) {
+              debugPrint('📊 EmployeeListSimple building with provider state:');
+              debugPrint('  - _initComplete: $_initComplete');
+              debugPrint(
+                  '  - employeeProvider.isLoading: ${employeeProvider.isLoading}');
+              debugPrint('  - _initError: $_initError');
+              debugPrint(
+                  '  - employeeProvider.errorMessage: ${employeeProvider.errorMessage}');
+              debugPrint(
+                  '  - employeeProvider.employees.length: ${employeeProvider.employees.length}');
 
-        // Show loading if initialization is incomplete OR provider is loading
-        if (!_initComplete || employeeProvider.isLoading) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(
-                !_initComplete ? 'Initializing employee management...' : 'Loading employees...',
-                style: const TextStyle(fontSize: 16),
-              ),
-              if (!_initComplete) ...[
-                const SizedBox(height: 8),
-                const Text(
-                  'If this takes too long, please check your internet connection',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                // Emergency bypass button
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    debugPrint('🚨 Emergency bypass activated');
-                    try {
-                      await EmployeeManagementHelper.populateDemoEmployees(context, silent: true);
-                      await employeeProvider.loadEmployees();
-                      setState(() {
-                        _loading = false;
-                        _initComplete = true;
-                        _initError = null;
-                      });
-                    } catch (e) {
-                      debugPrint('❌ Emergency bypass failed: $e');
-                      setState(() {
-                        _initError = 'Emergency bypass failed: $e';
-                        _loading = false;
-                        _initComplete = true;
-                      });
-                    }
-                  },
-                  icon: const Icon(Icons.warning),
-                  label: const Text('Emergency: Load Demo Data'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'If loading is stuck, click above to bypass',
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ],
-          );
-        }
+              // Show loading if initialization is incomplete OR provider is loading
+              if (!_initComplete || employeeProvider.isLoading) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      !_initComplete
+                          ? 'Initializing employee management...'
+                          : 'Loading employees...',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    if (!_initComplete) ...[
+                      const SizedBox(height: 8),
+                      const Text(
+                        'If this takes too long, please check your internet connection',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      // Emergency bypass button
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          debugPrint('🚨 Emergency bypass activated');
+                          try {
+                            await EmployeeManagementHelper
+                                .populateDemoEmployees(context, silent: true);
+                            await employeeProvider.loadEmployees();
+                            setState(() {
+                              _loading = false;
+                              _initComplete = true;
+                              _initError = null;
+                            });
+                          } catch (e) {
+                            debugPrint('❌ Emergency bypass failed: $e');
+                            setState(() {
+                              _initError = 'Emergency bypass failed: $e';
+                              _loading = false;
+                              _initComplete = true;
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.warning),
+                        label: const Text('Emergency: Load Demo Data'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'If loading is stuck, click above to bypass',
+                        style: TextStyle(fontSize: 10, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ],
+                );
+              }
 
-        // Show initialization error if any
-        if (_initError != null) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                'Initialization failed: $_initError',
-                style: const TextStyle(color: Colors.red),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _initComplete = false;
-                        _initError = null;
-                      });
-                      WidgetsBinding.instance.addPostFrameCallback((_) async {
-                        await employeeProvider.loadEmployees();
-                      });
-                    },
-                    child: const Text('Retry'),
-                  ),
-                  const SizedBox(width: 16),
-                  OutlinedButton(
-                    onPressed: () => EmployeeManagementHelper.forceRefreshEmployees(context, employeeProvider.loadEmployees),
-                    child: const Text('Force Refresh'),
-                  ),
-                ],
-              ),
-            ],
-          );
-        }
-
-        // Show provider error if any
-        if (employeeProvider.errorMessage != null) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                'Error: ${employeeProvider.errorMessage}',
-                style: const TextStyle(color: Colors.red),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => employeeProvider.loadEmployees(),
-                child: const Text('Retry'),
-              ),
-            ],
-          );
-        }
-
-        final employees = employeeProvider.employees;
-
-        return Column(
-          children: [
-            // Employee Management Statistics
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatCard('Total', employeeProvider.totalEmployees.toString(), Icons.people),
-                  _buildStatCard('Active', employeeProvider.activeEmployees.length.toString(), Icons.person, color: Colors.green),
-                  _buildStatCard('Owners', employees.where((e) => e.role == UserRole.shopOwner).length.toString(), Icons.star, color: Colors.purple),
-                  _buildStatCard('Avg Rating', employeeProvider.averageRating.toStringAsFixed(1), Icons.star_rate, color: Colors.amber),
-                ],
-              ),
-            ),
-
-            // Employee List
-            Expanded(
-              child: employees.isEmpty
-                ? Center(
-                    child: Column(
+              // Show initialization error if any
+              if (_initError != null) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Initialization failed: $_initError',
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _initComplete = false;
+                              _initError = null;
+                            });
+                            WidgetsBinding.instance
+                                .addPostFrameCallback((_) async {
+                              await employeeProvider.loadEmployees();
+                            });
+                          },
+                          child: const Text('Retry'),
+                        ),
+                        const SizedBox(width: 16),
+                        OutlinedButton(
+                          onPressed: () =>
+                              EmployeeManagementHelper.forceRefreshEmployees(
+                                  context, employeeProvider.loadEmployees),
+                          child: const Text('Force Refresh'),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }
 
+              // Show provider error if any
+              if (employeeProvider.errorMessage != null) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error: ${employeeProvider.errorMessage}',
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => employeeProvider.loadEmployees(),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                );
+              }
+
+              final employees = employeeProvider.employees;
+
+              return Column(
+                children: [
+                  // Employee Management Statistics
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatCard(
+                            'Total',
+                            employeeProvider.totalEmployees.toString(),
+                            Icons.people),
+                        _buildStatCard(
+                            'Active',
+                            employeeProvider.activeEmployees.length.toString(),
+                            Icons.person,
+                            color: Colors.green),
+                        _buildStatCard(
+                            'Owners',
+                            employees
+                                .where((e) => e.role == UserRole.shopOwner)
+                                .length
+                                .toString(),
+                            Icons.star,
+                            color: Colors.purple),
+                        _buildStatCard(
+                            'Avg Rating',
+                            employeeProvider.averageRating.toStringAsFixed(1),
+                            Icons.star_rate,
+                            color: Colors.amber),
+                      ],
+                    ),
+                  ),
+
+                  // Employee List
+                  Expanded(
+                    child: employees.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
                                 // Quick Setup Options
                                 Card(
-                                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 32),
                                   child: Padding(
                                     padding: const EdgeInsets.all(20),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           '🚀 Get Started',
@@ -553,16 +632,22 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                           style: TextStyle(color: Colors.grey),
                                         ),
                                         const SizedBox(height: 20),
-   
+
                                         Row(
                                           children: [
                                             Expanded(
                                               child: ElevatedButton.icon(
-                                                onPressed: () => EmployeeManagementHelper.populateDemoEmployees(context),
-                                                icon: const Icon(Icons.auto_awesome),
-                                                label: const Text('Load Demo Data'),
+                                                onPressed: () =>
+                                                    EmployeeManagementHelper
+                                                        .populateDemoEmployees(
+                                                            context),
+                                                icon: const Icon(
+                                                    Icons.auto_awesome),
+                                                label: const Text(
+                                                    'Load Demo Data'),
                                                 style: ElevatedButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 16),
                                                   backgroundColor: Colors.blue,
                                                 ),
                                               ),
@@ -570,11 +655,16 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: OutlinedButton.icon(
-                                                onPressed: () => _showAddEmployeeDialog(context),
-                                                icon: const Icon(Icons.person_add),
-                                                label: const Text('Add First Employee'),
+                                                onPressed: () =>
+                                                    _showAddEmployeeDialog(
+                                                        context),
+                                                icon: const Icon(
+                                                    Icons.person_add),
+                                                label: const Text(
+                                                    'Add First Employee'),
                                                 style: OutlinedButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 16),
                                                 ),
                                               ),
                                             ),
@@ -590,31 +680,48 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                                 await showDialog(
                                                   context: context,
                                                   barrierDismissible: false,
-                                                  builder: (context) => const AlertDialog(
-                                                    title: Text('Setting up demo employees...'),
-                                                    content: CircularProgressIndicator(),
+                                                  builder: (context) =>
+                                                      const AlertDialog(
+                                                    title: Text(
+                                                        'Setting up demo employees...'),
+                                                    content:
+                                                        CircularProgressIndicator(),
                                                   ),
                                                 );
                                                 // Call direct employee setup from Firebase directly
-                                                final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-                                                await employeeProvider.loadEmployees();
+                                                final employeeProvider =
+                                                    Provider.of<
+                                                            EmployeeProvider>(
+                                                        context,
+                                                        listen: false);
+                                                await employeeProvider
+                                                    .loadEmployees();
                                                 if (context.mounted) {
-                                                  Navigator.of(context).pop(); // Close loading
-                                                  await employeeProvider.loadEmployees();
+                                                  Navigator.of(context)
+                                                      .pop(); // Close loading
+                                                  await employeeProvider
+                                                      .loadEmployees();
                                                 }
                                               } catch (e) {
                                                 if (context.mounted) {
-                                                  Navigator.of(context).pop(); // Close loading
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text('Failed to setup employees: $e')),
+                                                  Navigator.of(context)
+                                                      .pop(); // Close loading
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            'Failed to setup employees: $e')),
                                                   );
                                                 }
                                               }
                                             },
                                             icon: Icon(Icons.bolt),
-                                            label: const Text('Direct Employee Setup'),
+                                            label: const Text(
+                                                'Direct Employee Setup'),
                                             style: ElevatedButton.styleFrom(
-                                              padding: const EdgeInsets.symmetric(vertical: 16),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 16),
                                               backgroundColor: Colors.green,
                                             ),
                                           ),
@@ -625,35 +732,51 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             Expanded(
                                               child: OutlinedButton.icon(
                                                 onPressed: () async {
-                                                  debugPrint('🔄 Force refreshing employee data...');
+                                                  debugPrint(
+                                                      '🔄 Force refreshing employee data...');
                                                   setState(() {
                                                     _initComplete = false;
                                                     _initError = null;
                                                   });
-                                                  final populated = await EmployeeManagementHelper.checkAndPopulateIfEmpty(context);
-                                                  await EmployeeManagementHelper.forceRefreshEmployees(context, () async {
-                                                    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-                                                    await employeeProvider.loadEmployees();
+                                                  final populated =
+                                                      await EmployeeManagementHelper
+                                                          .checkAndPopulateIfEmpty(
+                                                              context);
+                                                  await EmployeeManagementHelper
+                                                      .forceRefreshEmployees(
+                                                          context, () async {
+                                                    final employeeProvider =
+                                                        Provider.of<
+                                                                EmployeeProvider>(
+                                                            context,
+                                                            listen: false);
+                                                    await employeeProvider
+                                                        .loadEmployees();
                                                   });
                                                   setState(() {
                                                     _initComplete = true;
                                                   });
                                                 },
                                                 icon: const Icon(Icons.refresh),
-                                                label: const Text('Force Refresh'),
+                                                label:
+                                                    const Text('Force Refresh'),
                                                 style: OutlinedButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 12),
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: OutlinedButton.icon(
-                                                onPressed: () => _showDebugInfo(context),
-                                                icon: const Icon(Icons.bug_report),
+                                                onPressed: () =>
+                                                    _showDebugInfo(context),
+                                                icon: const Icon(
+                                                    Icons.bug_report),
                                                 label: const Text('Debug Info'),
                                                 style: OutlinedButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 12),
                                                 ),
                                               ),
                                             ),
@@ -664,11 +787,14 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                           padding: const EdgeInsets.all(12),
                                           decoration: BoxDecoration(
                                             color: Colors.amber.shade50,
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                           child: const Text(
                                             '💡 Demo data includes:\n• Esther (Owner) with management privileges\n• Rajesh Kumar (Tailor) for customization work\n• Priya Sharma (Designer) for creative tasks\n• Amit Patel (Cutter) for fabric preparation\n• Sneha Gupta (Finisher) for final touches\n• Manual employee addition available',
-                                            style: TextStyle(fontSize: 12, color: Colors.black87),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black87),
                                           ),
                                         ),
                                       ],
@@ -680,12 +806,14 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
                                 // Database Status
                                 Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 32),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.grey.shade300),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
                                   ),
                                   child: const Column(
                                     children: [
@@ -693,11 +821,13 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                       SizedBox(height: 8),
                                       Text(
                                         'Database Connection: Active',
-                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         'Firebase Firestore is ready for data operations',
-                                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                                        style: TextStyle(
+                                            fontSize: 12, color: Colors.grey),
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
@@ -715,88 +845,104 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                 margin: const EdgeInsets.only(bottom: 12),
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(12),
-                                  onTap: () => _showEmployeeDetails(context, employee),
+                                  onTap: () =>
+                                      _showEmployeeDetails(context, employee),
                                   child: Padding(
                                     padding: const EdgeInsets.all(16),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            CircleAvatar(
+                                            UserAvatar(
+                                              displayName: employee.displayName,
+                                              imageUrl: employee.photoUrl,
                                               radius: 24,
-                                              backgroundImage: employee.photoUrl != null
-                                                  ? NetworkImage(employee.photoUrl!)
-                                                  : null,
-                                              child: employee.photoUrl == null
-                                                  ? Text(
-                                                      employee.displayName[0].toUpperCase(),
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 16,
-                                                      ),
-                                                    )
-                                                  : null,
                                             ),
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     employee.displayName,
-                                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   ),
                                                   const SizedBox(height: 2),
                                                   Text(
                                                     employee.email,
-                                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                      color: Colors.grey[600],
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          color:
+                                                              Colors.grey[600],
+                                                        ),
                                                   ),
                                                 ],
                                               ),
                                             ),
                                             // Role and Status Row
                                             Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
                                               children: [
-                                                if (employee.role == UserRole.shopOwner)
+                                                if (employee.role ==
+                                                    UserRole.shopOwner)
                                                   Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2),
                                                     decoration: BoxDecoration(
                                                       color: Colors.purple[100],
-                                                      borderRadius: BorderRadius.circular(8),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
                                                     ),
                                                     child: const Text(
                                                       'Owner',
                                                       style: TextStyle(
                                                         color: Colors.purple,
                                                         fontSize: 10,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
                                                   ),
                                                 const SizedBox(height: 4),
                                                 Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2),
                                                   decoration: BoxDecoration(
                                                     color: employee.isActive
                                                         ? Colors.green[100]
                                                         : Colors.red[100],
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                   child: Text(
-                                                    employee.isActive ? 'Active' : 'Inactive',
+                                                    employee.isActive
+                                                        ? 'Active'
+                                                        : 'Inactive',
                                                     style: TextStyle(
                                                       color: employee.isActive
                                                           ? Colors.green[800]
                                                           : Colors.red[800],
                                                       fontSize: 10,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -813,30 +959,54 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             // Skills
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'Skills',
-                                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                      color: Colors.grey[600],
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color:
+                                                              Colors.grey[600],
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Wrap(
                                                     spacing: 4,
-                                                    children: employee.skills.take(2).map((skill) {
+                                                    children: employee.skills
+                                                        .take(2)
+                                                        .map((skill) {
                                                       return Container(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                                                          borderRadius: BorderRadius.circular(8),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 6,
+                                                                vertical: 2),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary
+                                                                  .withValues(
+                                                                      alpha:
+                                                                          0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
                                                         child: Text(
                                                           skill.name,
                                                           style: TextStyle(
                                                             fontSize: 10,
-                                                            color: Theme.of(context).colorScheme.primary,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .primary,
                                                           ),
                                                         ),
                                                       );
@@ -849,17 +1019,23 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             // Stats
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
                                                 children: [
                                                   Row(
-                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
                                                     children: [
-                                                      const Icon(Icons.star, size: 16, color: Colors.amber),
+                                                      const Icon(Icons.star,
+                                                          size: 16,
+                                                          color: Colors.amber),
                                                       const SizedBox(width: 4),
                                                       Text(
-                                                        employee.averageRating.toStringAsFixed(1),
+                                                        employee.averageRating
+                                                            .toStringAsFixed(1),
                                                         style: const TextStyle(
-                                                          fontWeight: FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           fontSize: 14,
                                                         ),
                                                       ),
@@ -883,33 +1059,55 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
                                         // Action Buttons
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             // Edit Button - Available for all employees
                                             TextButton.icon(
-                                              onPressed: () => _showEditEmployeeDialog(context, employee),
-                                              icon: const Icon(Icons.edit, size: 16),
+                                              onPressed: () =>
+                                                  _showEditEmployeeDialog(
+                                                      context, employee),
+                                              icon: const Icon(Icons.edit,
+                                                  size: 16),
                                               label: const Text('Edit'),
                                               style: TextButton.styleFrom(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6),
                                               ),
                                             ),
 
                                             const SizedBox(width: 8),
 
                                             // Deactivate/Reactivate Button - Restricted for owner
-                                            if (employee.role != UserRole.shopOwner)
+                                            if (employee.role !=
+                                                UserRole.shopOwner)
                                               TextButton.icon(
-                                                onPressed: () => _toggleEmployeeStatus(context, employee),
+                                                onPressed: () =>
+                                                    _toggleEmployeeStatus(
+                                                        context, employee),
                                                 icon: Icon(
-                                                  employee.isActive ? Icons.person_off : Icons.person,
+                                                  employee.isActive
+                                                      ? Icons.person_off
+                                                      : Icons.person,
                                                   size: 16,
-                                                  color: employee.isActive ? Colors.orange : Colors.green,
+                                                  color: employee.isActive
+                                                      ? Colors.orange
+                                                      : Colors.green,
                                                 ),
-                                                label: Text(employee.isActive ? 'Deactivate' : 'Activate'),
+                                                label: Text(employee.isActive
+                                                    ? 'Deactivate'
+                                                    : 'Activate'),
                                                 style: TextButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                  foregroundColor: employee.isActive ? Colors.orange : Colors.green,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
+                                                  foregroundColor:
+                                                      employee.isActive
+                                                          ? Colors.orange
+                                                          : Colors.green,
                                                 ),
                                               )
                                             else
@@ -925,13 +1123,21 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             const SizedBox(width: 8),
 
                                             // Delete Button - Restricted for owner
-                                            if (employee.role != UserRole.shopOwner)
+                                            if (employee.role !=
+                                                UserRole.shopOwner)
                                               TextButton.icon(
-                                                onPressed: () => _showDeleteEmployeeDialog(context, employee),
-                                                icon: const Icon(Icons.delete, size: 16, color: Colors.red),
+                                                onPressed: () =>
+                                                    _showDeleteEmployeeDialog(
+                                                        context, employee),
+                                                icon: const Icon(Icons.delete,
+                                                    size: 16,
+                                                    color: Colors.red),
                                                 label: const Text('Delete'),
                                                 style: TextButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
                                                   foregroundColor: Colors.red,
                                                 ),
                                               )
@@ -972,7 +1178,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
   void _showAddEmployeeDialog(BuildContext context) {
     // Capture the provider before the async operation
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
 
     Navigator.push(
       context,
@@ -994,8 +1201,9 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Edit Employee'),
-        content: Text('Edit functionality for ${employee.displayName} goes here. '
-                    'This would allow updating employee details, skills, availability, etc.'),
+        content: Text(
+            'Edit functionality for ${employee.displayName} goes here. '
+            'This would allow updating employee details, skills, availability, etc.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -1006,7 +1214,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
               // TODO: Implement actual edit functionality
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit functionality coming soon!')),
+                const SnackBar(
+                    content: Text('Edit functionality coming soon!')),
               );
             },
             child: const Text('Save'),
@@ -1016,8 +1225,10 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     );
   }
 
-  void _toggleEmployeeStatus(BuildContext context, emp.Employee employee) async {
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+  void _toggleEmployeeStatus(
+      BuildContext context, emp.Employee employee) async {
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
 
     final newStatus = !employee.isActive;
     final action = newStatus ? 'activate' : 'deactivate';
@@ -1026,7 +1237,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('$action Employee'),
-        content: Text('Are you sure you want to $action ${employee.displayName}?'),
+        content:
+            Text('Are you sure you want to $action ${employee.displayName}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -1037,7 +1249,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
             style: ElevatedButton.styleFrom(
               backgroundColor: newStatus ? Colors.green : Colors.orange,
             ),
-            child: Text(action.substring(0, 1).toUpperCase() + action.substring(1)),
+            child: Text(
+                action.substring(0, 1).toUpperCase() + action.substring(1)),
           ),
         ],
       ),
@@ -1048,7 +1261,9 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
         await employeeProvider.toggleEmployeeStatus(employee.id, newStatus);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${employee.displayName} has been ${newStatus ? 'activated' : 'deactivated'}')),
+            SnackBar(
+                content: Text(
+                    '${employee.displayName} has been ${newStatus ? 'activated' : 'deactivated'}')),
           );
         }
       } catch (e) {
@@ -1061,7 +1276,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     }
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, {Color? color}) {
+  Widget _buildStatCard(String label, String value, IconData icon,
+      {Color? color}) {
     return Column(
       children: [
         Icon(icon, size: 24, color: color ?? Colors.blue),
@@ -1109,20 +1325,28 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('🔐 Authentication:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('User: ${currentUser?.email ?? "Not logged in"}', style: const TextStyle(fontSize: 12)),
-                  Text('UID: ${currentUser?.uid ?? "N/A"}', style: const TextStyle(fontSize: 12)),
+                  const Text('🔐 Authentication:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('User: ${currentUser?.email ?? "Not logged in"}',
+                      style: const TextStyle(fontSize: 12)),
+                  Text('UID: ${currentUser?.uid ?? "N/A"}',
+                      style: const TextStyle(fontSize: 12)),
                   const SizedBox(height: 16),
-                  const Text('💾 Database Status:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('💾 Database Status:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   Text('Employees in database: $employeeCount'),
                   Text('Collection: employees'),
-                  if (employeeCount == 0) const Text('⚠️ No employees found - database is empty', style: TextStyle(color: Colors.orange, fontSize: 12)),
+                  if (employeeCount == 0)
+                    const Text('⚠️ No employees found - database is empty',
+                        style: TextStyle(color: Colors.orange, fontSize: 12)),
                   const SizedBox(height: 16),
-                  const Text('🔧 Troubleshooting Options:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('🔧 Troubleshooting Options:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      await EmployeeManagementHelper.populateDemoEmployees(context);
+                      await EmployeeManagementHelper.populateDemoEmployees(
+                          context);
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Demo data populated!')),
@@ -1135,8 +1359,10 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                   OutlinedButton.icon(
                     onPressed: () async {
                       // Try to manually refresh
-                      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-                      await EmployeeManagementHelper.forceRefreshEmployees(context, () async {
+                      final employeeProvider =
+                          Provider.of<EmployeeProvider>(context, listen: false);
+                      await EmployeeManagementHelper.forceRefreshEmployees(
+                          context, () async {
                         await employeeProvider.loadEmployees();
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -1157,7 +1383,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const EmployeePerformanceDashboard(),
+                      builder: (context) =>
+                          const EmployeePerformanceDashboard(),
                     ),
                   );
                 },
@@ -1166,7 +1393,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () {
-                  final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+                  final employeeProvider =
+                      Provider.of<EmployeeProvider>(context, listen: false);
                   employeeProvider.loadEmployees();
                 },
                 tooltip: 'Refresh Employees',
@@ -1187,13 +1415,20 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Error: $e', style: const TextStyle(color: Colors.red, fontSize: 12)),
+                  Text('Error: $e',
+                      style: const TextStyle(color: Colors.red, fontSize: 12)),
                   const SizedBox(height: 16),
-                  const Text('This might indicate:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const Text('• Firebase connection issues', style: TextStyle(fontSize: 12)),
-                  const Text('• Internet connectivity problems', style: TextStyle(fontSize: 12)),
-                  const Text('• Firebase configuration issues', style: TextStyle(fontSize: 12)),
-                  const Text('• "Cannot send Null" debug service errors interfering', style: TextStyle(fontSize: 12, color: Colors.orange)),
+                  const Text('This might indicate:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('• Firebase connection issues',
+                      style: TextStyle(fontSize: 12)),
+                  const Text('• Internet connectivity problems',
+                      style: TextStyle(fontSize: 12)),
+                  const Text('• Firebase configuration issues',
+                      style: TextStyle(fontSize: 12)),
+                  const Text(
+                      '• "Cannot send Null" debug service errors interfering',
+                      style: TextStyle(fontSize: 12, color: Colors.orange)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -1221,13 +1456,15 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     }
   }
 
-  void _showDeleteEmployeeDialog(BuildContext context, emp.Employee employee) async {
+  void _showDeleteEmployeeDialog(
+      BuildContext context, emp.Employee employee) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Employee'),
-        content: Text('Are you sure you want to permanently delete ${employee.displayName}? '
-                    'This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to permanently delete ${employee.displayName}? '
+            'This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -1246,7 +1483,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
     if (confirmed == true) {
       try {
-        final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+        final employeeProvider =
+            Provider.of<EmployeeProvider>(context, listen: false);
         await employeeProvider.deleteEmployee(employee.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

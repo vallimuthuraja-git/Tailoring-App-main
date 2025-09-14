@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/user_avatar.dart';
 
 void main() {
   runApp(const StandaloneTailoringApp());
@@ -133,7 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView(
                     children: const [
                       ChatMessage(
-                        message: "Hello! I'm your AI tailoring assistant. How can I help you today?",
+                        message:
+                            "Hello! I'm your AI tailoring assistant. How can I help you today?",
                         isUser: false,
                       ),
                       ChatMessage(
@@ -141,7 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         isUser: true,
                       ),
                       ChatMessage(
-                        message: "I'd be happy to help you with suit measurements! For a proper fit, we'll need to measure: chest, waist, shoulder, length, and inseam. Would you like me to guide you through the process?",
+                        message:
+                            "I'd be happy to help you with suit measurements! For a proper fit, we'll need to measure: chest, waist, shoulder, length, and inseam. Would you like me to guide you through the process?",
                         isUser: false,
                       ),
                       ChatMessage(
@@ -149,7 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         isUser: true,
                       ),
                       ChatMessage(
-                        message: "For our custom 3-piece suits, the typical delivery time is 14-21 days, including fittings and alterations. Premium fabrics may take 21-30 days. We offer express service for urgent orders!",
+                        message:
+                            "For our custom 3-piece suits, the typical delivery time is 14-21 days, including fittings and alterations. Premium fabrics may take 21-30 days. We offer express service for urgent orders!",
                         isUser: false,
                       ),
                     ],
@@ -465,19 +469,22 @@ class ProductsScreen extends StatelessWidget {
   final List<Map<String, dynamic>> demoProducts = const [
     {
       'name': 'Custom Suit - 3 Piece',
-      'description': 'Complete 3-piece suit with jacket, vest, and trousers. Premium wool fabric.',
+      'description':
+          'Complete 3-piece suit with jacket, vest, and trousers. Premium wool fabric.',
       'price': '₹15,000',
       'category': 'Men\'s Wear',
     },
     {
       'name': 'Wedding Lehenga',
-      'description': 'Beautiful wedding lehenga with heavy embroidery and traditional design.',
+      'description':
+          'Beautiful wedding lehenga with heavy embroidery and traditional design.',
       'price': '₹25,000',
       'category': 'Women\'s Wear',
     },
     {
       'name': 'Business Shirt - Cotton',
-      'description': 'Professional cotton business shirt with perfect fit and comfort.',
+      'description':
+          'Professional cotton business shirt with perfect fit and comfort.',
       'price': '₹2,500',
       'category': 'Men\'s Wear',
     },
@@ -489,7 +496,8 @@ class ProductsScreen extends StatelessWidget {
     },
     {
       'name': 'Suit Alteration Service',
-      'description': 'Professional suit alteration service including adjustments.',
+      'description':
+          'Professional suit alteration service including adjustments.',
       'price': '₹2,000',
       'category': 'Alterations',
     },
@@ -557,7 +565,8 @@ class ProductsScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.blue.shade100,
                                 borderRadius: BorderRadius.circular(12),
@@ -659,7 +668,8 @@ class OrdersScreen extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -760,15 +770,9 @@ class CustomersScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  UserAvatar(
+                    displayName: customer['name'],
                     radius: 30,
-                    child: Text(
-                      customer['name'][0].toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -805,7 +809,8 @@ class CustomersScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.blue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -959,7 +964,8 @@ class AnalyticsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _buildTopProduct('Custom Suit - 3 Piece', 'Men\'s Wear', '₹15,000'),
           const SizedBox(height: 12),
-          _buildTopProduct('Evening Gown - Designer', 'Women\'s Wear', '₹18,000'),
+          _buildTopProduct(
+              'Evening Gown - Designer', 'Women\'s Wear', '₹18,000'),
         ],
       ),
     );
@@ -1074,7 +1080,9 @@ class _PerformanceIndicator extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
-              value: isPercentage ? value / 100 : (value > 100 ? 1.0 : value / 100),
+              value: isPercentage
+                  ? value / 100
+                  : (value > 100 ? 1.0 : value / 100),
               backgroundColor: Colors.grey.shade200,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),

@@ -5,6 +5,7 @@ import '../../providers/theme_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../models/user_role.dart';
 import '../../utils/theme_constants.dart';
+import '../../widgets/user_avatar.dart';
 import '../catalog/modern_product_catalog_screen.dart';
 import '../services/service_catalog_screen.dart';
 import '../orders/order_history_screen.dart';
@@ -20,6 +21,7 @@ import '../ai/ai_assistance_screen.dart';
 import '../demo_overview_screen.dart';
 import '../employee/simple_employee_list_screen.dart';
 import '../dashboard/analytics_dashboard_screen.dart';
+import '../../utils/responsive_utils.dart';
 
 // Using beautiful theme-level opacity extensions
 // No more deprecated withValues(alpha:) calls - everything uses withValues() internally
@@ -130,9 +132,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       builder: (context, authProvider, themeProvider, child) {
         // Check user role and configure navigation accordingly
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (authProvider.userRole == UserRole.employee && _screens.length != 3) {
+          if (authProvider.userRole == UserRole.employee &&
+              _screens.length != 3) {
             _reconfigureForEmployee();
-          } else if (authProvider.userRole != UserRole.employee && _screens.length != 5) {
+          } else if (authProvider.userRole != UserRole.employee &&
+              _screens.length != 5) {
             _setupNavigation();
           }
         });
@@ -147,8 +151,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               });
             },
             type: BottomNavigationBarType.fixed,
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
-            selectedItemColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
+            selectedItemColor: themeProvider.isDarkMode
+                ? DarkAppColors.primary
+                : AppColors.primary,
             unselectedItemColor: themeProvider.isDarkMode
                 ? DarkAppColors.onSurface.withValues(alpha: 0.6)
                 : AppColors.onSurface.withValues(alpha: 0.6),
@@ -178,102 +186,117 @@ class DashboardTab extends StatelessWidget {
       builder: (context, authProvider, themeProvider, child) {
         final user = authProvider.userProfile;
         final isShopOwner = authProvider.isShopOwnerOrAdmin;
+        final deviceType = ResponsiveUtils.getDeviceTypeFromContext(context);
 
         return Scaffold(
           appBar: AppBar(
             title: const Text('Dashboard'),
             toolbarHeight: kToolbarHeight + 5,
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             elevation: 0,
             iconTheme: IconThemeData(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             titleTextStyle: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
             actions: [
-               Consumer<CartProvider>(
-                 builder: (context, cartProvider, child) {
-                   return Stack(
-                     children: [
-                       IconButton(
-                         icon: Icon(
-                           Icons.shopping_cart,
-                           color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                         ),
-                         onPressed: () {
-                           Navigator.push(
-                             context,
-                             MaterialPageRoute(
-                               builder: (context) => const CartScreen(),
-                             ),
-                           );
-                         },
-                       ),
-                       if (cartProvider.itemCount > 0)
-                         Positioned(
-                           right: 8,
-                           top: 8,
-                           child: Container(
-                             padding: const EdgeInsets.all(2),
-                             decoration: BoxDecoration(
-                               color: Colors.teal,
-                               borderRadius: BorderRadius.circular(10),
-                             ),
-                             constraints: const BoxConstraints(
-                               minWidth: 16,
-                               minHeight: 16,
-                             ),
-                             child: Text(
-                               cartProvider.itemCount.toString(),
-                               style: const TextStyle(
-                                 color: Colors.white,
-                                 fontSize: 10,
-                                 fontWeight: FontWeight.bold,
-                               ),
-                               textAlign: TextAlign.center,
-                             ),
-                           ),
-                         ),
-                     ],
-                   );
-                 },
-               ),
-               IconButton(
-                 icon: Icon(
-                   Icons.notifications,
-                   color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                 ),
-                 onPressed: () {
-                   // Navigate to notifications
-                 },
-               ),
-               IconButton(
-                 icon: Icon(
-                   Icons.chat,
-                   color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                 ),
-                 onPressed: () {
-                   // Open AI chatbot
-                   _showChatbot(context);
-                 },
-               ),
-               IconButton(
-                 icon: Icon(
-                   Icons.play_arrow,
-                   color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-                 ),
-                 tooltip: 'View Demo',
-                 onPressed: () => _showDemoOverview(context),
-               ),
+              Consumer<CartProvider>(
+                builder: (context, cartProvider, child) {
+                  return Stack(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.shopping_cart,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface
+                              : AppColors.onSurface,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CartScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      if (cartProvider.itemCount > 0)
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.teal,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              cartProvider.itemCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.notifications,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                ),
+                onPressed: () {
+                  // Navigate to notifications
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.chat,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                ),
+                onPressed: () {
+                  // Open AI chatbot
+                  _showChatbot(context);
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.play_arrow,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                ),
+                tooltip: 'View Demo',
+                onPressed: () => _showDemoOverview(context),
+              ),
             ],
           ),
           body: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.05,
-              vertical: 20,
+              horizontal: ResponsiveUtils.getResponsiveSpacing(context, 16.0),
+              vertical: ResponsiveUtils.getResponsiveSpacing(context, 20.0),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,14 +313,20 @@ class DashboardTab extends StatelessWidget {
                                   ? DarkAppColors.primary.withValues(alpha: 0.8)
                                   : AppColors.primary.withValues(alpha: 0.8),
                               themeProvider.isDarkMode
-                                  ? DarkAppColors.primaryVariant.withValues(alpha: 0.9)
-                                  : AppColors.primaryVariant.withValues(alpha: 0.9),
+                                  ? DarkAppColors.primaryVariant
+                                      .withValues(alpha: 0.9)
+                                  : AppColors.primaryVariant
+                                      .withValues(alpha: 0.9),
                             ],
                           )
                         : LinearGradient(
                             colors: [
-                              themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                              themeProvider.isDarkMode ? DarkAppColors.primaryVariant : AppColors.primaryVariant,
+                              themeProvider.isDarkMode
+                                  ? DarkAppColors.primary
+                                  : AppColors.primary,
+                              themeProvider.isDarkMode
+                                  ? DarkAppColors.primaryVariant
+                                  : AppColors.primaryVariant,
                             ],
                           ),
                     borderRadius: BorderRadius.circular(16),
@@ -307,19 +336,10 @@ class DashboardTab extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
-                            backgroundImage: user?.photoUrl != null
-                                ? NetworkImage(user!.photoUrl!)
-                                : null,
-                            child: user?.photoUrl == null
-                                ? Icon(
-                                    Icons.person,
-                                    size: 30,
-                                    color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                                  )
-                                : null,
+                          UserAvatar(
+                            displayName: user?.displayName ?? 'User',
+                            imageUrl: user?.photoUrl,
+                            radius: 30.0,
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -368,12 +388,15 @@ class DashboardTab extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onBackground
+                        : AppColors.onBackground,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                ..._buildQuickActions(isShopOwner, onNavigateToProducts, onNavigateToOrders, context),
+                _buildQuickActions(isShopOwner, onNavigateToProducts,
+                    onNavigateToOrders, context, deviceType),
 
                 const SizedBox(height: 32),
 
@@ -383,7 +406,9 @@ class DashboardTab extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onBackground
+                        : AppColors.onBackground,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -392,12 +417,14 @@ class DashboardTab extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.surface
+                        : AppColors.background,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha:0.2)
-                          : AppColors.onSurface.withValues(alpha:0.2),
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.2)
+                          : AppColors.onSurface.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
@@ -405,8 +432,8 @@ class DashboardTab extends StatelessWidget {
                       Icon(
                         Icons.info_outline,
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.onSurface.withValues(alpha:0.7)
-                            : AppColors.onSurface.withValues(alpha:0.7),
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                            : AppColors.onSurface.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -414,8 +441,8 @@ class DashboardTab extends StatelessWidget {
                           'No recent activity yet. Start exploring our services!',
                           style: TextStyle(
                             color: themeProvider.isDarkMode
-                                ? DarkAppColors.onSurface.withValues(alpha:0.7)
-                                : AppColors.onSurface.withValues(alpha:0.7),
+                                ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                : AppColors.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -448,386 +475,324 @@ class DashboardTab extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildQuickActions(bool isShopOwner, VoidCallback? onNavigateToProducts, VoidCallback onNavigateToOrders, BuildContext context) {
+  Widget _buildQuickActions(
+      bool isShopOwner,
+      VoidCallback? onNavigateToProducts,
+      VoidCallback onNavigateToOrders,
+      BuildContext context,
+      DeviceType deviceType) {
     if (isShopOwner) {
-      return [
-        // Shop Owner Actions
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.people_alt,
-                title: 'View Employees',
-                color: Colors.blue,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SimpleEmployeeListScreen(),
-                    ),
-                  );
-                },
+      final actions = [
+        _QuickActionCard(
+          icon: Icons.people_alt,
+          title: 'View Employees',
+          color: Colors.blue,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SimpleEmployeeListScreen(),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.inventory,
-                title: 'Manage Products',
-                color: Colors.orange,
-                onTap: onNavigateToProducts ?? () {},
-              ),
-            ),
-          ],
+            );
+          },
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.people,
-                title: 'Customers',
-                color: Colors.teal,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CustomerManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.group,
-                title: 'Team Management',
-                color: Colors.purple,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EmployeeManagementHome(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+        _QuickActionCard(
+          icon: Icons.inventory,
+          title: 'Manage Products',
+          color: Colors.orange,
+          onTap: onNavigateToProducts ?? () {},
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.receipt_long,
-                title: 'Order Mgmt',
-                color: Colors.indigo,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrderManagementDashboard(),
-                    ),
-                  );
-                },
+        _QuickActionCard(
+          icon: Icons.people,
+          title: 'Customers',
+          color: Colors.teal,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CustomerManagementScreen(),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.people,
-                title: 'Customer Mgmt',
-                color: Colors.teal,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CustomerManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+            );
+          },
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.analytics,
-                title: 'Reports',
-                color: Colors.cyan,
-                onTap: () {
-                  // Navigate to reports
-                },
+        _QuickActionCard(
+          icon: Icons.group,
+          title: 'Team Management',
+          color: Colors.purple,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EmployeeManagementHome(),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.build,
-                title: 'Demo Setup',
-                color: Colors.teal,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DemoSetupScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+            );
+          },
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.build,
-                title: 'Demo Setup',
-                color: Colors.teal,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DemoSetupScreen(),
-                    ),
-                  );
-                },
+        _QuickActionCard(
+          icon: Icons.receipt_long,
+          title: 'Order Mgmt',
+          color: Colors.indigo,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const OrderManagementDashboard(),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.storage,
-                title: 'Database Mgmt',
-                color: Colors.purple,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DatabaseManagementHome(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+            );
+          },
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.engineering,
-                title: 'Workflow',
-                color: Colors.indigo,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TailoringWorkflowScreen(),
-                    ),
-                  );
-                },
+        _QuickActionCard(
+          icon: Icons.people,
+          title: 'Customer Mgmt',
+          color: Colors.teal,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CustomerManagementScreen(),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.analytics,
-                title: 'Analytics',
-                color: Colors.cyan,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AnalyticsDashboardScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+            );
+          },
         ),
+        _QuickActionCard(
+          icon: Icons.analytics,
+          title: 'Reports',
+          color: Colors.cyan,
+          onTap: () {
+            // Navigate to reports
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.build,
+          title: 'Demo Setup',
+          color: Colors.teal,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DemoSetupScreen(),
+              ),
+            );
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.storage,
+          title: 'Database Mgmt',
+          color: Colors.purple,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DatabaseManagementHome(),
+              ),
+            );
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.engineering,
+          title: 'Workflow',
+          color: Colors.indigo,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TailoringWorkflowScreen(),
+              ),
+            );
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.analytics,
+          title: 'Analytics',
+          color: Colors.cyan,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AnalyticsDashboardScreen(),
+              ),
+            );
+          },
+        ),
+      ];
 
-        // Employee Analytics and Management
-        const SizedBox(height: 24),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFF1E3C72).withValues(alpha: 0.9),
-                const Color(0xFF2A5298).withValues(alpha: 0.9),
+      final actionsWidget = deviceType == DeviceType.mobile
+          ? Column(
+              children: actions
+                  .map((card) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: card,
+                      ))
+                  .toList(),
+            )
+          : GridView.count(
+              crossAxisCount: ResponsiveUtils.responsiveGridColumns(deviceType),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: actions,
+            );
+
+      return Column(
+        children: [
+          actionsWidget,
+          const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF1E3C72).withValues(alpha: 0.9),
+                  const Color(0xFF2A5298).withValues(alpha: 0.9),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
               ],
             ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.business_center,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.business_center,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Employee Management Hub',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Employee Management Hub',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Complete employee tools & analytics',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 14,
+                          Text(
+                            'Complete employee tools & analytics',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EmployeeManagementHome(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.people),
-                    label: const Text('Access Team Management'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF1E3C72),
-                      side: const BorderSide(color: Colors.white, width: 1),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ];
-    } else {
-      return [
-        // Customer Actions
-        Row(
-          children: [
-            Expanded(
-              child: Hero(
-                tag: 'action-shopping-bag',
-                child: _QuickActionCard(
-                  icon: Icons.shopping_bag,
-                  title: 'Browse Products',
-                  color: Colors.blue,
-                  onTap: onNavigateToProducts ?? () {},
+                  ],
                 ),
-              ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const EmployeeManagementHome(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.people),
+                      label: const Text('Access Team Management'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1E3C72),
+                        side: const BorderSide(color: Colors.white, width: 1),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.receipt_long,
-                title: 'My Orders',
-                color: Colors.green,
-                onTap: onNavigateToOrders,
-              ),
-            ),
-          ],
+          ),
+        ],
+      );
+    } else {
+      final actions = [
+        Hero(
+          tag: 'action-shopping-bag',
+          child: _QuickActionCard(
+            icon: Icons.shopping_bag,
+            title: 'Browse Products',
+            color: Colors.blue,
+            onTap: onNavigateToProducts ?? () {},
+          ),
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.chat,
-                title: 'AI Assistant',
-                color: Colors.purple,
-                onTap: () {
-                  _showChatbot(context);
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.support_agent,
-                title: 'Support',
-                color: Colors.teal,
-                onTap: () {
-                  // Navigate to support
-                },
-              ),
-            ),
-          ],
+        _QuickActionCard(
+          icon: Icons.receipt_long,
+          title: 'My Orders',
+          color: Colors.green,
+          onTap: onNavigateToOrders,
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.support_agent,
-                title: 'Support',
-                color: Colors.blue,
-                onTap: () {
-                  // Navigate to support
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.feedback,
-                title: 'Feedback',
-                color: Colors.orange,
-                onTap: () {
-                  // Navigate to feedback
-                },
-              ),
-            ),
-          ],
+        _QuickActionCard(
+          icon: Icons.chat,
+          title: 'AI Assistant',
+          color: Colors.purple,
+          onTap: () {
+            _showChatbot(context);
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.support_agent,
+          title: 'Support',
+          color: Colors.teal,
+          onTap: () {
+            // Navigate to support
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.feedback,
+          title: 'Feedback',
+          color: Colors.orange,
+          onTap: () {
+            // Navigate to feedback
+          },
         ),
       ];
+
+      final actionsWidget = deviceType == DeviceType.mobile
+          ? Column(
+              children: actions
+                  .map((card) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: card,
+                      ))
+                  .toList(),
+            )
+          : GridView.count(
+              crossAxisCount: ResponsiveUtils.responsiveGridColumns(deviceType),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: actions,
+            );
+
+      return actionsWidget;
     }
   }
 }
@@ -849,7 +814,8 @@ class _QuickActionCard extends StatefulWidget {
   State<_QuickActionCard> createState() => _QuickActionCardState();
 }
 
-class _QuickActionCardState extends State<_QuickActionCard> with TickerProviderStateMixin {
+class _QuickActionCardState extends State<_QuickActionCard>
+    with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -897,20 +863,22 @@ class _QuickActionCardState extends State<_QuickActionCard> with TickerProviderS
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withValues(alpha:0.2)
-                  : AppColors.onSurface.withValues(alpha:0.2),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.2)
+                  : AppColors.onSurface.withValues(alpha: 0.2),
             ),
             boxShadow: themeProvider.isGlassyMode
                 ? null
                 : [
                     BoxShadow(
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha:0.1)
-                          : AppColors.onSurface.withValues(alpha:0.1),
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                          : AppColors.onSurface.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -925,7 +893,9 @@ class _QuickActionCardState extends State<_QuickActionCard> with TickerProviderS
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),

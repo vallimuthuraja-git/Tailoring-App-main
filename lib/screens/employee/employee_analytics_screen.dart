@@ -4,12 +4,14 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/employee_analytics_service.dart';
 import '../../models/employee.dart';
+import '../../widgets/user_avatar.dart';
 
 class EmployeeAnalyticsScreen extends StatefulWidget {
   const EmployeeAnalyticsScreen({super.key});
 
   @override
-  State<EmployeeAnalyticsScreen> createState() => _EmployeeAnalyticsScreenState();
+  State<EmployeeAnalyticsScreen> createState() =>
+      _EmployeeAnalyticsScreenState();
 }
 
 class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
@@ -36,13 +38,15 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
 
       if (authProvider.currentUser != null) {
         // Get individual employee analytics
-        final employeeAnalytics = await _analyticsService.getEmployeeAnalytics(authProvider.currentUser!.uid);
+        final employeeAnalytics = await _analyticsService
+            .getEmployeeAnalytics(authProvider.currentUser!.uid);
 
         // Get team analytics
         final teamAnalytics = await _analyticsService.getTeamAnalytics();
 
         // Get efficiency analytics
-        final efficiencyAnalytics = await _analyticsService.getWorkEfficiencyAnalytics();
+        final efficiencyAnalytics =
+            await _analyticsService.getWorkEfficiencyAnalytics();
 
         setState(() {
           _analyticsData = {
@@ -146,8 +150,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
@@ -165,14 +169,10 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
           children: [
             Row(
               children: [
-                CircleAvatar(
+                UserAvatar(
+                  displayName: employee.displayName,
+                  imageUrl: employee.photoUrl,
                   radius: 30,
-                  backgroundImage: employee.photoUrl != null
-                      ? NetworkImage(employee.photoUrl!)
-                      : null,
-                  child: employee.photoUrl == null
-                      ? Text(employee.displayName[0].toUpperCase())
-                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -247,7 +247,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
                 Expanded(
                   child: _buildMetricCard(
                     'Efficiency Score',
-                    (employeeData['efficiencyScore'] as double).toStringAsFixed(1),
+                    (employeeData['efficiencyScore'] as double)
+                        .toStringAsFixed(1),
                     Icons.speed,
                     Colors.purple,
                   ),
@@ -260,7 +261,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
     );
   }
 
-  Widget _buildMetricCard(String label, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -292,7 +294,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
 
   Widget _buildProductivityChart() {
     final employeeData = _analyticsData!['employee'] as Map<String, dynamic>;
-    final productivityTrend = employeeData['productivityTrend'] as List<Map<String, dynamic>>;
+    final productivityTrend =
+        employeeData['productivityTrend'] as List<Map<String, dynamic>>;
 
     if (productivityTrend.isEmpty) {
       return const Card(
@@ -325,8 +328,10 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          if (value.toInt() >= 0 && value.toInt() < productivityTrend.length) {
-                            final month = productivityTrend[value.toInt()]['month'] as String;
+                          if (value.toInt() >= 0 &&
+                              value.toInt() < productivityTrend.length) {
+                            final month = productivityTrend[value.toInt()]
+                                ['month'] as String;
                             return Text(month.split('-')[1]); // Show month only
                           }
                           return const Text('');
@@ -336,8 +341,10 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
                     leftTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: true),
                     ),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                   ),
                   borderData: FlBorderData(show: true),
                   lineBarsData: [
@@ -345,7 +352,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
                       spots: productivityTrend.asMap().entries.map((entry) {
                         final index = entry.key.toDouble();
                         final data = entry.value;
-                        return FlSpot(index, (data['completedOrders'] as num).toDouble());
+                        return FlSpot(
+                            index, (data['completedOrders'] as num).toDouble());
                       }).toList(),
                       isCurved: true,
                       color: Colors.blue,
@@ -449,7 +457,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
                 Expanded(
                   child: _buildTeamMetric(
                     'Avg Rating',
-                    (teamData['averageTeamRating'] as double).toStringAsFixed(1),
+                    (teamData['averageTeamRating'] as double)
+                        .toStringAsFixed(1),
                     Icons.star,
                     Colors.amber,
                   ),
@@ -471,7 +480,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
     );
   }
 
-  Widget _buildTeamMetric(String label, String value, IconData icon, Color color) {
+  Widget _buildTeamMetric(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -501,7 +511,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
   }
 
   Widget _buildEfficiencyCard() {
-    final efficiencyData = _analyticsData!['efficiency'] as Map<String, dynamic>;
+    final efficiencyData =
+        _analyticsData!['efficiency'] as Map<String, dynamic>;
 
     return Card(
       elevation: 4,
@@ -548,7 +559,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
     );
   }
 
-  Widget _buildEfficiencyMetric(String label, String value, IconData icon, Color color) {
+  Widget _buildEfficiencyMetric(
+      String label, String value, IconData icon, Color color) {
     return Row(
       children: [
         Icon(icon, color: color, size: 20),
@@ -579,7 +591,8 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
 
   Widget _buildSkillAnalysisCard() {
     final employeeData = _analyticsData!['employee'] as Map<String, dynamic>;
-    final skillUtilization = employeeData['skillUtilization'] as Map<String, double>;
+    final skillUtilization =
+        employeeData['skillUtilization'] as Map<String, double>;
 
     if (skillUtilization.isEmpty) {
       return const Card(
@@ -627,8 +640,10 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
   }
 
   Widget _buildRecommendationsCard() {
-    final efficiencyData = _analyticsData!['efficiency'] as Map<String, dynamic>;
-    final suggestions = efficiencyData['optimizationSuggestions'] as List<String>;
+    final efficiencyData =
+        _analyticsData!['efficiency'] as Map<String, dynamic>;
+    final suggestions =
+        efficiencyData['optimizationSuggestions'] as List<String>;
 
     if (suggestions.isEmpty) {
       return const Card(
@@ -652,21 +667,22 @@ class _EmployeeAnalyticsScreenState extends State<EmployeeAnalyticsScreen> {
             ),
             const SizedBox(height: 16),
             ...suggestions.map((suggestion) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.lightbulb, color: Colors.amber, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      suggestion,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.lightbulb,
+                          color: Colors.amber, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          suggestion,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )),
+                )),
           ],
         ),
       ),

@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../models/employee.dart' as emp;
 import '../../providers/employee_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/responsive_utils.dart';
+import '../../widgets/user_avatar.dart';
 import 'employee_detail_screen.dart';
 import 'employee_create_screen.dart';
 import 'employee_performance_dashboard.dart';
@@ -36,7 +38,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   }
 
   Future<void> _loadEmployees() async {
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
     await employeeProvider.loadEmployees();
   }
 
@@ -48,7 +51,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         // Allow shop owners, admins, and employees (employees can view their own profile)
         final currentUser = authProvider.currentUser;
         final hasAccess = authProvider.isShopOwnerOrAdmin ||
-            (currentUser != null); // Employees can view the list but with limited actions
+            (currentUser !=
+                null); // Employees can view the list but with limited actions
 
         if (!hasAccess) {
           return Scaffold(
@@ -94,7 +98,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                     child: IconButton(
                       icon: Icon(
                         Icons.sync,
-                        color: provider.isLoading ? Colors.orange : Colors.green,
+                        color:
+                            provider.isLoading ? Colors.orange : Colors.green,
                       ),
                       onPressed: provider.isLoading ? null : _loadEmployees,
                       tooltip: 'Sync with server',
@@ -110,7 +115,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const EmployeePerformanceDashboard(),
+                        builder: (context) =>
+                            const EmployeePerformanceDashboard(),
                       ),
                     );
                   },
@@ -153,7 +159,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.error, size: 64, color: Colors.red),
+                            const Icon(Icons.error,
+                                size: 64, color: Colors.red),
                             const SizedBox(height: 16),
                             Text(
                               'Error loading employees',
@@ -186,7 +193,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                             SizedBox(height: 16),
                             Text(
                               'No employees found',
-                              style: TextStyle(fontSize: 18, color: Colors.grey),
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.grey),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -198,12 +206,44 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                       );
                     }
 
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: employees.length,
-                      itemBuilder: (context, index) {
-                        final employee = employees[index];
-                        return _buildEmployeeCard(employee);
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final deviceType =
+                            ResponsiveUtils.getDeviceType(constraints.maxWidth);
+                        final isDesktop = deviceType == DeviceType.desktop;
+
+                        if (isDesktop) {
+                          // Desktop: Grid layout
+                          return GridView.builder(
+                            padding: const EdgeInsets.all(16),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount:
+                                  ResponsiveUtils.getResponsiveGridColumns(
+                                      context),
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 1.2,
+                            ),
+                            itemCount: employees.length,
+                            itemBuilder: (context, index) {
+                              final employee = employees[index];
+                              return _buildEmployeeCard(employee,
+                                  isDesktop: true);
+                            },
+                          );
+                        } else {
+                          // Mobile/Tablet: List layout
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: employees.length,
+                            itemBuilder: (context, index) {
+                              final employee = employees[index];
+                              return _buildEmployeeCard(employee,
+                                  isDesktop: false);
+                            },
+                          );
+                        }
                       },
                     );
                   },
@@ -231,100 +271,157 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   }
 
   Widget _buildSearchAndFilters() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Search Bar
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search employees...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final deviceType = ResponsiveUtils.getDeviceType(constraints.maxWidth);
+        final isDesktop = deviceType == DeviceType.desktop;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-              filled: true,
-              fillColor: Theme.of(context).colorScheme.surface,
-            ),
-            onChanged: (value) {
-              final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-              employeeProvider.searchEmployees(value);
-            },
+            ],
           ),
-          const SizedBox(height: 12),
-
-          // Filters Row
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                // Skill Filter
-                _buildFilterChip(
-                  label: 'Skill',
-                  value: _selectedSkillFilter?.name ?? 'All',
-                  onTap: () => _showSkillFilterDialog(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Search Bar
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search employees...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
                 ),
-                const SizedBox(width: 8),
+                onChanged: (value) {
+                  final employeeProvider =
+                      Provider.of<EmployeeProvider>(context, listen: false);
+                  employeeProvider.searchEmployees(value);
+                },
+              ),
+              const SizedBox(height: 12),
 
-                // Availability Filter
-                _buildFilterChip(
-                  label: 'Availability',
-                  value: _selectedAvailabilityFilter?.name ?? 'All',
-                  onTap: () => _showAvailabilityFilterDialog(),
+              // Filters
+              if (isDesktop)
+                // Desktop: Wrap layout
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    // Skill Filter
+                    _buildFilterChip(
+                      label: 'Skill',
+                      value: _selectedSkillFilter?.name ?? 'All',
+                      onTap: () => _showSkillFilterDialog(),
+                    ),
+
+                    // Availability Filter
+                    _buildFilterChip(
+                      label: 'Availability',
+                      value: _selectedAvailabilityFilter?.name ?? 'All',
+                      onTap: () => _showAvailabilityFilterDialog(),
+                    ),
+
+                    // Status Filter
+                    _buildFilterChip(
+                      label: 'Status',
+                      value: _activeStatusFilter == null
+                          ? 'All'
+                          : _activeStatusFilter!
+                              ? 'Active'
+                              : 'Inactive',
+                      onTap: () => _showStatusFilterDialog(),
+                    ),
+
+                    // Clear Filters
+                    ActionChip(
+                      label: const Text('Clear'),
+                      onPressed: _clearFilters,
+                      avatar: const Icon(Icons.clear, size: 16),
+                    ),
+                  ],
+                )
+              else
+                // Mobile/Tablet: Horizontal scroll
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Skill Filter
+                      _buildFilterChip(
+                        label: 'Skill',
+                        value: _selectedSkillFilter?.name ?? 'All',
+                        onTap: () => _showSkillFilterDialog(),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Availability Filter
+                      _buildFilterChip(
+                        label: 'Availability',
+                        value: _selectedAvailabilityFilter?.name ?? 'All',
+                        onTap: () => _showAvailabilityFilterDialog(),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Status Filter
+                      _buildFilterChip(
+                        label: 'Status',
+                        value: _activeStatusFilter == null
+                            ? 'All'
+                            : _activeStatusFilter!
+                                ? 'Active'
+                                : 'Inactive',
+                        onTap: () => _showStatusFilterDialog(),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      // Clear Filters
+                      ActionChip(
+                        label: const Text('Clear'),
+                        onPressed: _clearFilters,
+                        avatar: const Icon(Icons.clear, size: 16),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 8),
-
-                // Status Filter
-                _buildFilterChip(
-                  label: 'Status',
-                  value: _activeStatusFilter == null ? 'All' :
-                         _activeStatusFilter! ? 'Active' : 'Inactive',
-                  onTap: () => _showStatusFilterDialog(),
-                ),
-
-                const SizedBox(width: 8),
-
-                // Clear Filters
-                ActionChip(
-                  label: const Text('Clear'),
-                  onPressed: _clearFilters,
-                  avatar: const Icon(Icons.clear, size: 16),
-                ),
-              ],
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildFilterChip({required String label, required String value, required VoidCallback onTap}) {
+  Widget _buildFilterChip(
+      {required String label,
+      required String value,
+      required VoidCallback onTap}) {
     return FilterChip(
       label: Text('$label: $value'),
       selected: false,
       onSelected: (_) => onTap(),
       avatar: Icon(
-        label == 'Skill' ? Icons.build :
-        label == 'Availability' ? Icons.schedule :
-        Icons.toggle_on,
+        label == 'Skill'
+            ? Icons.build
+            : label == 'Availability'
+                ? Icons.schedule
+                : Icons.toggle_on,
         size: 16,
       ),
     );
   }
 
-  Widget _buildEmployeeCard(emp.Employee employee) {
+  Widget _buildEmployeeCard(emp.Employee employee, {bool isDesktop = false}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -345,20 +442,10 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               Row(
                 children: [
                   // Employee Avatar
-                  CircleAvatar(
+                  UserAvatar(
+                    displayName: employee.displayName,
+                    imageUrl: employee.photoUrl,
                     radius: 24,
-                    backgroundImage: employee.photoUrl != null
-                        ? NetworkImage(employee.photoUrl!)
-                        : null,
-                    child: employee.photoUrl == null
-                        ? Text(
-                            employee.displayName[0].toUpperCase(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          )
-                        : null,
                   ),
                   const SizedBox(width: 12),
 
@@ -369,23 +456,26 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                       children: [
                         Text(
                           employee.displayName,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           employee.email,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '${employee.experienceYears} years experience',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                       ],
                     ),
@@ -393,15 +483,20 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
                   // Status Indicator
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: employee.isActive ? Colors.green[100] : Colors.red[100],
+                      color: employee.isActive
+                          ? Colors.green[100]
+                          : Colors.red[100],
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       employee.isActive ? 'Active' : 'Inactive',
                       style: TextStyle(
-                        color: employee.isActive ? Colors.green[800] : Colors.red[800],
+                        color: employee.isActive
+                            ? Colors.green[800]
+                            : Colors.red[800],
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -421,19 +516,24 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                       children: [
                         Text(
                           'Skills',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 4),
                         Wrap(
                           spacing: 4,
                           children: employee.skills.take(3).map((skill) {
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -466,7 +566,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Icon(Icons.check_circle, size: 16, color: Colors.green),
+                            const Icon(Icons.check_circle,
+                                size: 16, color: Colors.green),
                             const SizedBox(width: 4),
                             Text(
                               '${employee.totalOrdersCompleted}',
@@ -508,13 +609,16 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             return ListTile(
               title: Text(skill.name),
               leading: Icon(
-                skill == _selectedSkillFilter ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                skill == _selectedSkillFilter
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _selectedSkillFilter = skill;
                 });
-                final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+                final employeeProvider =
+                    Provider.of<EmployeeProvider>(context, listen: false);
                 employeeProvider.filterBySkill(skill);
                 Navigator.pop(context);
               },
@@ -527,7 +631,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               setState(() {
                 _selectedSkillFilter = null;
               });
-              final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+              final employeeProvider =
+                  Provider.of<EmployeeProvider>(context, listen: false);
               employeeProvider.filterBySkill(null);
               Navigator.pop(context);
             },
@@ -557,7 +662,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                 setState(() {
                   _selectedAvailabilityFilter = availability;
                 });
-                final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+                final employeeProvider =
+                    Provider.of<EmployeeProvider>(context, listen: false);
                 employeeProvider.filterByAvailability(availability);
                 Navigator.pop(context);
               },
@@ -570,7 +676,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               setState(() {
                 _selectedAvailabilityFilter = null;
               });
-              final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+              final employeeProvider =
+                  Provider.of<EmployeeProvider>(context, listen: false);
               employeeProvider.filterByAvailability(null);
               Navigator.pop(context);
             },
@@ -592,13 +699,16 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             ListTile(
               title: const Text('All'),
               leading: Icon(
-                _activeStatusFilter == null ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                _activeStatusFilter == null
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _activeStatusFilter = null;
                 });
-                final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+                final employeeProvider =
+                    Provider.of<EmployeeProvider>(context, listen: false);
                 employeeProvider.filterByActiveStatus(null);
                 Navigator.pop(context);
               },
@@ -606,13 +716,16 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             ListTile(
               title: const Text('Active'),
               leading: Icon(
-                _activeStatusFilter == true ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                _activeStatusFilter == true
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _activeStatusFilter = true;
                 });
-                final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+                final employeeProvider =
+                    Provider.of<EmployeeProvider>(context, listen: false);
                 employeeProvider.filterByActiveStatus(true);
                 Navigator.pop(context);
               },
@@ -620,13 +733,16 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             ListTile(
               title: const Text('Inactive'),
               leading: Icon(
-                _activeStatusFilter == false ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                _activeStatusFilter == false
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _activeStatusFilter = false;
                 });
-                final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+                final employeeProvider =
+                    Provider.of<EmployeeProvider>(context, listen: false);
                 employeeProvider.filterByActiveStatus(false);
                 Navigator.pop(context);
               },
@@ -644,7 +760,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
       _activeStatusFilter = null;
     });
 
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
     employeeProvider.searchEmployees('');
     employeeProvider.filterBySkill(null);
     employeeProvider.filterByAvailability(null);

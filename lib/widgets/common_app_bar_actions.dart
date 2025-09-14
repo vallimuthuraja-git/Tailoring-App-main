@@ -4,9 +4,10 @@ import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/cart_provider.dart';
 import '../utils/theme_constants.dart';
-import '../services/auth_service.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/cart/cart_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import 'user_avatar.dart';
 
 class CommonAppBarActions extends StatefulWidget {
   final bool showLogout;
@@ -39,7 +40,8 @@ class _CommonAppBarActionsState extends State<CommonAppBarActions> {
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              final authProvider =
+                  Provider.of<AuthProvider>(context, listen: false);
               await authProvider.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
@@ -66,13 +68,22 @@ class _CommonAppBarActionsState extends State<CommonAppBarActions> {
     );
   }
 
+  void _navigateToProfile(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ThemeProvider, CartProvider>(
-      builder: (context, themeProvider, cartProvider, child) {
+    return Consumer3<ThemeProvider, CartProvider, AuthProvider>(
+      builder: (context, themeProvider, cartProvider, authProvider, child) {
         final iconColor = themeProvider.isDarkMode
             ? DarkAppColors.onSurface
             : AppColors.onSurface;
+
+        final user = authProvider.userProfile;
 
         final actions = <Widget>[];
 
@@ -115,6 +126,19 @@ class _CommonAppBarActionsState extends State<CommonAppBarActions> {
             ),
           );
         }
+
+        // Add profile icon with avatar
+        actions.add(
+          IconButton(
+            icon: UserAvatar(
+              displayName: user?.displayName ?? 'U',
+              imageUrl: user?.photoUrl,
+              radius: 16,
+            ),
+            onPressed: () => _navigateToProfile(context),
+            tooltip: 'View Profile',
+          ),
+        );
 
         // Add logout icon
         if (widget.showLogout) {

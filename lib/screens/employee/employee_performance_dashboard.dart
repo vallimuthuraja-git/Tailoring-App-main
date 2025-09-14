@@ -3,15 +3,18 @@ import 'package:provider/provider.dart';
 import '../../models/employee.dart';
 import '../../providers/employee_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/user_avatar.dart';
 
 class EmployeePerformanceDashboard extends StatefulWidget {
   const EmployeePerformanceDashboard({super.key});
 
   @override
-  State<EmployeePerformanceDashboard> createState() => _EmployeePerformanceDashboardState();
+  State<EmployeePerformanceDashboard> createState() =>
+      _EmployeePerformanceDashboardState();
 }
 
-class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashboard> {
+class _EmployeePerformanceDashboardState
+    extends State<EmployeePerformanceDashboard> {
   bool _isLoading = false;
 
   @override
@@ -25,7 +28,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
       _isLoading = true;
     });
 
-    final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
     await employeeProvider.loadEmployees();
 
     if (mounted) {
@@ -43,7 +47,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
         // Allow shop owners, admins, and employees (employees can view their own performance)
         final currentUser = authProvider.currentUser;
         final hasAccess = authProvider.isShopOwnerOrAdmin ||
-            (currentUser != null); // Employees can view their own performance data
+            (currentUser !=
+                null); // Employees can view their own performance data
 
         if (!hasAccess) {
           return Scaffold(
@@ -138,10 +143,14 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
 
   Widget _buildOverviewCards(List<Employee> employees) {
     final activeEmployees = employees.where((e) => e.isActive).length;
-    final totalOrders = employees.fold(0, (sum, e) => sum + e.totalOrdersCompleted);
-    final avgRating = employees.isEmpty ? 0.0 :
-        employees.map((e) => e.averageRating).reduce((a, b) => a + b) / employees.length;
-    final totalEarnings = employees.fold(0.0, (sum, e) => sum + e.totalEarnings);
+    final totalOrders =
+        employees.fold(0, (sum, e) => sum + e.totalOrdersCompleted);
+    final avgRating = employees.isEmpty
+        ? 0.0
+        : employees.map((e) => e.averageRating).reduce((a, b) => a + b) /
+            employees.length;
+    final totalEarnings =
+        employees.fold(0.0, (sum, e) => sum + e.totalEarnings);
 
     return Row(
       children: [
@@ -176,7 +185,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
     );
   }
 
-  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(
+      String title, String value, IconData icon, Color color) {
     return Expanded(
       child: Card(
         child: Padding(
@@ -216,8 +226,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
         Text(
           'Performance Distribution',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+              ),
         ),
         const SizedBox(height: 16),
 
@@ -231,8 +241,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
                 Text(
                   'Performance by Rating',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 _buildRatingDistribution(employees),
@@ -253,8 +263,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
                 Text(
                   'Skills Distribution',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 _buildSkillsDistribution(employees),
@@ -271,15 +281,17 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
     final distribution = <double, int>{};
 
     for (var rating in ratings) {
-      distribution[rating] = employees.where((e) =>
-        e.averageRating >= rating && e.averageRating < rating + 1.0
-      ).length;
+      distribution[rating] = employees
+          .where((e) =>
+              e.averageRating >= rating && e.averageRating < rating + 1.0)
+          .length;
     }
 
     return Column(
       children: ratings.map((rating) {
         final count = distribution[rating] ?? 0;
-        final percentage = employees.isEmpty ? 0.0 : (count / employees.length) * 100;
+        final percentage =
+            employees.isEmpty ? 0.0 : (count / employees.length) * 100;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
@@ -295,8 +307,11 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
                   value: percentage / 100,
                   backgroundColor: Colors.grey[300],
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    rating >= 4.0 ? Colors.green :
-                    rating >= 3.0 ? Colors.amber : Colors.red,
+                    rating >= 4.0
+                        ? Colors.green
+                        : rating >= 3.0
+                            ? Colors.amber
+                            : Colors.red,
                   ),
                 ),
               ),
@@ -328,7 +343,8 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
       children: sortedSkills.map((entry) {
         final skill = entry.key;
         final count = entry.value;
-        final percentage = employees.isEmpty ? 0.0 : (count / employees.length) * 100;
+        final percentage =
+            employees.isEmpty ? 0.0 : (count / employees.length) * 100;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
@@ -367,11 +383,10 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
         Text(
           'Workload Analysis',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+              ),
         ),
         const SizedBox(height: 16),
-
         if (suggestions.isEmpty) ...[
           Card(
             child: Padding(
@@ -392,50 +407,54 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
           ),
         ] else ...[
           ...suggestions.map((suggestion) => Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    suggestion['type'] == 'overload' ? Icons.warning : Icons.info,
-                    color: suggestion['type'] == 'overload' ? Colors.red : Colors.blue,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          suggestion['message'],
-                          style: TextStyle(
-                            color: suggestion['type'] == 'overload' ? Colors.red[700] : Colors.blue[700],
-                            fontWeight: FontWeight.bold,
-                          ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        suggestion['type'] == 'overload'
+                            ? Icons.warning
+                            : Icons.info,
+                        color: suggestion['type'] == 'overload'
+                            ? Colors.red
+                            : Colors.blue,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              suggestion['message'],
+                              style: TextStyle(
+                                color: suggestion['type'] == 'overload'
+                                    ? Colors.red[700]
+                                    : Colors.blue[700],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              suggestion['action'],
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          suggestion['action'],
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          )),
+                ),
+              )),
         ],
       ],
     );
   }
 
   Widget _buildTopPerformersSection(List<Employee> employees) {
-    final topPerformers = employees
-        .where((e) => e.isActive)
-        .toList()
+    final topPerformers = employees.where((e) => e.isActive).toList()
       ..sort((a, b) => b.averageRating.compareTo(a.averageRating))
       ..take(5);
 
@@ -447,36 +466,32 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
         Text(
           'Top Performers',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+              ),
         ),
         const SizedBox(height: 16),
-
         ...topPerformers.map((employee) => Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: employee.photoUrl != null
-                  ? NetworkImage(employee.photoUrl!)
-                  : null,
-              child: employee.photoUrl == null
-                  ? Text(employee.displayName[0].toUpperCase())
-                  : null,
-            ),
-            title: Text(employee.displayName),
-            subtitle: Text('${employee.totalOrdersCompleted} orders completed'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star, color: Colors.amber, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  employee.averageRating.toStringAsFixed(1),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              child: ListTile(
+                leading: UserAvatar(
+                  displayName: employee.displayName,
+                  imageUrl: employee.photoUrl,
                 ),
-              ],
-            ),
-          ),
-        )),
+                title: Text(employee.displayName),
+                subtitle:
+                    Text('${employee.totalOrdersCompleted} orders completed'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      employee.averageRating.toStringAsFixed(1),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            )),
       ],
     );
   }
@@ -495,38 +510,35 @@ class _EmployeePerformanceDashboardState extends State<EmployeePerformanceDashbo
         Text(
           'Needs Attention',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.red,
-          ),
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
         ),
         const SizedBox(height: 16),
-
         ...underperformers.map((employee) => Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: employee.photoUrl != null
-                  ? NetworkImage(employee.photoUrl!)
-                  : null,
-              child: employee.photoUrl == null
-                  ? Text(employee.displayName[0].toUpperCase())
-                  : null,
-            ),
-            title: Text(employee.displayName),
-            subtitle: Text('Rating: ${employee.averageRating.toStringAsFixed(1)} • ${employee.totalOrdersCompleted} orders'),
-            trailing: IconButton(
-              icon: const Icon(Icons.arrow_forward),
-              onPressed: () {
-                // Navigate to employee detail
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Container(), // Would navigate to employee detail
-                  ),
-                );
-              },
-            ),
-          ),
-        )),
+              child: ListTile(
+                leading: UserAvatar(
+                  displayName: employee.displayName,
+                  imageUrl: employee.photoUrl,
+                ),
+                title: Text(employee.displayName),
+                subtitle: Text(
+                    'Rating: ${employee.averageRating.toStringAsFixed(1)} • ${employee.totalOrdersCompleted} orders'),
+                trailing: IconButton(
+                  icon: const Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    // Navigate to employee detail
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            Container(), // Would navigate to employee detail
+                      ),
+                    );
+                  },
+                ),
+              ),
+            )),
       ],
     );
   }

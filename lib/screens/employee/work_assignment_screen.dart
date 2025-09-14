@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/employee.dart';
 import '../../providers/employee_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/user_avatar.dart';
 
 class WorkAssignmentScreen extends StatefulWidget {
   final Employee employee;
@@ -29,8 +30,10 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
     });
 
     try {
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
-      final assignments = await employeeProvider.getEmployeeAssignments(widget.employee.id);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
+      final assignments =
+          await employeeProvider.getEmployeeAssignments(widget.employee.id);
 
       if (mounted) {
         setState(() {
@@ -133,17 +136,10 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
           children: [
             Row(
               children: [
-                CircleAvatar(
+                UserAvatar(
+                  displayName: widget.employee.displayName,
+                  imageUrl: widget.employee.photoUrl,
                   radius: 30,
-                  backgroundImage: widget.employee.photoUrl != null
-                      ? NetworkImage(widget.employee.photoUrl!)
-                      : null,
-                  child: widget.employee.photoUrl == null
-                      ? Text(
-                          widget.employee.displayName[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        )
-                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -153,15 +149,15 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
                       Text(
                         widget.employee.displayName,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${widget.employee.experienceYears} years experience',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                              color: Colors.grey[600],
+                            ),
                       ),
                     ],
                   ),
@@ -253,21 +249,25 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
     }
 
     // Group assignments by status
-    final activeAssignments = _assignments.where((a) => a.status != WorkStatus.completed).toList();
-    final completedAssignments = _assignments.where((a) => a.status == WorkStatus.completed).toList();
+    final activeAssignments =
+        _assignments.where((a) => a.status != WorkStatus.completed).toList();
+    final completedAssignments =
+        _assignments.where((a) => a.status == WorkStatus.completed).toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (activeAssignments.isNotEmpty) ...[
           _buildSectionHeader('Active Assignments', Colors.blue),
-          ...activeAssignments.map((assignment) => _buildAssignmentCard(assignment)),
+          ...activeAssignments
+              .map((assignment) => _buildAssignmentCard(assignment)),
         ],
-
         if (completedAssignments.isNotEmpty) ...[
           if (activeAssignments.isNotEmpty) const SizedBox(height: 24),
           _buildSectionHeader('Completed Assignments', Colors.green),
-          ...completedAssignments.take(5).map((assignment) => _buildAssignmentCard(assignment)),
+          ...completedAssignments
+              .take(5)
+              .map((assignment) => _buildAssignmentCard(assignment)),
         ],
       ],
     );
@@ -287,8 +287,8 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
           Text(
             title,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
         ],
       ),
@@ -313,9 +313,10 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
                     children: [
                       Text(
                         'Order #${assignment.orderId}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -328,9 +329,11 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(assignment.status).withValues(alpha: 0.1),
+                    color: _getStatusColor(assignment.status)
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -344,9 +347,7 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
-
             Row(
               children: [
                 Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
@@ -373,26 +374,26 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
                 ],
               ],
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Due: ${assignment.deadline?.toString().split(' ')[0] ?? 'No deadline'}',
               style: TextStyle(
-                color: (assignment.deadline?.isBefore(DateTime.now()) ?? false) && !isCompleted
-                    ? Colors.red[600]
-                    : Colors.grey[600],
+                color:
+                    (assignment.deadline?.isBefore(DateTime.now()) ?? false) &&
+                            !isCompleted
+                        ? Colors.red[600]
+                        : Colors.grey[600],
                 fontSize: 12,
               ),
             ),
-
             if (!isCompleted) ...[
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton.icon(
-                    onPressed: () => _updateAssignmentStatus(assignment, WorkStatus.inProgress),
+                    onPressed: () => _updateAssignmentStatus(
+                        assignment, WorkStatus.inProgress),
                     icon: const Icon(Icons.play_arrow, size: 16),
                     label: const Text('Start'),
                     style: OutlinedButton.styleFrom(
@@ -470,9 +471,11 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
     );
   }
 
-  void _updateAssignmentStatus(WorkAssignment assignment, WorkStatus status) async {
+  void _updateAssignmentStatus(
+      WorkAssignment assignment, WorkStatus status) async {
     try {
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
       await employeeProvider.updateWorkAssignment(
         assignmentId: assignment.id,
         status: status,
@@ -480,7 +483,8 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
       _loadAssignments();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Assignment status updated to ${status.name}')),
+          SnackBar(
+              content: Text('Assignment status updated to ${status.name}')),
         );
       }
     } catch (e) {
@@ -492,9 +496,11 @@ class _WorkAssignmentScreenState extends State<WorkAssignmentScreen> {
     }
   }
 
-  void _completeAssignment(WorkAssignment assignment, double actualHours, String notes) async {
+  void _completeAssignment(
+      WorkAssignment assignment, double actualHours, String notes) async {
     try {
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
       await employeeProvider.updateWorkAssignment(
         assignmentId: assignment.id,
         status: WorkStatus.completed,
@@ -590,11 +596,10 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
                 Text(
                   'Assign Work to ${widget.employee.displayName}',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 24),
-
                 TextFormField(
                   controller: _orderIdController,
                   decoration: const InputDecoration(
@@ -608,9 +613,7 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 TextFormField(
                   controller: _taskController,
                   decoration: const InputDecoration(
@@ -625,9 +628,7 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 DropdownButtonFormField<EmployeeSkill>(
                   initialValue: _selectedSkill,
                   decoration: const InputDecoration(
@@ -647,9 +648,7 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
                     }
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 Row(
                   children: [
                     Expanded(
@@ -684,9 +683,7 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 16),
-
                 Row(
                   children: [
                     Expanded(
@@ -710,9 +707,7 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -754,7 +749,8 @@ class _CreateAssignmentDialogState extends State<CreateAssignmentDialog> {
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
 
       await employeeProvider.assignWorkToEmployee(
         employeeId: widget.employee.id,

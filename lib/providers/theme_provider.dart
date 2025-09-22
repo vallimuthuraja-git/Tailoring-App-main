@@ -86,16 +86,33 @@ class ThemeProvider with ChangeNotifier {
   }
 
   // Helper method to get theme configuration from string
-  ({ThemeMode themeMode, bool isDarkMode, bool isGlassyMode}) _getThemeConfig(String themeString, bool isDark) {
+  ({ThemeMode themeMode, bool isDarkMode, bool isGlassyMode}) _getThemeConfig(
+      String themeString, bool isDark) {
     switch (themeString) {
       case 'dark':
-        return (themeMode: ThemeMode.dark, isDarkMode: true, isGlassyMode: false);
+        return (
+          themeMode: ThemeMode.dark,
+          isDarkMode: true,
+          isGlassyMode: false
+        );
       case 'glassy':
-        return (themeMode: ThemeMode.system, isDarkMode: isDark, isGlassyMode: true);
+        return (
+          themeMode: ThemeMode.system,
+          isDarkMode: isDark,
+          isGlassyMode: true
+        );
       case 'system':
-        return (themeMode: ThemeMode.system, isDarkMode: isDark, isGlassyMode: false);
+        return (
+          themeMode: ThemeMode.system,
+          isDarkMode: isDark,
+          isGlassyMode: false
+        );
       default:
-        return (themeMode: ThemeMode.light, isDarkMode: false, isGlassyMode: false);
+        return (
+          themeMode: ThemeMode.light,
+          isDarkMode: false,
+          isGlassyMode: false
+        );
     }
   }
 
@@ -105,7 +122,8 @@ class ThemeProvider with ChangeNotifier {
 
     try {
       // Store device info for potential future use
-      final deviceInfo = await DeviceDetectionService.instance.getDeviceInfo(context);
+      final deviceInfo =
+          await DeviceDetectionService.instance.getDeviceInfo(context);
       _deviceInfo = deviceInfo;
 
       // For web browsers, use direct brightness detection instead of ThemeMode.system
@@ -123,7 +141,6 @@ class ThemeProvider with ChangeNotifier {
       _isGlassyMode = false;
       await _saveThemePreference();
       notifyListeners();
-
     } catch (e) {
       // If device detection fails, use system theme as fallback
       _currentTheme = ThemeMode.system;
@@ -160,9 +177,9 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  // Setup web theme change listener
-  void setupWebThemeListener(BuildContext context) {
-    DeviceDetectionService.instance.setupWebThemeListener((Brightness brightness) {
+  // Setup theme change listener
+  void setupThemeListener(BuildContext context) {
+    DeviceDetectionService.instance.setupThemeListener((Brightness brightness) {
       if (_isAutoDetectEnabled && _deviceInfo?.isWeb == true) {
         final isDark = brightness == Brightness.dark;
         if (_isDarkMode != isDark) {
@@ -173,7 +190,6 @@ class ThemeProvider with ChangeNotifier {
       }
     });
   }
-
 
   // Toggle between light and dark mode
   Future<void> toggleTheme() async {

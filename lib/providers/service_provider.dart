@@ -31,15 +31,19 @@ class ServiceProvider with ChangeNotifier {
 
   // Getters
   List<Service> get services => _searchQuery.isEmpty &&
-      _selectedCategoryFilter == null &&
-      _selectedTypeFilter == null &&
-      _activeStatusFilter == null
+          _selectedCategoryFilter == null &&
+          _selectedTypeFilter == null &&
+          _activeStatusFilter == null
       ? _services
       : _filteredServices;
 
-  List<Service> get activeServices => _services.where((service) => service.isActive).toList();
-  List<Service> get popularServices => _services.where((service) => service.isPopular).toList();
-  List<Service> get sareeServices => _services.where((service) => service.category == ServiceCategory.sareeServices).toList();
+  List<Service> get activeServices =>
+      _services.where((service) => service.isActive).toList();
+  List<Service> get popularServices =>
+      _services.where((service) => service.isPopular).toList();
+  List<Service> get sareeServices => _services
+      .where((service) => service.category == ServiceCategory.sareeServices)
+      .toList();
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -52,7 +56,8 @@ class ServiceProvider with ChangeNotifier {
 
   double get averageServicePrice {
     if (_services.isEmpty) return 0.0;
-    return _services.map((s) => s.effectivePrice).reduce((a, b) => a + b) / _services.length;
+    return _services.map((s) => s.effectivePrice).reduce((a, b) => a + b) /
+        _services.length;
   }
 
   List<Service> getServicesByCategory(ServiceCategory category) {
@@ -77,11 +82,22 @@ class ServiceProvider with ChangeNotifier {
         return Service.fromJson(data);
       }).toList();
 
-      _calculateStats();
-      _applyFilters();
-      _isLoading = false;
-      notifyListeners();
+      debugPrint('loadServices: Found ${_services.length} existing services');
+
+      // Initialize sample services if none exist
+      if (_services.isEmpty) {
+        debugPrint(
+            'loadServices: No services found, initializing sample services');
+        await initializeSampleServices();
+      } else {
+        debugPrint('loadServices: Using existing services, calculating stats');
+        _calculateStats();
+        _applyFilters();
+        _isLoading = false;
+        notifyListeners();
+      }
     } catch (e) {
+      debugPrint('loadServices: Error - $e');
       _isLoading = false;
       _errorMessage = 'Failed to load services: $e';
       notifyListeners();
@@ -102,7 +118,8 @@ class ServiceProvider with ChangeNotifier {
   // Get service by ID
   Future<Service?> getServiceById(String serviceId) async {
     try {
-      final docSnapshot = await _firebaseService.getDocument('services', serviceId);
+      final docSnapshot =
+          await _firebaseService.getDocument('services', serviceId);
       if (docSnapshot.exists) {
         final data = docSnapshot.data() as Map<String, dynamic>;
         data['id'] = docSnapshot.id;
@@ -117,8 +134,10 @@ class ServiceProvider with ChangeNotifier {
   }
 
   // Create new service
-  Future<bool> createService(Service service) async {
-    debugPrint('createService called with service: ${service.name}, category: ${service.category}, price: ${service.basePrice}');
+  Future<bool> createService(Service service,
+      {bool reloadAfterCreate = true}) async {
+    debugPrint(
+        'createService called with service: ${service.name}, category: ${service.category}, price: ${service.basePrice}');
     _isLoading = true;
     notifyListeners();
 
@@ -132,8 +151,10 @@ class ServiceProvider with ChangeNotifier {
       debugPrint('createService: serviceData: $serviceData');
       await _firebaseService.addDocument('services', serviceData);
 
-      debugPrint('createService: calling loadServices');
-      await loadServices();
+      if (reloadAfterCreate) {
+        debugPrint('createService: calling loadServices');
+        await loadServices();
+      }
       debugPrint('createService: success');
       _isLoading = false;
       notifyListeners();
@@ -148,7 +169,8 @@ class ServiceProvider with ChangeNotifier {
   }
 
   // Update service
-  Future<bool> updateService(String serviceId, Map<String, dynamic> updates) async {
+  Future<bool> updateService(
+      String serviceId, Map<String, dynamic> updates) async {
     debugPrint('updateService called for $serviceId with updates: $updates');
     _isLoading = true;
     notifyListeners();
@@ -241,26 +263,32 @@ class ServiceProvider with ChangeNotifier {
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((service) {
         return service.name.toLowerCase().contains(_searchQuery) ||
-               service.description.toLowerCase().contains(_searchQuery) ||
-               service.shortDescription.toLowerCase().contains(_searchQuery) ||
-               service.categoryName.toLowerCase().contains(_searchQuery) ||
-               service.typeName.toLowerCase().contains(_searchQuery);
+            service.description.toLowerCase().contains(_searchQuery) ||
+            service.shortDescription.toLowerCase().contains(_searchQuery) ||
+            service.categoryName.toLowerCase().contains(_searchQuery) ||
+            service.typeName.toLowerCase().contains(_searchQuery);
       }).toList();
     }
 
     // Apply category filter
     if (_selectedCategoryFilter != null) {
-      filtered = filtered.where((service) => service.category == _selectedCategoryFilter).toList();
+      filtered = filtered
+          .where((service) => service.category == _selectedCategoryFilter)
+          .toList();
     }
 
     // Apply type filter
     if (_selectedTypeFilter != null) {
-      filtered = filtered.where((service) => service.type == _selectedTypeFilter).toList();
+      filtered = filtered
+          .where((service) => service.type == _selectedTypeFilter)
+          .toList();
     }
 
     // Apply active status filter
     if (_activeStatusFilter != null) {
-      filtered = filtered.where((service) => service.isActive == _activeStatusFilter).toList();
+      filtered = filtered
+          .where((service) => service.isActive == _activeStatusFilter)
+          .toList();
     }
 
     _filteredServices = filtered;
@@ -283,6 +311,15 @@ class ServiceProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Force reload services (useful for debugging)
+  Future<void> forceReloadServices() async {
+    debugPrint('forceReloadServices: Forcing reload of services');
+    await loadServices();
+  }
+
+  // Get current service count for debugging
+  int get currentServiceCount => _services.length;
+
   // Calculate statistics
   void _calculateStats() {
     _categoryStats = {};
@@ -292,7 +329,8 @@ class ServiceProvider with ChangeNotifier {
 
     for (final service in _services) {
       // Category stats
-      _categoryStats[service.category] = (_categoryStats[service.category] ?? 0) + 1;
+      _categoryStats[service.category] =
+          (_categoryStats[service.category] ?? 0) + 1;
 
       // Type stats
       _typeStats[service.type] = (_typeStats[service.type] ?? 0) + 1;
@@ -327,35 +365,48 @@ class ServiceProvider with ChangeNotifier {
   Map<String, dynamic> _calculateBookingTrend(Service service) {
     // Simplified trend calculation
     final recentBookings = service.totalBookings;
-    final averageBookings = _services.map((s) => s.totalBookings).reduce((a, b) => a + b) / _services.length;
+    final averageBookings =
+        _services.map((s) => s.totalBookings).reduce((a, b) => a + b) /
+            _services.length;
 
     return {
       'currentBookings': recentBookings,
       'averageBookings': averageBookings,
       'trend': recentBookings > averageBookings ? 'up' : 'down',
-      'percentage': averageBookings > 0 ? ((recentBookings - averageBookings) / averageBookings * 100).round() : 0,
+      'percentage': averageBookings > 0
+          ? ((recentBookings - averageBookings) / averageBookings * 100).round()
+          : 0,
     };
   }
 
   List<Service> _findSimilarServices(Service service) {
-    return _services.where((s) {
-      return s.id != service.id &&
-             (s.category == service.category || s.type == service.type) &&
-             s.isActive;
-    }).take(3).toList();
+    return _services
+        .where((s) {
+          return s.id != service.id &&
+              (s.category == service.category || s.type == service.type) &&
+              s.isActive;
+        })
+        .take(3)
+        .toList();
   }
 
   // Category Analytics
   Map<String, dynamic> getCategoryAnalytics(ServiceCategory category) {
-    final categoryServices = _services.where((s) => s.category == category).toList();
+    final categoryServices =
+        _services.where((s) => s.category == category).toList();
 
     if (categoryServices.isEmpty) {
       return {};
     }
 
-    final totalRevenue = categoryServices.map((s) => s.effectivePrice * s.totalBookings).reduce((a, b) => a + b);
-    final totalBookings = categoryServices.map((s) => s.totalBookings).reduce((a, b) => a + b);
-    final averageRating = categoryServices.map((s) => s.averageRating).reduce((a, b) => a + b) / categoryServices.length;
+    final totalRevenue = categoryServices
+        .map((s) => s.effectivePrice * s.totalBookings)
+        .reduce((a, b) => a + b);
+    final totalBookings =
+        categoryServices.map((s) => s.totalBookings).reduce((a, b) => a + b);
+    final averageRating =
+        categoryServices.map((s) => s.averageRating).reduce((a, b) => a + b) /
+            categoryServices.length;
 
     return {
       'totalServices': categoryServices.length,
@@ -363,8 +414,10 @@ class ServiceProvider with ChangeNotifier {
       'totalRevenue': totalRevenue,
       'totalBookings': totalBookings,
       'averageRating': averageRating,
-      'popularServices': categoryServices.where((s) => s.isPopular).take(5).toList(),
-      'topRatedServices': categoryServices.where((s) => s.isHighlyRated).take(5).toList(),
+      'popularServices':
+          categoryServices.where((s) => s.isPopular).take(5).toList(),
+      'topRatedServices':
+          categoryServices.where((s) => s.isHighlyRated).take(5).toList(),
     };
   }
 
@@ -378,20 +431,26 @@ class ServiceProvider with ChangeNotifier {
       'totalBookings': _totalBookings,
       'averageServicePrice': averageServicePrice,
       'topRevenueServices': activeServices
-          .map((s) => {'service': s, 'revenue': s.effectivePrice * s.totalBookings})
+          .map((s) =>
+              {'service': s, 'revenue': s.effectivePrice * s.totalBookings})
           .toList()
-        ..sort((a, b) => (b['revenue'] as double).compareTo(a['revenue'] as double))
+        ..sort((a, b) =>
+            (b['revenue'] as double).compareTo(a['revenue'] as double))
         ..take(10),
       'categoryRevenue': ServiceCategory.values.map((category) {
-        final categoryServices = activeServices.where((s) => s.category == category).toList();
-        final revenue = categoryServices.map((s) => s.effectivePrice * s.totalBookings).fold(0.0, (a, b) => a + b);
+        final categoryServices =
+            activeServices.where((s) => s.category == category).toList();
+        final revenue = categoryServices
+            .map((s) => s.effectivePrice * s.totalBookings)
+            .fold(0.0, (a, b) => a + b);
         return {'category': category, 'revenue': revenue};
       }).toList(),
     };
   }
 
   // Service Recommendations
-  List<Service> getRecommendedServices({String? forServiceId, ServiceCategory? category, double? budget}) {
+  List<Service> getRecommendedServices(
+      {String? forServiceId, ServiceCategory? category, double? budget}) {
     var recommended = _services.where((s) => s.isActive).toList();
 
     // Exclude current service if specified
@@ -406,7 +465,8 @@ class ServiceProvider with ChangeNotifier {
 
     // Filter by budget if specified
     if (budget != null) {
-      recommended = recommended.where((s) => s.effectivePrice <= budget).toList();
+      recommended =
+          recommended.where((s) => s.effectivePrice <= budget).toList();
     }
 
     // Sort by popularity and rating
@@ -420,7 +480,8 @@ class ServiceProvider with ChangeNotifier {
   }
 
   // Bulk operations
-  Future<bool> bulkUpdateServices(List<String> serviceIds, Map<String, dynamic> updates) async {
+  Future<bool> bulkUpdateServices(
+      List<String> serviceIds, Map<String, dynamic> updates) async {
     _isLoading = true;
     notifyListeners();
 
@@ -452,14 +513,28 @@ class ServiceProvider with ChangeNotifier {
   // Initialize with sample data
   Future<void> initializeSampleServices() async {
     if (_services.isEmpty) {
+      debugPrint(
+          'initializeSampleServices: Starting initialization of ${ServiceTemplates.allServices.length} sample services');
+      int createdCount = 0;
       for (final service in ServiceTemplates.allServices) {
-        await createService(service);
+        await createService(service, reloadAfterCreate: false);
+        createdCount++;
+        debugPrint(
+            'initializeSampleServices: Created service $createdCount/${ServiceTemplates.allServices.length}: ${service.name}');
       }
+      debugPrint(
+          'initializeSampleServices: All services created, reloading...');
+      // Reload services after all have been created
+      await loadServices();
+    } else {
+      debugPrint(
+          'initializeSampleServices: Services already exist, skipping initialization');
     }
   }
 
   // Availability checking for service booking
-  Future<List<DateTime>> getAvailableDates(String serviceId, {DateTime? startDate, int daysAhead = 30}) async {
+  Future<List<DateTime>> getAvailableDates(String serviceId,
+      {DateTime? startDate, int daysAhead = 30}) async {
     final start = startDate ?? DateTime.now();
     final end = start.add(Duration(days: daysAhead));
     final availableDates = <DateTime>[];
@@ -468,7 +543,8 @@ class ServiceProvider with ChangeNotifier {
     for (int i = 0; i <= daysAhead; i++) {
       final date = start.add(Duration(days: i));
       // Skip weekends for demo
-      if (date.weekday != DateTime.saturday && date.weekday != DateTime.sunday) {
+      if (date.weekday != DateTime.saturday &&
+          date.weekday != DateTime.sunday) {
         availableDates.add(date);
       }
     }
@@ -476,7 +552,8 @@ class ServiceProvider with ChangeNotifier {
     return availableDates;
   }
 
-  Future<List<String>> getAvailableTimeSlots(String serviceId, DateTime date) async {
+  Future<List<String>> getAvailableTimeSlots(
+      String serviceId, DateTime date) async {
     final slots = [
       '09:00 - 11:00', // Morning
       '11:00 - 13:00', // Morning
@@ -495,7 +572,8 @@ class ServiceProvider with ChangeNotifier {
     return slots.where((slot) => !unavailableSlots.contains(slot)).toList();
   }
 
-  Future<bool> checkSlotAvailability(String serviceId, DateTime date, String timeSlot) async {
+  Future<bool> checkSlotAvailability(
+      String serviceId, DateTime date, String timeSlot) async {
     final availableSlots = await getAvailableTimeSlots(serviceId, date);
     return availableSlots.contains(timeSlot);
   }

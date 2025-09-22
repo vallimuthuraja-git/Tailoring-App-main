@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class DirectEmployeeSetup {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> setupBasicEmployees() async {
     try {
-      print('🚀 Setting up basic demo employees...');
+      if (kDebugMode) print('🚀 Setting up basic demo employees...');
 
       // Basic employee data
       final employees = [
@@ -20,7 +21,13 @@ class DirectEmployeeSetup {
           'experienceYears': 8,
           'certifications': ['Master Tailor Certification'],
           'availability': 0, // fullTime
-          'preferredWorkDays': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          'preferredWorkDays': [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday'
+          ],
           'preferredStartTime': {'hour': 9, 'minute': 0},
           'preferredEndTime': {'hour': 17, 'minute': 0},
           'canWorkRemotely': false,
@@ -116,20 +123,22 @@ class DirectEmployeeSetup {
       // Check if employees already exist
       final existingEmployees = await _firestore.collection('employees').get();
       if (existingEmployees.docs.isNotEmpty) {
-        print('✅ Demo employees already exist (${existingEmployees.docs.length} found)');
+        if (kDebugMode) {
+          print(
+              '✅ Demo employees already exist (${existingEmployees.docs.length} found)');
+        }
         return;
       }
 
       // Add each employee
       for (final employee in employees) {
         await _firestore.collection('employees').add(employee);
-        print('✅ Added employee: ${employee['displayName']}');
+        if (kDebugMode) print('✅ Added employee: ${employee['displayName']}');
       }
 
-      print('✅ Successfully added 3 demo employees!');
-
+      if (kDebugMode) print('✅ Successfully added 3 demo employees!');
     } catch (e) {
-      print('❌ Error setting up employees: $e');
+      if (kDebugMode) print('❌ Error setting up employees: $e');
       rethrow;
     }
   }
@@ -139,5 +148,5 @@ class DirectEmployeeSetup {
 Future<void> setupEmployeesDirectly() async {
   final setup = DirectEmployeeSetup();
   await setup.setupBasicEmployees();
-  print('✅ Direct employee setup completed successfully');
+  if (kDebugMode) print('✅ Direct employee setup completed successfully');
 }

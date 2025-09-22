@@ -280,7 +280,7 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       _errorMessage = e.toString();
       notifyListeners();
-      throw e;
+      rethrow;
     }
   }
 
@@ -627,7 +627,7 @@ class AuthProvider with ChangeNotifier {
               '✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
         } catch (createError) {
           debugPrint('❌ DEMO LOGIN: Account creation failed: $createError');
-          throw createError;
+          rethrow;
         }
       }
 

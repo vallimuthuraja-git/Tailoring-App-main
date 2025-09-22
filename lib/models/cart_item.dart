@@ -1,4 +1,4 @@
-import 'product.dart';
+import 'product_models.dart';
 
 class CartItem {
   final String id;

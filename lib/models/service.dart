@@ -4,16 +4,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum ServiceCategory {
-  sareeServices,      // Saree draping, pre-pleat, etc.
-  garmentServices,    // Dressmaking, suits, etc.
+  sareeServices, // Saree draping, pre-pleat, etc.
+  garmentServices, // Dressmaking, suits, etc.
   alterationServices, // Alterations and repairs
-  customDesign,       // Bespoke designs
-  consultation,       // Style consultation
-  measurements,       // Measurement services
-  specialOccasion,    // Wedding, party wear
-  corporateWear,      // Business attire
-  uniformServices,    // School, work uniforms
-  bridalServices,     // Bridal wear and accessories
+  customDesign, // Bespoke designs
+  consultation, // Style consultation
+  measurements, // Measurement services
+  specialOccasion, // Wedding, party wear
+  corporateWear, // Business attire
+  uniformServices, // School, work uniforms
+  bridalServices, // Bridal wear and accessories
 }
 
 enum ServiceType {
@@ -63,18 +63,18 @@ enum ServiceType {
 }
 
 enum ServiceDuration {
-  quick,      // 30 minutes - 2 hours
-  standard,   // 2-8 hours
-  extended,   // 8-24 hours
-  project,    // Multiple days
-  ongoing,    // Recurring services
+  quick, // 30 minutes - 2 hours
+  standard, // 2-8 hours
+  extended, // 8-24 hours
+  project, // Multiple days
+  ongoing, // Recurring services
 }
 
 enum ServiceComplexity {
-  simple,     // Basic alterations, simple stitching
-  moderate,   // Standard garments, minor alterations
-  complex,    // Custom designs, intricate work
-  expert,     // Bespoke, high-end craftsmanship
+  simple, // Basic alterations, simple stitching
+  moderate, // Standard garments, minor alterations
+  complex, // Custom designs, intricate work
+  expert, // Bespoke, high-end craftsmanship
 }
 
 class Service {
@@ -189,8 +189,9 @@ class Service {
       preparationTips: List<String>.from(json['preparationTips'] ?? []),
       specifications: Map<String, dynamic>.from(json['specifications'] ?? {}),
       customizations: (json['customizations'] as List<dynamic>?)
-          ?.map((c) => ServiceCustomization.fromJson(c))
-          .toList() ?? [],
+              ?.map((c) => ServiceCustomization.fromJson(c))
+              .toList() ??
+          [],
       addOns: List<String>.from(json['addOns'] ?? []),
       addOnPricing: Map<String, double>.from(json['addOnPricing'] ?? {}),
       isActive: json['isActive'] ?? true,
@@ -279,10 +280,15 @@ class Service {
   }
 
   String get typeName {
-    return type.toString().split('.').last.replaceAllMapped(
-      RegExp(r'([A-Z])'),
-      (match) => ' ${match.group(1)}',
-    ).trim();
+    return type
+        .toString()
+        .split('.')
+        .last
+        .replaceAllMapped(
+          RegExp(r'([A-Z])'),
+          (match) => ' ${match.group(1)}',
+        )
+        .trim();
   }
 
   String get durationText {
@@ -462,226 +468,414 @@ class ServiceCustomization {
 // Predefined Service Templates
 class ServiceTemplates {
   static List<Service> get sareeServices => [
-    // Saree Draping
-    Service(
-      id: 'saree_draping_basic',
-      name: 'Saree Draping - Basic',
-      description: 'Professional saree draping service for traditional wear. Includes basic draping techniques suitable for casual and semi-formal occasions.',
-      shortDescription: 'Basic saree draping for everyday wear',
-      category: ServiceCategory.sareeServices,
-      type: ServiceType.sareeDraping,
-      duration: ServiceDuration.quick,
-      complexity: ServiceComplexity.simple,
-      basePrice: 25.0,
-      features: [
-        'Traditional draping technique',
-        'Basic pleat styling',
-        'Blouse adjustment',
-        'Safety pins provided',
-        'Photo reference guide',
-      ],
-      requiresMeasurement: false,
-      estimatedHours: 1,
-      requiredSkills: ['saree_draping'],
-      recommendedFabrics: ['cotton', 'silk', 'chiffon'],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
+        // Saree Draping
+        Service(
+          id: 'saree_draping_basic',
+          name: 'Saree Draping - Basic',
+          description:
+              'Professional saree draping service for traditional wear. Includes basic draping techniques suitable for casual and semi-formal occasions.',
+          shortDescription: 'Basic saree draping for everyday wear',
+          category: ServiceCategory.sareeServices,
+          type: ServiceType.sareeDraping,
+          duration: ServiceDuration.quick,
+          complexity: ServiceComplexity.simple,
+          basePrice: 25.0,
+          features: [
+            'Traditional draping technique',
+            'Basic pleat styling',
+            'Blouse adjustment',
+            'Safety pins provided',
+            'Photo reference guide',
+          ],
+          requiresMeasurement: false,
+          estimatedHours: 1,
+          requiredSkills: ['saree_draping'],
+          recommendedFabrics: ['cotton', 'silk', 'chiffon'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
 
-    // Pre-pleat Saree Service
-    Service(
-      id: 'saree_prepleat_standard',
-      name: 'Pre-pleat Saree Service',
-      description: 'Professional pre-pleating service for sarees. Perfect preparation for weddings, parties, and special occasions. Includes multiple pleat styles and finishing touches.',
-      shortDescription: 'Professional saree pre-pleating for special occasions',
-      category: ServiceCategory.sareeServices,
-      type: ServiceType.sareePrePleat,
-      duration: ServiceDuration.standard,
-      complexity: ServiceComplexity.moderate,
-      basePrice: 75.0,
-      minPrice: 50.0,
-      maxPrice: 200.0,
-      features: [
-        'Multiple pleat style options',
-        'Professional finishing',
-        'Ironing and pressing',
-        'Storage recommendations',
-        'Care instructions',
-        'Emergency repair kit',
-      ],
-      includedItems: [
-        'Professional pleating',
-        'Safety pins',
-        'Storage bag',
-        'Care instructions',
-      ],
-      requirements: [
-        'Clean saree in good condition',
-        'No stains or tears',
-        'Fabric should be pleat-friendly',
-      ],
-      preparationTips: [
-        'Dry clean saree before pleating',
-        'Remove all accessories',
-        'Ensure saree is properly ironed',
-      ],
-      tierPricing: {
-        'Basic': 50.0,
-        'Standard': 75.0,
-        'Premium': 125.0,
-        'Deluxe': 200.0,
-      },
-      requiresMeasurement: true,
-      requiresFitting: false,
-      estimatedHours: 4,
-      requiredSkills: ['saree_pleating', 'finishing'],
-      recommendedFabrics: ['silk', 'crepe', 'georgette', 'chiffon'],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
+        // Pre-pleat Saree Service
+        Service(
+          id: 'saree_prepleat_standard',
+          name: 'Pre-pleat Saree Service',
+          description:
+              'Professional pre-pleating service for sarees. Perfect preparation for weddings, parties, and special occasions. Includes multiple pleat styles and finishing touches.',
+          shortDescription:
+              'Professional saree pre-pleating for special occasions',
+          category: ServiceCategory.sareeServices,
+          type: ServiceType.sareePrePleat,
+          duration: ServiceDuration.standard,
+          complexity: ServiceComplexity.moderate,
+          basePrice: 75.0,
+          minPrice: 50.0,
+          maxPrice: 200.0,
+          features: [
+            'Multiple pleat style options',
+            'Professional finishing',
+            'Ironing and pressing',
+            'Storage recommendations',
+            'Care instructions',
+            'Emergency repair kit',
+          ],
+          includedItems: [
+            'Professional pleating',
+            'Safety pins',
+            'Storage bag',
+            'Care instructions',
+          ],
+          requirements: [
+            'Clean saree in good condition',
+            'No stains or tears',
+            'Fabric should be pleat-friendly',
+          ],
+          preparationTips: [
+            'Dry clean saree before pleating',
+            'Remove all accessories',
+            'Ensure saree is properly ironed',
+          ],
+          tierPricing: {
+            'Basic': 50.0,
+            'Standard': 75.0,
+            'Premium': 125.0,
+            'Deluxe': 200.0,
+          },
+          requiresMeasurement: true,
+          requiresFitting: false,
+          estimatedHours: 4,
+          requiredSkills: ['saree_pleating', 'finishing'],
+          recommendedFabrics: ['silk', 'crepe', 'georgette', 'chiffon'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
 
-    // Pre-pleat on the Go
-    Service(
-      id: 'saree_prepleat_onthego',
-      name: 'Pre-pleat on the Go',
-      description: 'Convenient mobile pre-pleating service. Our expert comes to your location for saree pleating. Perfect for busy schedules and last-minute preparations.',
-      shortDescription: 'Mobile saree pre-pleating at your location',
-      category: ServiceCategory.sareeServices,
-      type: ServiceType.sareePrePleatOnTheGo,
-      duration: ServiceDuration.extended,
-      complexity: ServiceComplexity.moderate,
-      basePrice: 150.0,
-      features: [
-        'Mobile service at your location',
-        'Professional pleating expert',
-        'All tools and equipment provided',
-        'Multiple pleat consultations',
-        'Fitting assistance',
-        'Follow-up service',
-        'Travel fee included',
-      ],
-      includedItems: [
-        'Professional pleating',
-        'Travel to your location',
-        'All necessary tools',
-        'Finishing touches',
-        'Care instructions',
-      ],
-      requirements: [
-        'Serviceable location access',
-        'Adequate working space',
-        'Clean saree ready for pleating',
-        'Access to ironing facilities',
-      ],
-      preparationTips: [
-        'Ensure adequate space',
-        'Have saree ready and ironed',
-        'Clear area for work',
-        'Have refreshments available',
-      ],
-      tierPricing: {
-        'Home Visit': 150.0,
-        'Event Location': 200.0,
-        'Multiple Sarees': 250.0,
-      },
-      customizations: const [
-        ServiceCustomization(
-          id: 'travel_distance',
-          name: 'Travel Distance',
-          type: 'selection',
-          description: 'Distance from our location',
-          options: ['Within 5km', '5-15km', '15-30km', 'Over 30km'],
-          additionalPrice: 25.0,
-          affectsPricing: true,
+        // Pre-pleat on the Go
+        Service(
+          id: 'saree_prepleat_onthego',
+          name: 'Pre-pleat on the Go',
+          description:
+              'Convenient mobile pre-pleating service. Our expert comes to your location for saree pleating. Perfect for busy schedules and last-minute preparations.',
+          shortDescription: 'Mobile saree pre-pleating at your location',
+          category: ServiceCategory.sareeServices,
+          type: ServiceType.sareePrePleatOnTheGo,
+          duration: ServiceDuration.extended,
+          complexity: ServiceComplexity.moderate,
+          basePrice: 150.0,
+          features: [
+            'Mobile service at your location',
+            'Professional pleating expert',
+            'All tools and equipment provided',
+            'Multiple pleat consultations',
+            'Fitting assistance',
+            'Follow-up service',
+            'Travel fee included',
+          ],
+          includedItems: [
+            'Professional pleating',
+            'Travel to your location',
+            'All necessary tools',
+            'Finishing touches',
+            'Care instructions',
+          ],
+          requirements: [
+            'Serviceable location access',
+            'Adequate working space',
+            'Clean saree ready for pleating',
+            'Access to ironing facilities',
+          ],
+          preparationTips: [
+            'Ensure adequate space',
+            'Have saree ready and ironed',
+            'Clear area for work',
+            'Have refreshments available',
+          ],
+          tierPricing: {
+            'Home Visit': 150.0,
+            'Event Location': 200.0,
+            'Multiple Sarees': 250.0,
+          },
+          customizations: const [
+            ServiceCustomization(
+              id: 'travel_distance',
+              name: 'Travel Distance',
+              type: 'selection',
+              description: 'Distance from our location',
+              options: ['Within 5km', '5-15km', '15-30km', 'Over 30km'],
+              additionalPrice: 25.0,
+              affectsPricing: true,
+            ),
+            ServiceCustomization(
+              id: 'urgency',
+              name: 'Urgency',
+              type: 'selection',
+              description: 'How soon do you need the service?',
+              options: [
+                'Standard (3-5 days)',
+                'Express (24-48 hours)',
+                'Same Day'
+              ],
+              additionalPrice: 50.0,
+              affectsPricing: true,
+            ),
+          ],
+          requiresMeasurement: true,
+          requiresFitting: true,
+          estimatedHours: 6,
+          requiredSkills: ['saree_pleating', 'mobile_service', 'finishing'],
+          recommendedFabrics: [
+            'silk',
+            'crepe',
+            'georgette',
+            'chiffon',
+            'banarasi'
+          ],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-        ServiceCustomization(
-          id: 'urgency',
-          name: 'Urgency',
-          type: 'selection',
-          description: 'How soon do you need the service?',
-          options: ['Standard (3-5 days)', 'Express (24-48 hours)', 'Same Day'],
-          additionalPrice: 50.0,
-          affectsPricing: true,
-        ),
-      ],
-      requiresMeasurement: true,
-      requiresFitting: true,
-      estimatedHours: 6,
-      requiredSkills: ['saree_pleating', 'mobile_service', 'finishing'],
-      recommendedFabrics: ['silk', 'crepe', 'georgette', 'chiffon', 'banarasi'],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
 
-    // Saree Blouse Stitching
-    Service(
-      id: 'saree_blouse_stitching',
-      name: 'Saree Blouse Stitching',
-      description: 'Expert saree blouse stitching service. Custom-designed blouses to complement your saree perfectly. Includes multiple design consultations and fittings.',
-      shortDescription: 'Custom saree blouse stitching and design',
-      category: ServiceCategory.sareeServices,
-      type: ServiceType.sareeBlouseStitching,
-      duration: ServiceDuration.project,
-      complexity: ServiceComplexity.complex,
-      basePrice: 120.0,
-      minPrice: 80.0,
-      maxPrice: 500.0,
-      features: [
-        'Custom design consultation',
-        'Multiple fitting sessions',
-        'Professional stitching',
-        'Quality fabric selection',
-        'Perfect fit guarantee',
-        'Alteration support',
-      ],
-      includedItems: [
-        'Custom blouse stitching',
-        'Multiple fittings',
-        'Fabric recommendations',
-        'Design consultation',
-        'Finishing touches',
-      ],
-      customizations: const [
-        ServiceCustomization(
-          id: 'fabric_type',
-          name: 'Fabric Type',
-          type: 'selection',
-          description: 'Choose the fabric for your blouse',
-          options: ['Cotton', 'Silk', 'Georgette', 'Net', 'Velvet', 'Brocade'],
-          additionalPrice: 30.0,
-          affectsPricing: true,
+        // Saree Blouse Stitching
+        Service(
+          id: 'saree_blouse_stitching',
+          name: 'Saree Blouse Stitching',
+          description:
+              'Expert saree blouse stitching service. Custom-designed blouses to complement your saree perfectly. Includes multiple design consultations and fittings.',
+          shortDescription: 'Custom saree blouse stitching and design',
+          category: ServiceCategory.sareeServices,
+          type: ServiceType.sareeBlouseStitching,
+          duration: ServiceDuration.project,
+          complexity: ServiceComplexity.complex,
+          basePrice: 120.0,
+          minPrice: 80.0,
+          maxPrice: 500.0,
+          features: [
+            'Custom design consultation',
+            'Multiple fitting sessions',
+            'Professional stitching',
+            'Quality fabric selection',
+            'Perfect fit guarantee',
+            'Alteration support',
+          ],
+          includedItems: [
+            'Custom blouse stitching',
+            'Multiple fittings',
+            'Fabric recommendations',
+            'Design consultation',
+            'Finishing touches',
+          ],
+          customizations: const [
+            ServiceCustomization(
+              id: 'fabric_type',
+              name: 'Fabric Type',
+              type: 'selection',
+              description: 'Choose the fabric for your blouse',
+              options: [
+                'Cotton',
+                'Silk',
+                'Georgette',
+                'Net',
+                'Velvet',
+                'Brocade'
+              ],
+              additionalPrice: 30.0,
+              affectsPricing: true,
+            ),
+            ServiceCustomization(
+              id: 'neck_design',
+              name: 'Neck Design',
+              type: 'selection',
+              description: 'Choose neckline style',
+              options: [
+                'Round Neck',
+                'V-Neck',
+                'Boat Neck',
+                'Sweetheart',
+                'Scoop Neck',
+                'Custom'
+              ],
+              additionalPrice: 15.0,
+              affectsPricing: true,
+            ),
+            ServiceCustomization(
+              id: 'sleeve_style',
+              name: 'Sleeve Style',
+              type: 'selection',
+              description: 'Choose sleeve design',
+              options: [
+                'Sleeveless',
+                'Cap Sleeve',
+                'Short Sleeve',
+                'Elbow Sleeve',
+                'Full Sleeve',
+                'Bell Sleeve'
+              ],
+              additionalPrice: 20.0,
+              affectsPricing: true,
+            ),
+          ],
+          requiresMeasurement: true,
+          requiresFitting: true,
+          estimatedHours: 24,
+          requiredSkills: ['blouse_stitching', 'design', 'fitting'],
+          recommendedFabrics: ['cotton', 'silk', 'georgette', 'net'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-        ServiceCustomization(
-          id: 'neck_design',
-          name: 'Neck Design',
-          type: 'selection',
-          description: 'Choose neckline style',
-          options: ['Round Neck', 'V-Neck', 'Boat Neck', 'Sweetheart', 'Scoop Neck', 'Custom'],
-          additionalPrice: 15.0,
-          affectsPricing: true,
+      ];
+
+  static List<Service> get garmentServices => [
+        // Dressmaking
+        Service(
+          id: 'dressmaking_standard',
+          name: 'Dressmaking Service',
+          description:
+              'Professional dressmaking service for custom dresses. Includes pattern making, cutting, stitching, and fittings for perfect fit.',
+          shortDescription: 'Custom dressmaking with professional fittings',
+          category: ServiceCategory.garmentServices,
+          type: ServiceType.dressmaking,
+          duration: ServiceDuration.project,
+          complexity: ServiceComplexity.complex,
+          basePrice: 150.0,
+          minPrice: 100.0,
+          maxPrice: 400.0,
+          features: [
+            'Custom pattern making',
+            'Professional stitching',
+            'Multiple fittings',
+            'Fabric selection assistance',
+            'Alterations included',
+            'Quality guarantee',
+          ],
+          requiresMeasurement: true,
+          requiresFitting: true,
+          estimatedHours: 20,
+          requiredSkills: ['dressmaking', 'pattern_making', 'fitting'],
+          recommendedFabrics: ['cotton', 'silk', 'chiffon', 'linen'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-        ServiceCustomization(
-          id: 'sleeve_style',
-          name: 'Sleeve Style',
-          type: 'selection',
-          description: 'Choose sleeve design',
-          options: ['Sleeveless', 'Cap Sleeve', 'Short Sleeve', 'Elbow Sleeve', 'Full Sleeve', 'Bell Sleeve'],
-          additionalPrice: 20.0,
-          affectsPricing: true,
+
+        // Suit Tailoring
+        Service(
+          id: 'suit_tailoring_premium',
+          name: 'Premium Suit Tailoring',
+          description:
+              'Bespoke suit tailoring service. Expert craftsmanship for business and formal wear with premium fabrics and perfect fit.',
+          shortDescription: 'Bespoke suit tailoring with premium fabrics',
+          category: ServiceCategory.garmentServices,
+          type: ServiceType.suitTailoring,
+          duration: ServiceDuration.project,
+          complexity: ServiceComplexity.expert,
+          basePrice: 300.0,
+          minPrice: 200.0,
+          maxPrice: 800.0,
+          features: [
+            'Bespoke tailoring',
+            'Premium fabric selection',
+            'Expert craftsmanship',
+            'Multiple fittings',
+            'Interior construction',
+            'Custom buttons and details',
+          ],
+          requiresMeasurement: true,
+          requiresFitting: true,
+          estimatedHours: 40,
+          requiredSkills: ['tailoring', 'suit_making', 'premium_fabrics'],
+          recommendedFabrics: ['wool', 'linen', 'cotton', 'silk'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-      ],
-      requiresMeasurement: true,
-      requiresFitting: true,
-      estimatedHours: 24,
-      requiredSkills: ['blouse_stitching', 'design', 'fitting'],
-      recommendedFabrics: ['cotton', 'silk', 'georgette', 'net'],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
+      ];
+
+  static List<Service> get alterationServices => [
+        // Hemming
+        Service(
+          id: 'hemming_basic',
+          name: 'Hemming Service',
+          description:
+              'Professional hemming service for pants, skirts, and dresses. Quick turnaround with precise measurements.',
+          shortDescription: 'Quick and precise hemming service',
+          category: ServiceCategory.alterationServices,
+          type: ServiceType.hemming,
+          duration: ServiceDuration.quick,
+          complexity: ServiceComplexity.simple,
+          basePrice: 15.0,
+          features: [
+            'Precise measurements',
+            'Quick turnaround',
+            'Professional finish',
+            'Multiple garment types',
+            'Quality thread',
+          ],
+          requiresMeasurement: true,
+          estimatedHours: 1,
+          requiredSkills: ['hemming', 'measurements'],
+          recommendedFabrics: ['all'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+
+        // Taking In/Letting Out
+        Service(
+          id: 'taking_in_service',
+          name: 'Taking In/Letting Out',
+          description:
+              'Expert alteration service for adjusting garment fit. Perfect for weight changes or style updates.',
+          shortDescription: 'Adjust garment fit for perfect sizing',
+          category: ServiceCategory.alterationServices,
+          type: ServiceType.takingIn,
+          duration: ServiceDuration.standard,
+          complexity: ServiceComplexity.moderate,
+          basePrice: 25.0,
+          features: [
+            'Size adjustment',
+            'Style modification',
+            'Preserve original design',
+            'Quality stitching',
+            'Fitting included',
+          ],
+          requiresMeasurement: true,
+          requiresFitting: true,
+          estimatedHours: 3,
+          requiredSkills: ['alterations', 'fitting', 'stitching'],
+          recommendedFabrics: ['cotton', 'wool', 'synthetic'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      ];
+
+  static List<Service> get consultationServices => [
+        // Style Consultation
+        Service(
+          id: 'style_consultation',
+          name: 'Style Consultation',
+          description:
+              'Personal style consultation service. Professional advice on colors, cuts, and styles that suit your body type and lifestyle.',
+          shortDescription: 'Personal style consultation with expert advice',
+          category: ServiceCategory.consultation,
+          type: ServiceType.styleConsultation,
+          duration: ServiceDuration.quick,
+          complexity: ServiceComplexity.simple,
+          basePrice: 50.0,
+          features: [
+            'Color analysis',
+            'Body type assessment',
+            'Style recommendations',
+            'Fabric suggestions',
+            'Lifestyle consideration',
+            'Follow-up advice',
+          ],
+          requiresMeasurement: false,
+          estimatedHours: 2,
+          requiredSkills: ['style_consultation', 'color_analysis'],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      ];
 
   static List<Service> get allServices => [
-    ...sareeServices,
-    // Add more service categories as needed
-  ];
+        ...sareeServices,
+        ...garmentServices,
+        ...alterationServices,
+        ...consultationServices,
+      ];
 }

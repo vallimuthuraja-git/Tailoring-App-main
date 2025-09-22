@@ -2,7 +2,6 @@
 // Handles wishlist CRUD operations, offline sync, and user preferences
 
 import 'package:flutter/material.dart';
-import '../models/service.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_service.dart' as auth;
 
@@ -18,9 +17,14 @@ class WishlistProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // Check if service is in wishlist
+  // Check if product is in wishlist
+  bool isProductInWishlist(String productId) {
+    return _wishlistServiceIds.contains(productId);
+  }
+
+  // Backward compatibility
   bool isServiceInWishlist(String serviceId) {
-    return _wishlistServiceIds.contains(serviceId);
+    return isProductInWishlist(serviceId);
   }
 
   // Get current user ID
@@ -136,7 +140,8 @@ class WishlistProvider with ChangeNotifier {
         return;
       }
 
-      final docSnapshot = await _firebaseService.getDocument('wishlists', userId);
+      final docSnapshot =
+          await _firebaseService.getDocument('wishlists', userId);
       if (docSnapshot.exists) {
         final data = docSnapshot.data() as Map<String, dynamic>;
         _wishlistServiceIds = List<String>.from(data['services'] ?? []);

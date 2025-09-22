@@ -16,7 +16,8 @@ class WishlistScreen extends StatefulWidget {
   State<WishlistScreen> createState() => _WishlistScreenState();
 }
 
-class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStateMixin {
+class _WishlistScreenState extends State<WishlistScreen>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -47,7 +48,9 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
           return Scaffold(
             appBar: AppBar(
               title: const Text('My Favorites'),
-              backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+              backgroundColor: themeProvider.isDarkMode
+                  ? DarkAppColors.surface
+                  : AppColors.surface,
             ),
             body: const Center(
               child: Column(
@@ -68,15 +71,20 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
         return Scaffold(
           appBar: AppBar(
             title: const Text('My Favorites'),
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             actions: [
               Consumer<WishlistProvider>(
                 builder: (context, wishlistProvider, child) {
                   if (wishlistProvider.wishlistCount > 0) {
                     return TextButton(
-                      onPressed: () => _showClearWishlistDialog(context, wishlistProvider),
+                      onPressed: () =>
+                          _showClearWishlistDialog(context, wishlistProvider),
                       style: TextButton.styleFrom(
-                        foregroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                        foregroundColor: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
                       ),
                       child: const Text('Clear All'),
                     );
@@ -93,7 +101,8 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
               }
 
               final wishlistServices = serviceProvider.services
-                  .where((service) => wishlistProvider.isServiceInWishlist(service.id))
+                  .where((service) =>
+                      wishlistProvider.isServiceInWishlist(service.id))
                   .toList();
 
               if (wishlistServices.isEmpty) {
@@ -112,7 +121,8 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
                   itemCount: wishlistServices.length,
                   itemBuilder: (context, index) {
                     final service = wishlistServices[index];
-                    return _buildWishlistItem(service, wishlistProvider, themeProvider, context);
+                    return _buildWishlistItem(
+                        service, wishlistProvider, themeProvider, context);
                   },
                 ),
               );
@@ -124,11 +134,11 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
   }
 
   Widget _buildWishlistItem(
-      Service service,
-      WishlistProvider wishlistProvider,
-      ThemeProvider themeProvider,
-      BuildContext context,
-      ) {
+    Service service,
+    WishlistProvider wishlistProvider,
+    ThemeProvider themeProvider,
+    BuildContext context,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -153,7 +163,9 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
           service.name,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface
+                : AppColors.onSurface,
           ),
         ),
         subtitle: Column(
@@ -173,7 +185,9 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
               '\$${service.effectivePrice.toStringAsFixed(0)} • ${service.durationText}',
               style: TextStyle(
                 fontSize: 12,
-                color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -182,7 +196,8 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
         trailing: IconButton(
           icon: const Icon(Icons.favorite, color: Colors.red),
           onPressed: () async {
-            final success = await wishlistProvider.removeFromWishlist(service.id);
+            final success =
+                await wishlistProvider.removeFromWishlist(service.id);
             if (success && mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -206,12 +221,14 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
     );
   }
 
-  void _showClearWishlistDialog(BuildContext context, WishlistProvider wishlistProvider) {
+  void _showClearWishlistDialog(
+      BuildContext context, WishlistProvider wishlistProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Wishlist'),
-        content: const Text('Are you sure you want to remove all items from your wishlist?'),
+        content: const Text(
+            'Are you sure you want to remove all items from your wishlist?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -287,7 +304,7 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
 }
 
 class _EmptyWishlistView extends StatelessWidget {
-  const _EmptyWishlistView({super.key});
+  const _EmptyWishlistView();
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +316,8 @@ class _EmptyWishlistView extends StatelessWidget {
           SizedBox(height: 16),
           Text(
             'No favorites yet',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
           ),
           SizedBox(height: 8),
           Text(
@@ -323,7 +341,7 @@ class _EmptyWishlistView extends StatelessWidget {
 class _ServiceDetailPlaceholder extends StatelessWidget {
   final Service service;
 
-  const _ServiceDetailPlaceholder({required this.service, super.key});
+  const _ServiceDetailPlaceholder({required this.service});
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,6 @@ import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/service_provider.dart';
-import '../../services/offline_storage_service.dart';
 import '../../utils/theme_constants.dart';
 
 class ServiceBookingWizard extends StatefulWidget {
@@ -14,18 +13,18 @@ class ServiceBookingWizard extends StatefulWidget {
   final Map<String, dynamic> selectedCustomizations;
   final double customizationTotalPrice;
 
-  const ServiceBookingWizard({
-    required this.service,
-    this.selectedCustomizations = const {},
-    this.customizationTotalPrice = 0.0,
-    super.key
-  });
+  const ServiceBookingWizard(
+      {required this.service,
+      this.selectedCustomizations = const {},
+      this.customizationTotalPrice = 0.0,
+      super.key});
 
   @override
   State<ServiceBookingWizard> createState() => _ServiceBookingWizardState();
 }
 
-class _ServiceBookingWizardState extends State<ServiceBookingWizard> with TickerProviderStateMixin {
+class _ServiceBookingWizardState extends State<ServiceBookingWizard>
+    with TickerProviderStateMixin {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
 
@@ -58,7 +57,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
   String? _addressError;
   String? _dateError;
   String? _timeSlotError;
-  Map<String, String?> _measurementErrors = {};
+  final Map<String, String?> _measurementErrors = {};
 
   // Step 5: Special Instructions
   final _instructionsController = TextEditingController();
@@ -86,7 +85,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     // Auto-fill with user info if available
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.currentUser != null) {
-      _customerNameController.text = authProvider.currentUser!.displayName ?? '';
+      _customerNameController.text =
+          authProvider.currentUser!.displayName ?? '';
       // Assume email and phone from user data if available
     }
   }
@@ -95,13 +95,22 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     setState(() => _checkingAvailability = true);
 
     try {
-      final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
-      _availableDates = await serviceProvider.getAvailableDates(widget.service.id!);
-      _availableTimeSlots = await serviceProvider.getAvailableTimeSlots(widget.service.id!, _selectedDate);
+      final serviceProvider =
+          Provider.of<ServiceProvider>(context, listen: false);
+      _availableDates =
+          await serviceProvider.getAvailableDates(widget.service.id);
+      _availableTimeSlots = await serviceProvider.getAvailableTimeSlots(
+          widget.service.id, _selectedDate);
     } catch (e) {
       // Use default availability if service call fails
-      _availableDates = List.generate(30, (i) => DateTime.now().add(Duration(days: i + 1)));
-      _availableTimeSlots = ['09:00 - 11:00', '11:00 - 13:00', '14:00 - 16:00', '16:00 - 18:00'];
+      _availableDates =
+          List.generate(30, (i) => DateTime.now().add(Duration(days: i + 1)));
+      _availableTimeSlots = [
+        '09:00 - 11:00',
+        '11:00 - 13:00',
+        '14:00 - 16:00',
+        '16:00 - 18:00'
+      ];
     } finally {
       if (mounted) setState(() => _checkingAvailability = false);
     }
@@ -110,8 +119,14 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
   void _initializeControllers() {
     // Standard measurements for tailoring
     const measurements = [
-      'Chest', 'Waist', 'Hip', 'Shoulder', 'Sleeve Length',
-      'Inseam', 'Length', 'Neck'
+      'Chest',
+      'Waist',
+      'Hip',
+      'Shoulder',
+      'Sleeve Length',
+      'Inseam',
+      'Length',
+      'Neck'
     ];
 
     if (widget.service.requiresMeasurement) {
@@ -144,16 +159,24 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
         title: Text(
           'Book ${widget.service.name}',
           style: TextStyle(
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface
+                : AppColors.onSurface,
           ),
         ),
-        backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        backgroundColor: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         titleTextStyle: TextStyle(
           fontSize: 18,
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
         ),
         iconTheme: IconThemeData(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(80),
@@ -168,7 +191,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
               children: [
                 _buildCustomerInfoStep(themeProvider),
                 _buildDateTimeStep(themeProvider),
-                if (widget.service.requiresMeasurement) _buildMeasurementsStep(themeProvider),
+                if (widget.service.requiresMeasurement)
+                  _buildMeasurementsStep(themeProvider),
                 _buildPaymentStep(themeProvider),
               ],
             ),
@@ -199,15 +223,21 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     color: isCompleted
                         ? Colors.green
                         : isActive
-                            ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                            : (themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.3) : AppColors.onSurface.withOpacity(0.3)),
+                            ? (themeProvider.isDarkMode
+                                ? DarkAppColors.primary
+                                : AppColors.primary)
+                            : (themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface.withOpacity(0.3)
+                                : AppColors.onSurface.withOpacity(0.3)),
                   ),
                   child: Center(
                     child: isCompleted
                         ? const Icon(Icons.check, size: 16, color: Colors.white)
                         : Text(
                             '${index + 1}',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
                           ),
                   ),
                 ),
@@ -216,8 +246,12 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                   steps[index],
                   style: TextStyle(
                     color: isActive
-                        ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                        : (themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.6) : AppColors.onSurface.withOpacity(0.6)),
+                        ? (themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
+                        : (themeProvider.isDarkMode
+                            ? DarkAppColors.onSurface.withOpacity(0.6)
+                            : AppColors.onSurface.withOpacity(0.6)),
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 12,
                   ),
@@ -254,7 +288,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.onBackground
+                    : AppColors.onBackground,
               ),
             ),
             const SizedBox(height: 8),
@@ -334,7 +370,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+        fillColor: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.background,
         errorText: errorText,
       ),
       keyboardType: keyboardType ?? TextInputType.text,
@@ -344,7 +382,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
         if (errorText != null) {
           setState(() {
             // Clear error when user types
-            if (validator != null && validator(_) == null) {
+            if (validator(_) == null) {
               _clearFieldError(label);
             }
           });
@@ -357,7 +395,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     // Clear field-specific errors
     if (label.contains('Name')) _phoneError = null;
     if (label.contains('Phone')) _phoneError = null;
-    if (label.contains('Email')) ;
+    if (label.contains('Email')) {}
     if (label.contains('Address')) _addressError = null;
   }
 
@@ -413,7 +451,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 8),
@@ -433,7 +473,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 16),
@@ -447,10 +489,10 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     itemBuilder: (context, index) {
                       final date = _availableDates[index];
                       final isSelected = date.day == _selectedDate.day &&
-                                         date.month == _selectedDate.month &&
-                                         date.year == _selectedDate.year;
+                          date.month == _selectedDate.month &&
+                          date.year == _selectedDate.year;
                       final isAvailable = date.weekday != DateTime.saturday &&
-                                          date.weekday != DateTime.sunday;
+                          date.weekday != DateTime.sunday;
 
                       return Container(
                         width: 80,
@@ -459,8 +501,12 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                           onTap: () => _selectDate(date),
                           child: Card(
                             color: isSelected
-                                ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                                : (themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface),
+                                ? (themeProvider.isDarkMode
+                                    ? DarkAppColors.primary
+                                    : AppColors.primary)
+                                : (themeProvider.isDarkMode
+                                    ? DarkAppColors.surface
+                                    : AppColors.surface),
                             elevation: isSelected ? 4 : 1,
                             child: Padding(
                               padding: const EdgeInsets.all(12),
@@ -468,12 +514,24 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][date.weekday - 1],
+                                    [
+                                      'Mon',
+                                      'Tue',
+                                      'Wed',
+                                      'Thu',
+                                      'Fri',
+                                      'Sat',
+                                      'Sun'
+                                    ][date.weekday - 1],
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: isSelected
-                                          ? (themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary)
-                                          : (themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface),
+                                          ? (themeProvider.isDarkMode
+                                              ? DarkAppColors.onPrimary
+                                              : AppColors.onPrimary)
+                                          : (themeProvider.isDarkMode
+                                              ? DarkAppColors.onSurface
+                                              : AppColors.onSurface),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -483,8 +541,12 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: isSelected
-                                          ? (themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary)
-                                          : (themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground),
+                                          ? (themeProvider.isDarkMode
+                                              ? DarkAppColors.onPrimary
+                                              : AppColors.onPrimary)
+                                          : (themeProvider.isDarkMode
+                                              ? DarkAppColors.onBackground
+                                              : AppColors.onBackground),
                                     ),
                                   ),
                                 ],
@@ -513,7 +575,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 16),
@@ -530,13 +594,18 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                   onTap: isAvailable ? () => _selectTimeSlot(slot) : null,
                   child: Card(
                     color: isSelected
-                        ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                        ? (themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
                         : !isAvailable
                             ? Colors.grey.shade300
-                            : (themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface),
+                            : (themeProvider.isDarkMode
+                                ? DarkAppColors.surface
+                                : AppColors.surface),
                     elevation: isSelected ? 4 : 1,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 12),
                       child: Column(
                         children: [
                           Text(
@@ -545,10 +614,14 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: isSelected
-                                  ? (themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary)
+                                  ? (themeProvider.isDarkMode
+                                      ? DarkAppColors.onPrimary
+                                      : AppColors.onPrimary)
                                   : !isAvailable
                                       ? Colors.grey
-                                      : (themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface),
+                                      : (themeProvider.isDarkMode
+                                          ? DarkAppColors.onSurface
+                                          : AppColors.onSurface),
                             ),
                           ),
                           if (!isAvailable) ...[
@@ -603,8 +676,10 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     setState(() => _checkingAvailability = true);
 
     try {
-      final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
-      _availableTimeSlots = await serviceProvider.getAvailableTimeSlots(widget.service.id!, date);
+      final serviceProvider =
+          Provider.of<ServiceProvider>(context, listen: false);
+      _availableTimeSlots =
+          await serviceProvider.getAvailableTimeSlots(widget.service.id, date);
 
       // Mock conflicts for demo
       _availabilityConflicts = date.weekday % 3 == 0 ? ['11:00 - 13:00'] : [];
@@ -629,7 +704,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 8),
@@ -642,7 +719,6 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             ),
           ),
           const SizedBox(height: 24),
-
           ..._measurementControllers.entries.map((entry) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -654,7 +730,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                  fillColor: themeProvider.isDarkMode
+                      ? DarkAppColors.surface
+                      : AppColors.background,
                 ),
                 keyboardType: TextInputType.number,
               ),
@@ -685,7 +763,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 8),
@@ -709,21 +789,23 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                   Text(
                     'Service Details',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       const Icon(Icons.build, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
-                      Text(widget.service.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      Text(widget.service.name,
+                          style: const TextStyle(fontWeight: FontWeight.w500)),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      const Icon(Icons.access_time,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text('${widget.service.estimatedHours} hours'),
                     ],
@@ -752,17 +834,21 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Customizations:', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Customizations:',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 12),
-                    ...widget.selectedCustomizations.entries.map((entry) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        children: [
-                          Text('${entry.key}: ', style: const TextStyle(fontWeight: FontWeight.w500)),
-                          Expanded(child: Text(entry.value.toString())),
-                        ],
-                      ),
-                    )),
+                    ...widget.selectedCustomizations.entries
+                        .map((entry) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  Text('${entry.key}: ',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500)),
+                                  Expanded(child: Text(entry.value.toString())),
+                                ],
+                              ),
+                            )),
                   ],
                 ),
               ),
@@ -782,15 +868,24 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  _buildPriceRow('Service', '\$${basePrice.toStringAsFixed(2)}'),
-                  _buildPriceRow('Customizations', '\$${customizationPrice.toStringAsFixed(2)}'),
-                  _buildPriceRow('Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
+                  _buildPriceRow(
+                      'Service', '\$${basePrice.toStringAsFixed(2)}'),
+                  _buildPriceRow('Customizations',
+                      '\$${customizationPrice.toStringAsFixed(2)}'),
+                  _buildPriceRow(
+                      'Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
                   const Divider(),
-                  _buildPriceRow('Tax (8%)', '\$${taxAmount.toStringAsFixed(2)}'),
-                  _buildPriceRow('Total Amount', '\$${totalAmount.toStringAsFixed(2)}', isBold: true),
+                  _buildPriceRow(
+                      'Tax (8%)', '\$${taxAmount.toStringAsFixed(2)}'),
+                  _buildPriceRow(
+                      'Total Amount', '\$${totalAmount.toStringAsFixed(2)}',
+                      isBold: true),
                   const Divider(),
-                  _buildPriceRow('Advance Payment (30%)', '\$${advanceAmount.toStringAsFixed(2)}', isHighlighted: true),
-                  _buildPriceRow('Balance Due', '\$${remainingAmount.toStringAsFixed(2)}'),
+                  _buildPriceRow('Advance Payment (30%)',
+                      '\$${advanceAmount.toStringAsFixed(2)}',
+                      isHighlighted: true),
+                  _buildPriceRow(
+                      'Balance Due', '\$${remainingAmount.toStringAsFixed(2)}'),
                 ],
               ),
             ),
@@ -806,9 +901,12 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
           const SizedBox(height: 16),
           Column(
             children: [
-              _buildPaymentMethodOption('card', 'Credit/Debit Card', Icons.credit_card, themeProvider),
-              _buildPaymentMethodOption('upi', 'UPI', Icons.smartphone, themeProvider),
-              _buildPaymentMethodOption('netBanking', 'Net Banking', Icons.account_balance, themeProvider),
+              _buildPaymentMethodOption('card', 'Credit/Debit Card',
+                  Icons.credit_card, themeProvider),
+              _buildPaymentMethodOption(
+                  'upi', 'UPI', Icons.smartphone, themeProvider),
+              _buildPaymentMethodOption('netBanking', 'Net Banking',
+                  Icons.account_balance, themeProvider),
             ],
           ),
 
@@ -824,14 +922,18 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     _agreeToTerms = value ?? false;
                   });
                 },
-                activeColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                activeColor: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
               ),
               Expanded(
                 child: Text(
                   'I agree to the terms and conditions and authorize the advance payment',
                   style: TextStyle(
                     fontSize: 14,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                 ),
               ),
@@ -849,14 +951,17 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                   : () {
                       if (!_agreeToTerms) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please accept the terms and conditions')),
+                          const SnackBar(
+                              content: Text(
+                                  'Please accept the terms and conditions')),
                         );
                         return;
                       }
 
                       if (_selectedPaymentMethod.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please select a payment method')),
+                          const SnackBar(
+                              content: Text('Please select a payment method')),
                         );
                         return;
                       }
@@ -865,7 +970,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: _agreeToTerms
-                    ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                    ? (themeProvider.isDarkMode
+                        ? DarkAppColors.primary
+                        : AppColors.primary)
                     : Colors.grey,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -887,7 +994,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                     )
                   : const Text(
                       'Pay Advance & Confirm Booking',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
             ),
           ),
@@ -898,7 +1006,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     );
   }
 
-  Widget _buildPriceRow(String label, String amount, {bool isBold = false, bool isHighlighted = false}) {
+  Widget _buildPriceRow(String label, String amount,
+      {bool isBold = false, bool isHighlighted = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -910,7 +1019,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
               fontSize: isBold ? 16 : 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               color: isHighlighted
-                  ? (Theme.of(context).brightness == Brightness.dark ? Colors.greenAccent : Colors.green[700])
+                  ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.greenAccent
+                      : Colors.green[700])
                   : null,
             ),
           ),
@@ -920,7 +1031,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
               fontSize: isBold ? 16 : 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               color: isHighlighted
-                  ? (Theme.of(context).brightness == Brightness.dark ? Colors.greenAccent : Colors.green[700])
+                  ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.greenAccent
+                      : Colors.green[700])
                   : null,
             ),
           ),
@@ -929,7 +1042,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     );
   }
 
-  Widget _buildPaymentMethodOption(String method, String label, IconData icon, ThemeProvider themeProvider) {
+  Widget _buildPaymentMethodOption(
+      String method, String label, IconData icon, ThemeProvider themeProvider) {
     final isSelected = _selectedPaymentMethod == method;
     return Card(
       child: InkWell(
@@ -942,7 +1056,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                 icon,
                 size: 24,
                 color: isSelected
-                    ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                    ? (themeProvider.isDarkMode
+                        ? DarkAppColors.primary
+                        : AppColors.primary)
                     : Colors.grey,
               ),
               const SizedBox(width: 12),
@@ -951,17 +1067,24 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
                   label,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                     color: isSelected
-                        ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                        : (themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface),
+                        ? (themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
+                        : (themeProvider.isDarkMode
+                            ? DarkAppColors.onSurface
+                            : AppColors.onSurface),
                   ),
                 ),
               ),
               if (isSelected)
                 Icon(
                   Icons.check_circle,
-                  color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.primary
+                      : AppColors.primary,
                 ),
             ],
           ),
@@ -1012,7 +1135,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
       final measurements = <String, dynamic>{};
       _measurementControllers.forEach((key, controller) {
         if (controller.text.isNotEmpty) {
-          measurements[key.toLowerCase().replaceAll(' ', '_')] = controller.text;
+          measurements[key.toLowerCase().replaceAll(' ', '_')] =
+              controller.text;
         }
       });
 
@@ -1023,7 +1147,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
 
       final orderItem = OrderItem(
         id: 'service_${widget.service.id}_${DateTime.now().millisecondsSinceEpoch}',
-        productId: widget.service.id!,
+        productId: widget.service.id,
         productName: widget.service.name,
         category: widget.service.category.name,
         price: widget.service.effectivePrice + widget.customizationTotalPrice,
@@ -1033,7 +1157,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
       );
 
       final success = await orderProvider.createOrder(
-        customerId: authProvider.currentUser?.uid ?? 'customer_${DateTime.now().millisecondsSinceEpoch}',
+        customerId: authProvider.currentUser?.uid ??
+            'customer_${DateTime.now().millisecondsSinceEpoch}',
         items: [orderItem],
         measurements: measurements,
         specialInstructions: _instructionsController.text,
@@ -1052,7 +1177,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
         Navigator.of(context).pop(true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to book service. Please try again.')),
+          const SnackBar(
+              content: Text('Failed to book service. Please try again.')),
         );
       }
     } catch (e) {
@@ -1068,7 +1194,9 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         border: Border(
           top: BorderSide(
             color: themeProvider.isDarkMode
@@ -1091,8 +1219,12 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
             child: ElevatedButton(
               onPressed: _isLoading ? null : _nextStep,
               style: ElevatedButton.styleFrom(
-                backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                backgroundColor: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
+                foregroundColor: themeProvider.isDarkMode
+                    ? DarkAppColors.onPrimary
+                    : AppColors.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: _isLoading
@@ -1130,7 +1262,10 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard> with Ticker
         return;
       }
 
-      _processPayment((widget.service.effectivePrice + widget.customizationTotalPrice) * 1.08 * 0.3);
+      _processPayment(
+          (widget.service.effectivePrice + widget.customizationTotalPrice) *
+              1.08 *
+              0.3);
     }
   }
 

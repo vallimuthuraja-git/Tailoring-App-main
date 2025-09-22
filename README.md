@@ -48,36 +48,68 @@ This Flutter app addresses the core problems of traditional tailoring shops:
 
 ```
 lib/
-├── models/           # Data models and entities
-│   ├── customer.dart # Customer profile and measurements
-│   ├── order.dart    # Order management and tracking
-│   ├── product.dart  # Product catalog and customizations
-│   └── chat.dart     # Chat message and conversation models
-├── providers/        # State management providers
-│   ├── auth_provider.dart
-│   ├── customer_provider.dart
-│   ├── order_provider.dart
-│   ├── product_provider.dart
-│   └── chat_provider.dart
-├── screens/          # UI screens and pages
-│   ├── auth/         # Authentication screens
-│   ├── customer/     # Customer-facing screens
-│   ├── shop/         # Shop owner dashboard
-│   └── common/       # Shared components
-├── services/         # Business logic and API calls
-│   ├── firebase_service.dart
-│   ├── auth_service.dart
-│   ├── chat_service.dart
-│   └── notification_service.dart
-├── widgets/          # Reusable UI components
-│   ├── measurement_input.dart
-│   ├── order_card.dart
-│   ├── product_card.dart
-│   └── chat_bubble.dart
-└── utils/            # Utility functions and constants
-    ├── constants.dart
-    ├── validators.dart
-    └── helpers.dart
+├── main.dart                    # Application entry point
+├── simple_demo.dart            # Demo entry point
+├── standalone_demo.dart        # Standalone demo
+├── models/                     # Data models and entities
+│   ├── user.dart               # User profile data
+│   ├── user_role.dart          # User role definitions
+│   ├── customer.dart           # Customer profiles and measurements
+│   ├── employee.dart           # Employee information
+│   ├── order.dart              # Order management and tracking
+│   ├── product_models.dart     # Product catalog structures
+│   ├── service.dart            # Service offerings
+│   ├── chat.dart               # Chat messages and conversations
+│   └── ... (additional models)
+├── providers/                  # State management providers
+│   ├── auth_provider.dart      # Authentication state
+│   ├── theme_provider.dart     # Theme management
+│   ├── customer_provider.dart  # Customer data management
+│   ├── employee_provider.dart  # Employee management
+│   ├── product_provider.dart   # Product catalog state
+│   ├── order_provider.dart     # Order processing
+│   ├── service_provider.dart   # Service management
+│   └── ... (additional providers)
+├── screens/                    # UI screens and pages
+│   ├── auth/                   # Authentication screens
+│   │   ├── login_screen.dart
+│   │   ├── signup_screen.dart
+│   │   └── forgot_password_screen.dart
+│   ├── home/                   # Home and navigation
+│   │   ├── home_screen.dart
+│   │   ├── widgets/           # Home screen components
+│   │   └── controllers/       # Navigation controllers
+│   ├── catalog/                # Product catalog screens
+│   │   ├── product_detail_screen.dart
+│   │   ├── product_edit_screen.dart
+│   │   └── ... (catalog screens)
+│   ├── employee/               # Employee management screens
+│   ├── orders/                 # Order management screens
+│   ├── profile/                # User profile screens
+│   ├── services/               # Service management screens
+│   ├── dashboard/              # Analytics dashboards
+│   ├── database/               # Database management screens
+│   └── ... (additional screen directories)
+├── services/                   # Business logic and API calls
+│   ├── auth_service.dart       # Authentication service
+│   ├── firebase_service.dart   # Firebase operations
+│   ├── chatbot_service.dart    # AI chatbot integration
+│   ├── notification_service.dart # Notification handling
+│   ├── employee_analytics_service.dart # Analytics
+│   └── ... (additional services)
+├── widgets/                    # Reusable UI components
+│   ├── catalog/                # Catalog-specific widgets
+│   ├── common_app_bar_actions.dart
+│   ├── global_bottom_navigation_bar.dart
+│   └── ... (additional widgets)
+├── utils/                      # Utility functions and constants
+├── repositories/               # Data access layer
+│   └── product/                # Product repositories
+├── blocs/                      # BLoC pattern state management
+│   └── product/                # Product BLoC
+├── core/                       # Core application functionality
+└── data/                       # Data management
+    └── managers/               # Data managers
 ```
 
 ## 🚀 Key Features Implementation Plan
@@ -409,4 +441,4 @@ notifications/{userId}            # User notifications
 
 *Contact: [Your Contact Information]*
 *Version: 1.0.0*
-*Last Updated: August 2024*
+*Last Updated: September 2025*

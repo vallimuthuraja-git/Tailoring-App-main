@@ -6,8 +6,10 @@ import '../../providers/service_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/wishlist_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../../utils/theme_constants.dart';
-import 'service_detail_screen.dart';
+import '../../utils/responsive_utils.dart';
+import '../../screens/cart/cart_screen.dart';
 import 'customer_service_detail_screen.dart';
 import 'service_booking_wizard.dart';
 
@@ -18,11 +20,12 @@ class ServiceCatalogScreen extends StatefulWidget {
   State<ServiceCatalogScreen> createState() => _ServiceCatalogScreenState();
 }
 
-class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with TickerProviderStateMixin {
+class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   ServiceCategory? _selectedCategoryFilter;
   ServiceType? _selectedTypeFilter;
-  bool _showOnlyAvailable = true;
+  final bool _showOnlyAvailable = true;
   bool _isGridView = true; // Default to grid view
 
   bool _isLoaded = false;
@@ -58,9 +61,11 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
 
   Future<void> _loadServices() async {
     debugPrint('🔄 ServiceCatalogScreen loading services');
-    final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+    final serviceProvider =
+        Provider.of<ServiceProvider>(context, listen: false);
     await serviceProvider.loadServices();
-    debugPrint('✅ ServiceCatalogScreen services loaded successfully: ${serviceProvider.services.length}');
+    debugPrint(
+        '✅ ServiceCatalogScreen services loaded successfully: ${serviceProvider.services.length}');
   }
 
   Future<void> _loadViewModePreference() async {
@@ -95,103 +100,188 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Book a Service',
-            style: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-            ),
-          ),
-          backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
-          elevation: 0,
-          iconTheme: IconThemeData(
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-          ),
-          titleTextStyle: TextStyle(
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-          actions: [
-            // View Toggle Button
-            IconButton(
-              icon: Icon(
-                _isGridView ? Icons.view_list : Icons.grid_view,
-                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
-              ),
-              onPressed: _toggleViewMode,
-              tooltip: _isGridView ? 'Switch to List View' : 'Switch to Grid View',
-            ),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(60),
-            child: _buildSearchBar(themeProvider),
+      appBar: AppBar(
+        title: Text(
+          'Book a Service',
+          style: TextStyle(
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface
+                : AppColors.onSurface,
           ),
         ),
-        body: Column(
-          children: [
-            _buildFilters(themeProvider),
-            Expanded(
-              child: Consumer<ServiceProvider>(
-                builder: (context, serviceProvider, child) {
-                  if (serviceProvider.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (serviceProvider.errorMessage != null) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error, size: 64, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text('Error loading services', style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(height: 8),
-                          Text(serviceProvider.errorMessage!, style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: _loadServices,
-                            child: const Text('Retry'),
+        backgroundColor: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
+        elevation: 0,
+        iconTheme: IconThemeData(
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
+        ),
+        titleTextStyle: TextStyle(
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        actions: [
+          // Cart Icon
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.shopping_cart,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface
+                          : AppColors.onSurface,
+                    ),
+                    tooltip: 'Cart',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CartScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  if (cartProvider.itemCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.teal,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          cartProvider.itemCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    );
-                  }
+                    ),
+                ],
+              );
+            },
+          ),
 
-                  final services = serviceProvider.services.where((service) => service.isActive).toList();
-                  debugPrint('📊 ServiceCatalogScreen entered, services: ${services.length}');
+          // Logout Icon
+          IconButton(
+            icon: Icon(
+              Icons.logout,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
+            ),
+            tooltip: 'Logout',
+            onPressed: () => _showLogoutDialog(context),
+          ),
 
-                  if (services.isEmpty) {
-                    debugPrint('⚠️ No services available after filtering - total services: ${serviceProvider.services.length}');
-                    return const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.business_center, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text('No services available', style: TextStyle(fontSize: 18, color: Colors.grey)),
-                          SizedBox(height: 8),
-                          Text('Please check back later', style: TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    );
-                  }
+          // View Toggle Button
+          IconButton(
+            icon: Icon(
+              _isGridView ? Icons.view_list : Icons.grid_view,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
+            ),
+            onPressed: _toggleViewMode,
+            tooltip:
+                _isGridView ? 'Switch to List View' : 'Switch to Grid View',
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: _buildSearchBar(themeProvider),
+        ),
+      ),
+      body: Column(
+        children: [
+          _buildFilters(themeProvider),
+          Expanded(
+            child: Consumer<ServiceProvider>(
+              builder: (context, serviceProvider, child) {
+                if (serviceProvider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                  return FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: _isGridView
-                          ? _buildGridView(services, themeProvider)
-                          : _buildListView(services, themeProvider),
+                if (serviceProvider.errorMessage != null) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error, size: 64, color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text('Error loading services',
+                            style: Theme.of(context).textTheme.titleLarge),
+                        const SizedBox(height: 8),
+                        Text(serviceProvider.errorMessage!,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            textAlign: TextAlign.center),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _loadServices,
+                          child: const Text('Retry'),
+                        ),
+                      ],
                     ),
                   );
-                },
-              ),
+                }
+
+                final services = serviceProvider.services
+                    .where((service) => service.isActive)
+                    .toList();
+                debugPrint(
+                    '📊 ServiceCatalogScreen entered, services: ${services.length}');
+
+                if (services.isEmpty) {
+                  debugPrint(
+                      '⚠️ No services available after filtering - total services: ${serviceProvider.services.length}');
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.business_center,
+                            size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text('No services available',
+                            style: TextStyle(fontSize: 18, color: Colors.grey)),
+                        SizedBox(height: 8),
+                        Text('Please check back later',
+                            style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  );
+                }
+
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _isGridView
+                        ? _buildGridView(services, themeProvider)
+                        : _buildListView(services, themeProvider),
+                  ),
+                );
+              },
             ),
-          ],
-     ),
-   );
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSearchBar(ThemeProvider themeProvider) {
@@ -200,19 +290,28 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
       child: TextField(
         controller: _searchController,
         style: TextStyle(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
           fontSize: 16,
           fontWeight: FontWeight.w400,
         ),
         decoration: InputDecoration(
           hintText: 'Search services...',
-          prefixIcon: Icon(Icons.search, color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7)),
+          prefixIcon: Icon(Icons.search,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface.withOpacity(0.7)
+                  : AppColors.onSurface.withOpacity(0.7)),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear, color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7)),
+                  icon: Icon(Icons.clear,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface.withOpacity(0.7)
+                          : AppColors.onSurface.withOpacity(0.7)),
                   onPressed: () {
                     _searchController.clear();
-                    Provider.of<ServiceProvider>(context, listen: false).searchServices('');
+                    Provider.of<ServiceProvider>(context, listen: false)
+                        .searchServices('');
                   },
                 )
               : null,
@@ -221,9 +320,13 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+          fillColor: themeProvider.isDarkMode
+              ? DarkAppColors.surface
+              : AppColors.surface,
         ),
-        onChanged: (value) => Provider.of<ServiceProvider>(context, listen: false).searchServices(value),
+        onChanged: (value) =>
+            Provider.of<ServiceProvider>(context, listen: false)
+                .searchServices(value),
       ),
     );
   }
@@ -234,7 +337,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
         horizontal: MediaQuery.of(context).size.width * 0.05,
         vertical: 8,
       ),
-      color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+      color:
+          themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -242,53 +346,47 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
             _buildFilterChip('All Categories', null, themeProvider),
             const SizedBox(width: 8),
             ...ServiceCategory.values.map((category) => Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: _buildFilterChip(category.name, category, themeProvider),
-            )),
+                  padding: const EdgeInsets.only(right: 8),
+                  child:
+                      _buildFilterChip(category.name, category, themeProvider),
+                )),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, ServiceCategory? category, ThemeProvider themeProvider) {
+  Widget _buildFilterChip(
+      String label, ServiceCategory? category, ThemeProvider themeProvider) {
     final isSelected = _selectedCategoryFilter == category;
     return FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (_) {
         setState(() => _selectedCategoryFilter = category);
-        Provider.of<ServiceProvider>(context, listen: false).filterByCategory(category);
+        Provider.of<ServiceProvider>(context, listen: false)
+            .filterByCategory(category);
       },
-      backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
-      selectedColor: (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary).withOpacity(0.2),
-      checkmarkColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+      backgroundColor:
+          themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+      selectedColor:
+          (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+              .withOpacity(0.2),
+      checkmarkColor:
+          themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
     );
   }
 
   Widget _buildGridView(List<Service> services, ThemeProvider themeProvider) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    int crossAxisCount = 2; // Default for mobile
-    if (screenWidth >= 1200) {
-      crossAxisCount = 3; // Large desktop
-    } else if (screenWidth >= 900) {
-      crossAxisCount = 3; // Tablet/desktop
-    } else if (screenWidth >= 600) {
-      crossAxisCount = 2; // Small desktop - keep at 2 for better spacing
-    }
-
     return GridView.builder(
       key: const ValueKey('grid'),
       padding: EdgeInsets.symmetric(
-        horizontal: MediaQuery.of(context).size.width * 0.05,
+        horizontal: MediaQuery.of(context).size.width < 600
+            ? 8.0
+            : MediaQuery.of(context).size.width * 0.05,
         vertical: 16,
       ),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: screenWidth >= 600 ? 0.85 : 0.8,
-      ),
+      gridDelegate: ResponsiveUtils.getOverflowSafeServiceGridDelegate(context),
       itemCount: services.length,
       itemBuilder: (context, index) {
         final service = services[index];
@@ -335,7 +433,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                           width: 60,
                           height: 60,
                           decoration: BoxDecoration(
-                            color: _getServiceColor(service.category).withOpacity(0.1),
+                            color: _getServiceColor(service.category)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Icon(
@@ -353,10 +452,13 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                         children: [
                           Text(
                             service.name,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -380,15 +482,19 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                                    color: themeProvider.isDarkMode
+                                        ? DarkAppColors.primary
+                                        : AppColors.primary,
                                   ),
                                 ),
                               ),
-                              Icon(Icons.access_time, size: 14, color: Colors.grey),
+                              Icon(Icons.access_time,
+                                  size: 14, color: Colors.grey),
                               const SizedBox(width: 2),
                               Text(
                                 service.durationText,
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -406,17 +512,21 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () async {
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  final authProvider =
+                      Provider.of<AuthProvider>(context, listen: false);
                   if (authProvider.user == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please log in to manage favorites')),
+                      const SnackBar(
+                          content: Text('Please log in to manage favorites')),
                     );
                     return;
                   }
 
-                  final success = await wishlistProvider.toggleWishlist(service.id);
+                  final success =
+                      await wishlistProvider.toggleWishlist(service.id);
                   if (success && mounted) {
-                    final isInWishlist = wishlistProvider.isServiceInWishlist(service.id);
+                    final isInWishlist =
+                        wishlistProvider.isServiceInWishlist(service.id);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(isInWishlist
@@ -471,7 +581,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: _getServiceColor(service.category).withOpacity(0.1),
+                      color:
+                          _getServiceColor(service.category).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -490,9 +601,10 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                     children: [
                       Text(
                         service.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -524,11 +636,14 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                           ),
                           const SizedBox(width: 16),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: service.category == ServiceCategory.consultation
+                              color: service.category ==
+                                      ServiceCategory.consultation
                                   ? Colors.blue.withOpacity(0.1)
-                                  : service.category == ServiceCategory.customDesign
+                                  : service.category ==
+                                          ServiceCategory.customDesign
                                       ? Colors.purple.withOpacity(0.1)
                                       : Colors.green.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
@@ -537,9 +652,11 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                               service.category.name,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: service.category == ServiceCategory.consultation
+                                color: service.category ==
+                                        ServiceCategory.consultation
                                     ? Colors.blue
-                                    : service.category == ServiceCategory.customDesign
+                                    : service.category ==
+                                            ServiceCategory.customDesign
                                         ? Colors.purple
                                         : Colors.green,
                                 fontWeight: FontWeight.w600,
@@ -562,7 +679,9 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -571,17 +690,22 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                     InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () async {
-                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                        final authProvider =
+                            Provider.of<AuthProvider>(context, listen: false);
                         if (authProvider.user == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please log in to manage favorites')),
+                            const SnackBar(
+                                content:
+                                    Text('Please log in to manage favorites')),
                           );
                           return;
                         }
 
-                        final success = await wishlistProvider.toggleWishlist(service.id);
+                        final success =
+                            await wishlistProvider.toggleWishlist(service.id);
                         if (success && mounted) {
-                          final isInWishlist = wishlistProvider.isServiceInWishlist(service.id);
+                          final isInWishlist =
+                              wishlistProvider.isServiceInWishlist(service.id);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(isInWishlist
@@ -595,7 +719,10 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: (themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface).withOpacity(0.8),
+                          color: (themeProvider.isDarkMode
+                                  ? DarkAppColors.surface
+                                  : AppColors.surface)
+                              .withOpacity(0.8),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -603,9 +730,10 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
                               ? Icons.favorite
                               : Icons.favorite_border,
                           size: 20,
-                          color: wishlistProvider.isServiceInWishlist(service.id)
-                              ? Colors.red
-                              : Colors.grey,
+                          color:
+                              wishlistProvider.isServiceInWishlist(service.id)
+                                  ? Colors.red
+                                  : Colors.grey,
                         ),
                       ),
                     ),
@@ -629,7 +757,10 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
           children: [
             Text(
               service.name,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
@@ -682,6 +813,37 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> with Ticker
       MaterialPageRoute(
         builder: (context) => CustomerServiceDetailScreen(service: service),
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close dialog
+                final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                await authProvider.signOut();
+                // The AuthWrapper will handle navigation to login screen
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -27,7 +27,8 @@ class RoleBasedRouteGuard extends StatelessWidget {
 
         // If no user is logged in, show login screen
         if (currentUser == null) {
-          return _buildFallback(context, 'Please log in to access this feature');
+          return _buildFallback(
+              context, 'Please log in to access this feature');
         }
 
         // Check if user has required role or higher
@@ -44,15 +45,15 @@ class RoleBasedRouteGuard extends StatelessWidget {
   bool hasRequiredRole(auth.UserRole userRole, auth.UserRole requiredRole) {
     // Role hierarchy logic - higher number = more permissions
     final roleHierarchy = {
-      auth.UserRole.admin: 10,           // Full access (equivalent to business owner)
-      auth.UserRole.shopOwner: 9,        // High-level business operations
-      auth.UserRole.supervisor: 8,       // Team supervision
-      auth.UserRole.employee: 5,         // General employee
-      auth.UserRole.tailor: 4,           // Specialized tailor
-      auth.UserRole.cutter: 4,           // Specialized cutter
-      auth.UserRole.finisher: 4,         // Specialized finisher
-      auth.UserRole.apprentice: 2,       // Training level
-      auth.UserRole.customer: 1,         // External customer
+      auth.UserRole.admin: 10, // Full access (equivalent to business owner)
+      auth.UserRole.shopOwner: 9, // High-level business operations
+      auth.UserRole.supervisor: 8, // Team supervision
+      auth.UserRole.employee: 5, // General employee
+      auth.UserRole.tailor: 4, // Specialized tailor
+      auth.UserRole.cutter: 4, // Specialized cutter
+      auth.UserRole.finisher: 4, // Specialized finisher
+      auth.UserRole.apprentice: 2, // Training level
+      auth.UserRole.customer: 1, // External customer
     };
 
     final userLevel = roleHierarchy[userRole] ?? 0;
@@ -121,8 +122,8 @@ class RoleBasedRouteGuard extends StatelessWidget {
             Text(
               'Required Role: ${requiredRole.name}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey,
-              ),
+                    color: Colors.grey,
+                  ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -175,7 +176,7 @@ class RoleBasedWidget extends StatelessWidget {
         if (userLevel >= requiredLevel) {
           return child ?? const SizedBox.shrink();
         }
-      
+
         return fallback ?? const SizedBox.shrink();
       },
     );
@@ -336,43 +337,76 @@ extension RoleCheck on auth.UserRole {
     // Define permission mappings for each role
     final rolePermissions = {
       auth.UserRole.admin: [
-        'create_user', 'read_user', 'update_user', 'delete_user',
-        'create_order', 'read_order', 'update_order', 'delete_order',
-        'create_product', 'read_product', 'update_product', 'delete_product',
-        'create_inventory', 'read_inventory', 'update_inventory', 'delete_inventory',
-        'view_analytics', 'view_reports', 'export_data',
-        'system_settings', 'business_config', 'security_settings',
+        'create_user',
+        'read_user',
+        'update_user',
+        'delete_user',
+        'create_order',
+        'read_order',
+        'update_order',
+        'delete_order',
+        'create_product',
+        'read_product',
+        'update_product',
+        'delete_product',
+        'create_inventory',
+        'read_inventory',
+        'update_inventory',
+        'delete_inventory',
+        'view_analytics',
+        'view_reports',
+        'export_data',
+        'system_settings',
+        'business_config',
+        'security_settings',
       ],
       auth.UserRole.shopOwner: [
-        'read_user', 'update_user',
-        'create_order', 'read_order', 'update_order', 'delete_order',
-        'create_product', 'read_product', 'update_product', 'delete_product',
-        'read_inventory', 'update_inventory',
-        'view_analytics', 'view_reports', 'export_data',
+        'read_user',
+        'update_user',
+        'create_order',
+        'read_order',
+        'update_order',
+        'delete_order',
+        'create_product',
+        'read_product',
+        'update_product',
+        'delete_product',
+        'read_inventory',
+        'update_inventory',
+        'view_analytics',
+        'view_reports',
+        'export_data',
         'business_config',
       ],
       auth.UserRole.supervisor: [
         'read_user',
-        'read_order', 'update_order',
-        'read_product', 'update_product',
+        'read_order',
+        'update_order',
+        'read_product',
+        'update_product',
         'read_inventory',
         'view_reports',
       ],
       auth.UserRole.employee: [
-        'read_order', 'update_order',
+        'read_order',
+        'update_order',
         'read_product',
         'read_inventory',
       ],
       auth.UserRole.tailor: [
-        'read_order', 'update_order',
+        'read_order',
+        'update_order',
         'read_product',
       ],
       auth.UserRole.cutter: [
-        'read_order', 'update_order',
-        'read_product', 'read_inventory',
+        'read_order',
+        'update_order',
+        'read_product',
+        'read_inventory',
       ],
       auth.UserRole.finisher: [
-        'read_order', 'update_order',
+        'read_order',
+        'update_order',
         'read_product',
       ],
       auth.UserRole.apprentice: [
@@ -380,7 +414,9 @@ extension RoleCheck on auth.UserRole {
         'read_product',
       ],
       auth.UserRole.customer: [
-        'create_order', 'read_order', 'update_order',
+        'create_order',
+        'read_order',
+        'update_order',
         'read_product',
       ],
     };
@@ -399,13 +435,13 @@ extension RoleCheckExtensions on BuildContext {
   bool hasRole(auth.UserRole requiredRole) {
     final authProvider = Provider.of<AuthProvider>(this, listen: false);
     final userRole = authProvider.userRole;
-    return userRole.canAccessRole(requiredRole) ?? false;
+    return userRole.canAccessRole(requiredRole);
   }
 
   bool hasPermission(String permission) {
     final authProvider = Provider.of<AuthProvider>(this, listen: false);
     final userRole = authProvider.userRole;
-    return userRole.hasPermission(permission) ?? false;
+    return userRole.hasPermission(permission);
   }
 
   auth.UserRole? get currentUserRole {

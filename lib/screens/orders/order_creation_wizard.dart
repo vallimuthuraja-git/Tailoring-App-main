@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/product.dart';
+import '../../../models/product_models.dart';
 import '../../models/order.dart';
-import '../../providers/product_provider.dart';
+import '../../../product_data_access.dart';
 import '../../providers/order_provider.dart';
+import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
@@ -55,8 +56,16 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
 
   void _initializeMeasurementControllers() {
     final standardMeasurements = [
-      'Chest', 'Waist', 'Hip', 'Shoulder', 'Sleeve Length',
-      'Inseam', 'Length', 'Neck', 'Armhole', 'Bicep'
+      'Chest',
+      'Waist',
+      'Hip',
+      'Shoulder',
+      'Sleeve Length',
+      'Inseam',
+      'Length',
+      'Neck',
+      'Armhole',
+      'Bicep'
     ];
 
     for (final measurement in standardMeasurements) {
@@ -85,13 +94,19 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create New Order'),
-        backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        backgroundColor: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         elevation: 0,
         iconTheme: IconThemeData(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
         ),
         titleTextStyle: TextStyle(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
@@ -135,8 +150,12 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                     color: isCompleted
                         ? Colors.green
                         : isActive
-                            ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                            : (themeProvider.isDarkMode ? DarkAppColors.onSurface.withValues(alpha: 0.3) : AppColors.onSurface.withValues(alpha: 0.3)),
+                            ? (themeProvider.isDarkMode
+                                ? DarkAppColors.primary
+                                : AppColors.primary)
+                            : (themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                                : AppColors.onSurface.withValues(alpha: 0.3)),
                   ),
                   child: Center(
                     child: isCompleted
@@ -155,8 +174,12 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   steps[index],
                   style: TextStyle(
                     color: isActive
-                        ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                        : (themeProvider.isDarkMode ? DarkAppColors.onSurface.withValues(alpha: 0.6) : AppColors.onSurface.withValues(alpha: 0.6)),
+                        ? (themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
+                        : (themeProvider.isDarkMode
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                            : AppColors.onSurface.withValues(alpha: 0.6)),
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -192,7 +215,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.onBackground
+                    : AppColors.onBackground,
               ),
             ),
             const SizedBox(height: 8),
@@ -216,7 +241,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.surface
+                    : AppColors.background,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -237,7 +264,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.surface
+                    : AppColors.background,
               ),
               keyboardType: TextInputType.phone,
               validator: (value) {
@@ -259,7 +288,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.surface
+                    : AppColors.background,
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -275,7 +306,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.surface
+                    : AppColors.background,
               ),
               maxLines: 3,
               validator: (value) {
@@ -302,12 +335,14 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.surface
+                    : AppColors.surface,
                 border: Border(
                   bottom: BorderSide(
                     color: themeProvider.isDarkMode
-                        ? DarkAppColors.onSurface.withValues(alpha:0.1)
-                        : AppColors.onSurface.withValues(alpha:0.1),
+                        ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                        : AppColors.onSurface.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -322,16 +357,21 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                        fillColor: themeProvider.isDarkMode
+                            ? DarkAppColors.background
+                            : AppColors.background,
                       ),
                       onChanged: productProvider.searchProducts,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.primary
+                          : AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -354,7 +394,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       ? const Center(child: Text('No products found'))
                       : GridView.builder(
                           padding: const EdgeInsets.all(16),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
@@ -373,12 +414,14 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.surface
+                      : AppColors.surface,
                   border: Border(
                     top: BorderSide(
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withValues(alpha:0.1)
-                          : AppColors.onSurface.withValues(alpha:0.1),
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                          : AppColors.onSurface.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -392,7 +435,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                             '${_selectedItems.length} item${_selectedItems.length > 1 ? 's' : ''}',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface
+                                  : AppColors.onSurface,
                             ),
                           ),
                           Text(
@@ -400,7 +445,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.primary
+                                  : AppColors.primary,
                             ),
                           ),
                         ],
@@ -411,8 +458,12 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       icon: const Icon(Icons.shopping_cart),
                       label: const Text('View Cart'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                        foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                        backgroundColor: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
+                        foregroundColor: themeProvider.isDarkMode
+                            ? DarkAppColors.onPrimary
+                            : AppColors.onPrimary,
                       ),
                     ),
                   ],
@@ -425,25 +476,35 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
   }
 
   Widget _buildProductCard(Product product, ThemeProvider themeProvider) {
-    final isSelected = _selectedItems.any((item) => item.productId == product.id);
+    final isSelected =
+        _selectedItems.any((item) => item.productId == product.id);
     final quantity = _itemQuantities[product.id] ?? 0;
 
     return GestureDetector(
       onTap: () => _toggleProductSelection(product),
       child: Container(
         decoration: BoxDecoration(
-          color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.surface
+              : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-                : (themeProvider.isDarkMode ? DarkAppColors.onSurface.withValues(alpha:0.1) : AppColors.onSurface.withValues(alpha:0.1)),
+                ? (themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary)
+                : (themeProvider.isDarkMode
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                    : AppColors.onSurface.withValues(alpha: 0.1)),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary).withValues(alpha: 0.2),
+                    color: (themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
+                        .withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -459,12 +520,16 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  color: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.background
+                      : AppColors.background,
                 ),
                 child: product.imageUrls.isNotEmpty
                     ? ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
                         child: Image.network(
                           product.imageUrls.first,
                           fit: BoxFit.cover,
@@ -488,7 +553,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       product.name,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.onSurface
+                            : AppColors.onSurface,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -499,17 +566,18 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
                       ),
                     ),
-
                     const Spacer(),
-
                     if (isSelected && quantity > 0) ...[
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () => _updateQuantity(product, quantity - 1),
+                            onPressed: () =>
+                                _updateQuantity(product, quantity - 1),
                             icon: const Icon(Icons.remove, size: 20),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -520,12 +588,15 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                               quantity.toString(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                                color: themeProvider.isDarkMode
+                                    ? DarkAppColors.onSurface
+                                    : AppColors.onSurface,
                               ),
                             ),
                           ),
                           IconButton(
-                            onPressed: () => _updateQuantity(product, quantity + 1),
+                            onPressed: () =>
+                                _updateQuantity(product, quantity + 1),
                             icon: const Icon(Icons.add, size: 20),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -537,7 +608,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         decoration: BoxDecoration(
-                          color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -571,7 +644,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 8),
@@ -596,7 +671,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                  fillColor: themeProvider.isDarkMode
+                      ? DarkAppColors.surface
+                      : AppColors.background,
                 ),
                 keyboardType: TextInputType.number,
               ),
@@ -611,7 +688,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 12),
@@ -619,21 +698,28 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
           Wrap(
             spacing: 12,
             children: [
-              _buildMeasurementTemplate('Standard Male', {
-                'Chest': '40',
-                'Waist': '32',
-                'Hip': '38',
-                'Shoulder': '18',
-                'Sleeve Length': '25',
-              }, themeProvider),
-              _buildMeasurementTemplate('Standard Female', {
-                'Chest': '36',
-                'Waist': '28',
-                'Hip': '38',
-                'Shoulder': '16',
-                'Sleeve Length': '23',
-              }, themeProvider),
-              _buildMeasurementTemplate('Clear All', {}, themeProvider, isClear: true),
+              _buildMeasurementTemplate(
+                  'Standard Male',
+                  {
+                    'Chest': '40',
+                    'Waist': '32',
+                    'Hip': '38',
+                    'Shoulder': '18',
+                    'Sleeve Length': '25',
+                  },
+                  themeProvider),
+              _buildMeasurementTemplate(
+                  'Standard Female',
+                  {
+                    'Chest': '36',
+                    'Waist': '28',
+                    'Hip': '38',
+                    'Shoulder': '16',
+                    'Sleeve Length': '23',
+                  },
+                  themeProvider),
+              _buildMeasurementTemplate('Clear All', {}, themeProvider,
+                  isClear: true),
             ],
           ),
         ],
@@ -641,7 +727,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
     );
   }
 
-  Widget _buildMeasurementTemplate(String name, Map<String, String> measurements, ThemeProvider themeProvider, {bool isClear = false}) {
+  Widget _buildMeasurementTemplate(String name,
+      Map<String, String> measurements, ThemeProvider themeProvider,
+      {bool isClear = false}) {
     return ElevatedButton(
       onPressed: () {
         if (isClear) {
@@ -659,10 +747,14 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
       style: ElevatedButton.styleFrom(
         backgroundColor: isClear
             ? Colors.red.shade100
-            : (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary),
+            : (themeProvider.isDarkMode
+                ? DarkAppColors.primary
+                : AppColors.primary),
         foregroundColor: isClear
             ? Colors.red.shade800
-            : (themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary),
+            : (themeProvider.isDarkMode
+                ? DarkAppColors.onPrimary
+                : AppColors.onPrimary),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
       child: Text(name),
@@ -680,7 +772,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 24),
@@ -689,12 +783,14 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.surface
+                  : AppColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: themeProvider.isDarkMode
-                    ? DarkAppColors.onSurface.withValues(alpha:0.1)
-                    : AppColors.onSurface.withValues(alpha:0.1),
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                    : AppColors.onSurface.withValues(alpha: 0.1),
               ),
             ),
             child: Column(
@@ -705,16 +801,21 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // Customer Info
-                _buildSummaryRow('Customer', _customerNameController.text, themeProvider),
-                _buildSummaryRow('Phone', _customerPhoneController.text, themeProvider),
+                _buildSummaryRow(
+                    'Customer', _customerNameController.text, themeProvider),
+                _buildSummaryRow(
+                    'Phone', _customerPhoneController.text, themeProvider),
                 if (_customerEmailController.text.isNotEmpty)
-                  _buildSummaryRow('Email', _customerEmailController.text, themeProvider),
+                  _buildSummaryRow(
+                      'Email', _customerEmailController.text, themeProvider),
 
                 const SizedBox(height: 16),
 
@@ -723,7 +824,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   'Products (${_selectedItems.length})',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -733,8 +836,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                         '${item.productName} x${item.quantity} - ₹${(item.price * item.quantity).toStringAsFixed(0)}',
                         style: TextStyle(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withValues(alpha:0.8)
-                              : AppColors.onSurface.withValues(alpha:0.8),
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.8)
+                              : AppColors.onSurface.withValues(alpha: 0.8),
                         ),
                       ),
                     )),
@@ -750,7 +853,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.onSurface
+                            : AppColors.onSurface,
                       ),
                     ),
                     Text(
@@ -758,7 +863,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
                       ),
                     ),
                   ],
@@ -774,15 +881,17 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                       'Advance (30%)',
                       style: TextStyle(
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.onSurface.withValues(alpha:0.8)
-                            : AppColors.onSurface.withValues(alpha:0.8),
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.8)
+                            : AppColors.onSurface.withValues(alpha: 0.8),
                       ),
                     ),
                     Text(
                       '₹${(_calculateTotal() * 0.3).toStringAsFixed(0)}',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
                       ),
                     ),
                   ],
@@ -802,7 +911,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                 borderRadius: BorderRadius.circular(12),
               ),
               filled: true,
-              fillColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+              fillColor: themeProvider.isDarkMode
+                  ? DarkAppColors.surface
+                  : AppColors.background,
             ),
             maxLines: 3,
           ),
@@ -817,11 +928,13 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
               decoration: BoxDecoration(
                 border: Border.all(
                   color: themeProvider.isDarkMode
-                      ? DarkAppColors.onSurface.withValues(alpha:0.3)
-                      : AppColors.onSurface.withValues(alpha:0.3),
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                      : AppColors.onSurface.withValues(alpha: 0.3),
                 ),
                 borderRadius: BorderRadius.circular(12),
-                color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.background,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.surface
+                    : AppColors.background,
               ),
               child: Row(
                 children: [
@@ -830,13 +943,17 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
                   Text(
                     'Delivery Date: ${_formatDeliveryDate()}',
                     style: TextStyle(
-                      color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                      color: themeProvider.isDarkMode
+                          ? DarkAppColors.onSurface
+                          : AppColors.onSurface,
                     ),
                   ),
                   const Spacer(),
                   Icon(
                     Icons.arrow_drop_down,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                 ],
               ),
@@ -847,7 +964,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, ThemeProvider themeProvider) {
+  Widget _buildSummaryRow(
+      String label, String value, ThemeProvider themeProvider) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -859,7 +977,9 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
               '$label:',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.onSurface
+                    : AppColors.onSurface,
               ),
             ),
           ),
@@ -868,8 +988,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
               value,
               style: TextStyle(
                 color: themeProvider.isDarkMode
-                    ? DarkAppColors.onSurface.withValues(alpha:0.8)
-                    : AppColors.onSurface.withValues(alpha:0.8),
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.8)
+                    : AppColors.onSurface.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -882,12 +1002,14 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         border: Border(
           top: BorderSide(
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withValues(alpha:0.1)
-                : AppColors.onSurface.withValues(alpha:0.1),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                : AppColors.onSurface.withValues(alpha: 0.1),
           ),
         ),
       ),
@@ -905,8 +1027,12 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
             child: ElevatedButton(
               onPressed: _isLoading ? null : _nextStep,
               style: ElevatedButton.styleFrom(
-                backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                backgroundColor: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
+                foregroundColor: themeProvider.isDarkMode
+                    ? DarkAppColors.onPrimary
+                    : AppColors.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: _isLoading
@@ -957,7 +1083,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
 
   void _toggleProductSelection(Product product) {
     setState(() {
-      final existingIndex = _selectedItems.indexWhere((item) => item.productId == product.id);
+      final existingIndex =
+          _selectedItems.indexWhere((item) => item.productId == product.id);
 
       if (existingIndex >= 0) {
         _selectedItems.removeAt(existingIndex);
@@ -987,7 +1114,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
     setState(() {
       _itemQuantities[product.id] = quantity;
 
-      final existingIndex = _selectedItems.indexWhere((item) => item.productId == product.id);
+      final existingIndex =
+          _selectedItems.indexWhere((item) => item.productId == product.id);
       if (existingIndex >= 0) {
         final updatedItem = OrderItem(
           id: _selectedItems[existingIndex].id,
@@ -1015,8 +1143,10 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
             children: _selectedItems.map((item) {
               return ListTile(
                 title: Text(item.productName),
-                subtitle: Text('₹${item.price.toStringAsFixed(0)} x ${item.quantity}'),
-                trailing: Text('₹${(item.price * item.quantity).toStringAsFixed(0)}'),
+                subtitle: Text(
+                    '₹${item.price.toStringAsFixed(0)} x ${item.quantity}'),
+                trailing:
+                    Text('₹${(item.price * item.quantity).toStringAsFixed(0)}'),
               );
             }).toList(),
           ),
@@ -1032,7 +1162,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
   }
 
   double _calculateTotal() {
-    return _selectedItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+    return _selectedItems.fold(
+        0.0, (sum, item) => sum + (item.price * item.quantity));
   }
 
   void _selectDeliveryDate(BuildContext context) async {
@@ -1053,7 +1184,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
 
   String _formatDeliveryDate() {
     // Return formatted delivery date
-    return DateFormat('MMM dd, yyyy').format(DateTime.now().add(const Duration(days: 7)));
+    return DateFormat('MMM dd, yyyy')
+        .format(DateTime.now().add(const Duration(days: 7)));
   }
 
   Future<void> _createOrder() async {
@@ -1067,12 +1199,14 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
       final measurements = <String, dynamic>{};
       _measurementControllers.forEach((key, controller) {
         if (controller.text.isNotEmpty) {
-          measurements[key.toLowerCase().replaceAll(' ', '_')] = controller.text;
+          measurements[key.toLowerCase().replaceAll(' ', '_')] =
+              controller.text;
         }
       });
 
       final success = await orderProvider.createOrder(
-        customerId: authProvider.user?.uid ?? 'customer_${DateTime.now().millisecondsSinceEpoch}',
+        customerId: authProvider.user?.uid ??
+            'customer_${DateTime.now().millisecondsSinceEpoch}',
         items: _selectedItems,
         measurements: measurements,
         specialInstructions: _specialInstructionsController.text,
@@ -1086,7 +1220,8 @@ class _OrderCreationWizardState extends State<OrderCreationWizard>
         Navigator.of(context).pop(true); // Return to previous screen
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to create order. Please try again.')),
+          const SnackBar(
+              content: Text('Failed to create order. Please try again.')),
         );
       }
     } catch (e) {

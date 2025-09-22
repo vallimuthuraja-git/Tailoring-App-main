@@ -367,7 +367,7 @@ class _Measurements3DScreenState extends State<Measurements3DScreen> {
         'hasMeasurements':
             customerProvider.currentCustomer?.measurements != null,
         'measurementsCount': // ignore: invalid_null_aware_operator
-            (customerProvider.currentCustomer?.measurements?.length) ?? 0,
+            (customerProvider.currentCustomer?.measurements.length) ?? 0,
       });
 
       if (mounted) {

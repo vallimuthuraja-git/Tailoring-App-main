@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,13 +12,13 @@ class UserAvatar extends StatefulWidget {
   final VoidCallback? onTap;
 
   const UserAvatar({
-    Key? key,
+    super.key,
     required this.displayName,
     this.imageUrl,
     this.radius = 20.0,
     this.showCustomization = false,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<UserAvatar> createState() => _UserAvatarState();

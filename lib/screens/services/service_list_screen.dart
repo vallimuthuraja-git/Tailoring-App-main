@@ -38,7 +38,8 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
   }
 
   Future<void> _loadServices() async {
-    final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+    final serviceProvider =
+        Provider.of<ServiceProvider>(context, listen: false);
     await serviceProvider.loadServices();
   }
 
@@ -82,7 +83,8 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                           ),
                           onPressed: () {
                             _searchController.clear();
-                            Provider.of<ServiceProvider>(context, listen: false).searchServices('');
+                            Provider.of<ServiceProvider>(context, listen: false)
+                                .searchServices('');
                           },
                         )
                       : null,
@@ -99,17 +101,25 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                       ? DarkAppColors.background
                       : AppColors.background,
                 ),
-                onChanged: (value) => Provider.of<ServiceProvider>(context, listen: false).searchServices(value),
+                onChanged: (value) =>
+                    Provider.of<ServiceProvider>(context, listen: false)
+                        .searchServices(value),
               ),
             ),
           ),
-          backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+          backgroundColor: themeProvider.isDarkMode
+              ? DarkAppColors.surface
+              : AppColors.surface,
           elevation: 0,
           iconTheme: IconThemeData(
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface
+                : AppColors.onSurface,
           ),
           titleTextStyle: TextStyle(
-            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+            color: themeProvider.isDarkMode
+                ? DarkAppColors.onSurface
+                : AppColors.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -136,7 +146,9 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
               child: IconButton(
                 icon: Icon(
                   Icons.add_business,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -203,7 +215,8 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.business_center, size: 64, color: Colors.grey),
+                          Icon(Icons.business_center,
+                              size: 64, color: Colors.grey),
                           SizedBox(height: 16),
                           Text(
                             'No services found',
@@ -291,8 +304,11 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                 // Status Filter
                 _buildFilterChip(
                   label: 'Status',
-                  value: _activeStatusFilter == null ? 'All' :
-                          _activeStatusFilter! ? 'Active' : 'Inactive',
+                  value: _activeStatusFilter == null
+                      ? 'All'
+                      : _activeStatusFilter!
+                          ? 'Active'
+                          : 'Inactive',
                   onTap: () => _showStatusFilterDialog(),
                 ),
 
@@ -317,34 +333,85 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
       builder: (context, serviceProvider, child) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildStatChip(
+                  '${serviceProvider.services.length}',
+                  'Total Services',
+                  Icons.business,
+                  Colors.blue,
+                ),
+                const SizedBox(width: 8),
+                _buildStatChip(
+                  '${serviceProvider.activeServices.length}',
+                  'Active',
+                  Icons.check_circle,
+                  Colors.green,
+                ),
+                const SizedBox(width: 8),
+                _buildStatChip(
+                  '\$${serviceProvider.totalRevenue.toStringAsFixed(0)}',
+                  'Revenue',
+                  Icons.attach_money,
+                  Colors.amber,
+                ),
+                const SizedBox(width: 8),
+                _buildStatChip(
+                  '${serviceProvider.totalBookings}',
+                  'Bookings',
+                  Icons.book_online,
+                  Colors.purple,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatChip(
+      String value, String label, IconData icon, Color color) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 400;
+        return Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 8 : 12,
+            vertical: isSmallScreen ? 6 : 8,
+          ),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withOpacity(0.3)),
+          ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildStatChip(
-                '${serviceProvider.services.length}',
-                'Total Services',
-                Icons.business,
-                Colors.blue,
-              ),
-              const SizedBox(width: 12),
-              _buildStatChip(
-                '${serviceProvider.activeServices.length}',
-                'Active',
-                Icons.check_circle,
-                Colors.green,
-              ),
-              const SizedBox(width: 12),
-              _buildStatChip(
-                '\$${serviceProvider.totalRevenue.toStringAsFixed(0)}',
-                'Revenue',
-                Icons.attach_money,
-                Colors.amber,
-              ),
-              const SizedBox(width: 12),
-              _buildStatChip(
-                '${serviceProvider.totalBookings}',
-                'Bookings',
-                Icons.book_online,
-                Colors.purple,
+              Icon(icon, size: isSmallScreen ? 14 : 16, color: color),
+              const SizedBox(width: 4),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: isSmallScreen ? 11 : 12,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: isSmallScreen ? 9 : 10,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -353,282 +420,328 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
     );
   }
 
-  Widget _buildStatChip(String value, String label, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 4),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip({required String label, required String value, required VoidCallback onTap}) {
+  Widget _buildFilterChip(
+      {required String label,
+      required String value,
+      required VoidCallback onTap}) {
     return FilterChip(
       label: Text('$label: $value'),
       selected: false,
       onSelected: (_) => onTap(),
       avatar: Icon(
-        label == 'Category' ? Icons.category :
-        label == 'Type' ? Icons.build :
-        Icons.toggle_on,
+        label == 'Category'
+            ? Icons.category
+            : label == 'Type'
+                ? Icons.build
+                : Icons.toggle_on,
         size: 16,
       ),
     );
   }
 
   Widget _buildServiceCard(Service service) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ServiceDetailScreen(service: service),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // Service Icon/Avatar
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: _getServiceColor(service.category).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _getServiceColor(service.category).withOpacity(0.3),
-                      ),
-                    ),
-                    child: Icon(
-                      _getServiceIcon(service.category),
-                      color: _getServiceColor(service.category),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 400;
+        final isMediumScreen = constraints.maxWidth < 600;
 
-                  // Service Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          service.name,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ServiceDetailScreen(service: service),
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Row with Icon, Title, and Price
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Service Icon/Avatar
+                      Container(
+                        width: isSmallScreen ? 40 : 50,
+                        height: isSmallScreen ? 40 : 50,
+                        decoration: BoxDecoration(
+                          color: _getServiceColor(service.category)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _getServiceColor(service.category)
+                                .withOpacity(0.3),
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          service.shortDescription,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        child: Icon(
+                          _getServiceIcon(service.category),
+                          color: _getServiceColor(service.category),
+                          size: isSmallScreen ? 20 : 24,
                         ),
-                        const SizedBox(height: 4),
-                        Row(
+                      ),
+                      const SizedBox(width: 12),
+
+                      // Service Info - Flexible to prevent overflow
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: _getServiceColor(service.category).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                service.categoryName,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: _getServiceColor(service.category),
-                                ),
-                              ),
+                            // Title with responsive font size
+                            Text(
+                              service.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isSmallScreen ? 14 : 16,
+                                  ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: service.isActive ? Colors.green[100] : Colors.red[100],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                service.isActive ? 'Active' : 'Inactive',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: service.isActive ? Colors.green[800] : Colors.red[800],
-                                ),
+                            const SizedBox(height: 2),
+
+                            // Description - responsive
+                            Text(
+                              service.shortDescription,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Colors.grey[600],
+                                    fontSize: isSmallScreen ? 11 : 12,
+                                  ),
+                              maxLines: isSmallScreen ? 1 : 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+
+                            // Category and Status tags - wrap on small screens
+                            const SizedBox(height: 6),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isSmallScreen ? 6 : 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _getServiceColor(service.category)
+                                          .withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      service.categoryName,
+                                      style: TextStyle(
+                                        fontSize: isSmallScreen ? 9 : 10,
+                                        color:
+                                            _getServiceColor(service.category),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isSmallScreen ? 6 : 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: service.isActive
+                                          ? Colors.green[100]
+                                          : Colors.red[100],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      service.isActive ? 'Active' : 'Inactive',
+                                      style: TextStyle(
+                                        fontSize: isSmallScreen ? 9 : 10,
+                                        color: service.isActive
+                                            ? Colors.green[800]
+                                            : Colors.red[800],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  // Price and Rating
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '\$${service.effectivePrice.toStringAsFixed(0)}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
+                      // Price and Rating - Right aligned, responsive
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '\$${service.effectivePrice.toStringAsFixed(0)}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontSize: isSmallScreen ? 14 : 16,
+                                  ),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                const Icon(Icons.star,
+                                    size: 12, color: Colors.amber),
+                                const SizedBox(width: 2),
+                                Text(
+                                  service.averageRating.toStringAsFixed(1),
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 10 : 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          const Icon(Icons.star, size: 14, color: Colors.amber),
-                          const SizedBox(width: 2),
-                          Text(
-                            service.averageRating.toStringAsFixed(1),
+                    ],
+                  ),
+
+                  // Features Section - Only show if space allows
+                  if (!isSmallScreen && service.features.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      'Key Features:',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[700],
+                            fontSize: 11,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 2,
+                      children: service.features
+                          .take(isMediumScreen ? 2 : 3)
+                          .map((feature) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            feature,
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
+                              fontSize: 9,
+                              color: Colors.grey[700],
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Service Features
-              if (service.features.isNotEmpty) ...[
-                Text(
-                  'Key Features:',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: service.features.take(3).map((feature) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        feature,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                if (service.features.length > 3) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    '+${service.features.length - 3} more features',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey[600],
+                        );
+                      }).toList(),
                     ),
-                  ),
-                ],
-              ],
-
-              const SizedBox(height: 8),
-
-              // Service Stats
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
+                    if (service.features.length > (isMediumScreen ? 2 : 3)) ...[
+                      const SizedBox(height: 2),
                       Text(
-                        service.durationText,
+                        '+${service.features.length - (isMediumScreen ? 2 : 3)} more',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 9,
                           color: Colors.grey[600],
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(width: 16),
-                  Row(
-                    children: [
-                      Icon(Icons.build, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        service.complexityText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  if (service.isPopular) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Popular',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.amber[800],
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ],
+
+                  // Footer with Service Stats - Responsive layout
+                  const SizedBox(height: 8),
+                  LayoutBuilder(
+                    builder: (context, footerConstraints) {
+                      return Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          // Duration and Complexity - Flexible
+                          Container(
+                            constraints: BoxConstraints(
+                              maxWidth: footerConstraints.maxWidth * 0.6,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.access_time,
+                                        size: 12, color: Colors.grey[600]),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      service.durationText,
+                                      style: TextStyle(
+                                        fontSize: isSmallScreen ? 10 : 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 8),
+                                Row(
+                                  children: [
+                                    Icon(Icons.build,
+                                        size: 12, color: Colors.grey[600]),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      service.complexityText,
+                                      style: TextStyle(
+                                        fontSize: isSmallScreen ? 10 : 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Popular badge - Right aligned
+                          if (service.isPopular)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isSmallScreen ? 4 : 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.amber[100],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Popular',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 9 : 10,
+                                  color: Colors.amber[800],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -693,13 +806,16 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
             return ListTile(
               title: Text(category.name),
               leading: Icon(
-                category == _selectedCategoryFilter ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                category == _selectedCategoryFilter
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _selectedCategoryFilter = category;
                 });
-                final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+                final serviceProvider =
+                    Provider.of<ServiceProvider>(context, listen: false);
                 serviceProvider.filterByCategory(category);
                 Navigator.pop(context);
               },
@@ -712,7 +828,8 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
               setState(() {
                 _selectedCategoryFilter = null;
               });
-              final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+              final serviceProvider =
+                  Provider.of<ServiceProvider>(context, listen: false);
               serviceProvider.filterByCategory(null);
               Navigator.pop(context);
             },
@@ -735,13 +852,16 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
               return ListTile(
                 title: Text(type.name),
                 leading: Icon(
-                  type == _selectedTypeFilter ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                  type == _selectedTypeFilter
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
                 ),
                 onTap: () {
                   setState(() {
                     _selectedTypeFilter = type;
                   });
-                  final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+                  final serviceProvider =
+                      Provider.of<ServiceProvider>(context, listen: false);
                   serviceProvider.filterByType(type);
                   Navigator.pop(context);
                 },
@@ -755,7 +875,8 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
               setState(() {
                 _selectedTypeFilter = null;
               });
-              final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+              final serviceProvider =
+                  Provider.of<ServiceProvider>(context, listen: false);
               serviceProvider.filterByType(null);
               Navigator.pop(context);
             },
@@ -777,13 +898,16 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
             ListTile(
               title: const Text('All'),
               leading: Icon(
-                _activeStatusFilter == null ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                _activeStatusFilter == null
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _activeStatusFilter = null;
                 });
-                final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+                final serviceProvider =
+                    Provider.of<ServiceProvider>(context, listen: false);
                 serviceProvider.filterByActiveStatus(null);
                 Navigator.pop(context);
               },
@@ -791,13 +915,16 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
             ListTile(
               title: const Text('Active'),
               leading: Icon(
-                _activeStatusFilter == true ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                _activeStatusFilter == true
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _activeStatusFilter = true;
                 });
-                final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+                final serviceProvider =
+                    Provider.of<ServiceProvider>(context, listen: false);
                 serviceProvider.filterByActiveStatus(true);
                 Navigator.pop(context);
               },
@@ -805,13 +932,16 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
             ListTile(
               title: const Text('Inactive'),
               leading: Icon(
-                _activeStatusFilter == false ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                _activeStatusFilter == false
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
               ),
               onTap: () {
                 setState(() {
                   _activeStatusFilter = false;
                 });
-                final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+                final serviceProvider =
+                    Provider.of<ServiceProvider>(context, listen: false);
                 serviceProvider.filterByActiveStatus(false);
                 Navigator.pop(context);
               },
@@ -829,7 +959,8 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
       _activeStatusFilter = null;
     });
 
-    final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+    final serviceProvider =
+        Provider.of<ServiceProvider>(context, listen: false);
     serviceProvider.searchServices('');
     serviceProvider.filterByCategory(null);
     serviceProvider.filterByType(null);

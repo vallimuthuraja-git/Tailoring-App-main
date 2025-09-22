@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/employee.dart' as emp;
 import '../../providers/employee_provider.dart';
 import '../../widgets/user_avatar.dart';
 

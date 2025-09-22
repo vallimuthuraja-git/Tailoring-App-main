@@ -4,17 +4,17 @@ import '../../providers/customer_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../models/customer.dart';
 import '../../utils/theme_constants.dart';
-import '../../services/firebase_service.dart';
 
 class CustomerAnalyticsScreen extends StatefulWidget {
   const CustomerAnalyticsScreen({super.key});
 
   @override
-  State<CustomerAnalyticsScreen> createState() => _CustomerAnalyticsScreenState();
+  State<CustomerAnalyticsScreen> createState() =>
+      _CustomerAnalyticsScreenState();
 }
 
 class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
     final totalCustomers = customers.length;
     final activeCustomers = customers.where((c) => c.isActive).length;
     final inactiveCustomers = totalCustomers - activeCustomers;
-    final totalRevenue = customers.fold<double>(0, (sum, c) => sum + c.totalSpent);
+    final totalRevenue =
+        customers.fold<double>(0, (sum, c) => sum + c.totalSpent);
 
     final loyaltyTierDistribution = <String, int>{};
     for (final customer in customers) {
@@ -89,9 +90,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
       loyaltyTierDistribution[tier] = (loyaltyTierDistribution[tier] ?? 0) + 1;
     }
 
-    final topCustomers = customers
-        .where((c) => c.totalSpent > 0)
-        .toList()
+    final topCustomers = customers.where((c) => c.totalSpent > 0).toList()
       ..sort((a, b) => b.totalSpent.compareTo(a.totalSpent))
       ..take(5);
 
@@ -158,7 +157,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
               ...loyaltyTierDistribution.entries.map((entry) {
                 final percentage = (entry.value / totalCustomers * 100).round();
                 return _buildProgressBarItem(
-                  label: '${entry.key.capitalize()}',
+                  label: entry.key.capitalize(),
                   value: entry.value,
                   percentage: percentage,
                   isDark: isDark,
@@ -229,7 +228,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
         color: isDark ? DarkAppColors.surface : AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface).withOpacity(0.1),
+          color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
+              .withOpacity(0.1),
         ),
       ),
       child: Column(
@@ -237,7 +237,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
         children: [
           Icon(
             icon,
-            color: color ?? (isDark ? DarkAppColors.primary : AppColors.primary),
+            color:
+                color ?? (isDark ? DarkAppColors.primary : AppColors.primary),
             size: 32,
           ),
           const SizedBox(height: 8),
@@ -253,7 +254,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface).withOpacity(0.7),
+              color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
+                  .withOpacity(0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -273,7 +275,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
         color: isDark ? DarkAppColors.surface : AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface).withOpacity(0.1),
+          color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
+              .withOpacity(0.1),
         ),
       ),
       child: Column(
@@ -293,7 +296,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color:
+                        isDark ? DarkAppColors.onSurface : AppColors.onSurface,
                   ),
                 ),
               ],
@@ -335,7 +339,9 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
               Text(
                 '$value ($percentage%)',
                 style: TextStyle(
-                  color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface).withOpacity(0.7),
+                  color:
+                      (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
+                          .withOpacity(0.7),
                 ),
               ),
             ],
@@ -343,7 +349,9 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: percentage / 100,
-            backgroundColor: (isDark ? DarkAppColors.onSurface : AppColors.onSurface).withOpacity(0.1),
+            backgroundColor:
+                (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
+                    .withOpacity(0.1),
             valueColor: AlwaysStoppedAnimation(
               isDark ? DarkAppColors.primary : AppColors.primary,
             ),
@@ -360,13 +368,14 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
   }) {
     final rankColors = [
       Colors.amber, // Gold
-      Colors.grey,  // Silver
+      Colors.grey, // Silver
       const Color(0xFFCD7F32), // Bronze
       Colors.blue,
       Colors.green,
     ];
 
-    final color = rank <= rankColors.length ? rankColors[rank - 1] : Colors.purple;
+    final color =
+        rank <= rankColors.length ? rankColors[rank - 1] : Colors.purple;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -398,14 +407,17 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
                   customer.name,
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    color: isDark ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color:
+                        isDark ? DarkAppColors.onSurface : AppColors.onSurface,
                   ),
                 ),
                 Text(
                   customer.email,
                   style: TextStyle(
                     fontSize: 12,
-                    color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface).withOpacity(0.7),
+                    color:
+                        (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
+                            .withOpacity(0.7),
                   ),
                 ),
               ],
@@ -442,7 +454,8 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: (isDark ? DarkAppColors.primary : AppColors.primary).withOpacity(0.1),
+              color: (isDark ? DarkAppColors.primary : AppColors.primary)
+                  .withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(

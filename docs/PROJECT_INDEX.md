@@ -7,7 +7,7 @@ This document provides a comprehensive index of all documentation files for the 
 ## 🗂️ Documentation Categories
 
 ### 📚 Core Documentation
-- [`README.md`](./README.md.md) - Main project documentation and overview
+- [`README.md`](../README.md) - Main project documentation and overview
 - [`PROJECT_INDEX.md`](./PROJECT_INDEX.md) - Complete project file index (this file)
 - [`pubspec.yaml.md`](./pubspec.yaml.md) - Project dependencies and configuration
 
@@ -31,9 +31,9 @@ This document provides a comprehensive index of all documentation files for the 
 - [`lib/services/device_detection_service.md`](./lib/services/device_detection_service.md) - ✅ Comprehensive device detection and intelligent theme recommendation system
 
 #### Screens Documentation
-- [`lib/screens/auth/login_screen.md`](./docs/lib/screens/auth/login_screen.md) - ✅ Login screen with comprehensive demo functionality, theme integration, and form validation
-- [`lib/screens/auth/signup_screen.md`](./docs/lib/screens/auth/signup_screen.md) - ✅ Multi-step registration with role selection and validation
-- [`lib/screens/auth/forgot_password_screen.md`](./docs/lib/screens/auth/forgot_password_screen.md) - ✅ Password reset screen with email validation and recovery flow
+- [`lib/screens/auth/login_screen.md`](./lib/screens/auth/login_screen.md) - ✅ Login screen with comprehensive demo functionality, theme integration, and form validation
+- [`lib/screens/auth/signup_screen.md`](./lib/screens/auth/signup_screen.md) - ✅ Multi-step registration with role selection and validation
+- [`lib/screens/auth/forgot_password_screen.md`](./lib/screens/auth/forgot_password_screen.md) - ✅ Password reset screen with email validation and recovery flow
 
 ### 🎯 Key Features Documented
 
@@ -61,14 +61,14 @@ This document provides a comprehensive index of all documentation files for the 
 - [`lib/providers/service_provider.dart.md`](./lib/providers/service_provider.dart.md) - ✅ Comprehensive service management with analytics and recommendations
 - [`lib/models/product.dart`](./lib/models/product.md) - ✅ Comprehensive product data model with categories
 - [`lib/models/service.dart.md`](./lib/models/service.dart.md) - ✅ Comprehensive service model with customization options
-- [`lib/screens/catalog/product_catalog_screen.dart`](./docs/lib/screens/catalog/product_catalog_screen.dart.md) - ✅ Advanced responsive product catalog with search, filtering, desktop sidebar, and comprehensive product cards
+- [`lib/screens/catalog/product_catalog_screen.dart`](./lib/screens/catalog/product_catalog_screen.dart.md) - ✅ Advanced responsive product catalog with search, filtering, desktop sidebar, and comprehensive product cards
 - [`lib/screens/catalog/product_edit_screen.dart`](./lib/screens/catalog/product_edit_screen.md) - Product editing
 
 ### 📋 Order Management
 - [`lib/providers/order_provider.dart.md`](./lib/providers/order_provider.dart.md) - ✅ Comprehensive order management with payment processing and analytics
 - [`lib/models/order.dart`](./lib/models/order.md) - ✅ Comprehensive order lifecycle management
 - [`lib/services/setup_demo_orders.dart.md`](./lib/services/setup_demo_orders.dart.md) - ✅ Comprehensive demo order setup with 8 diverse order scenarios and Bangalore-based customers
-- [`lib/screens/orders/order_creation_wizard.dart`](./docs/lib/screens/orders/order_creation_wizard.dart.md) - ✅ Comprehensive 4-step order creation wizard with customer info, product selection, measurements, and review
+- [`lib/screens/orders/order_creation_wizard.dart`](./lib/screens/orders/order_creation_wizard.dart.md) - ✅ Comprehensive 4-step order creation wizard with customer info, product selection, measurements, and review
 - [`lib/screens/orders/order_details_screen.dart`](./lib/screens/orders/order_details_screen.md) - ✅ Comprehensive order details with management
 - [`lib/screens/orders/order_history_screen.dart`](./lib/screens/orders/order_history_screen.md) - ✅ Advanced order history with analytics
 - [`lib/screens/orders/order_management_dashboard.dart`](./lib/screens/orders/order_management_dashboard.md) - Order management
@@ -105,17 +105,17 @@ This document provides a comprehensive index of all documentation files for the 
 - [`lib/screens/profile/profile_screen.dart`](./lib/screens/profile/profile_screen.md) - ✅ Comprehensive profile management with theme settings
 
 ### 👷 Employee Management Screens
-- [`lib/screens/employee/employee_dashboard_screen.dart`](./docs/lib/screens/employee/employee_dashboard_screen.dart.md) - ✅ Comprehensive employee dashboard with profile, performance metrics, assignments, and activity tracking
-- [`lib/screens/employee/employee_list_screen.dart`](./docs/lib/screens/employee/employee_list_screen.dart.md) - ✅ Advanced employee directory with search, filtering, role-based access, and comprehensive employee cards
+- [`lib/screens/employee/employee_dashboard_screen.dart`](./lib/screens/employee/employee_dashboard_screen.dart.md) - ✅ Comprehensive employee dashboard with profile, performance metrics, assignments, and activity tracking
+- [`lib/screens/employee/employee_list_screen.dart`](./lib/screens/employee/employee_list_screen.dart.md) - ✅ Advanced employee directory with search, filtering, role-based access, and comprehensive employee cards
 - [`lib/screens/employee/employee_list_simple.dart`](./lib/screens/employee/employee_list_simple.md) - ✅ Comprehensive employee list with search & CRUD
 - [`lib/screens/employee/employee_management_home.dart`](./lib/screens/employee/employee_management_home.md) - ✅ Employee management hub with role-based access
-- [`lib/screens/employee/employee_create_screen.dart`](./docs/lib/screens/employee/employee_create_screen.dart.md) - ✅ Comprehensive employee creation form with validation, skills selection, availability configuration, and role-based access control
-- [`lib/screens/employee/employee_edit_screen.dart`](./docs/lib/screens/employee/employee_edit_screen.dart.md) - ✅ Comprehensive employee profile editing with dynamic skills, specializations, certifications, schedule, compensation, and status management
-- [`lib/screens/employee/employee_detail_screen.dart`](./docs/lib/screens/employee/employee_detail_screen.dart.md) - ✅ Comprehensive employee profile view with performance metrics, skills display, work schedule, contact info, and role-based management actions
-- [`lib/screens/employee/employee_registration_screen.dart`](./docs/lib/screens/employee/employee_registration_screen.dart.md) - Employee registration
-- [`lib/screens/employee/employee_performance_dashboard.dart`](./docs/lib/screens/employee/employee_performance_dashboard.dart.md) - Performance analytics
-- [`lib/screens/employee/employee_analytics_screen.dart`](./docs/lib/screens/employee/employee_analytics_screen.dart.md) - Employee analytics
-- [`lib/screens/employee/work_assignment_screen.dart`](./docs/lib/screens/employee/work_assignment_screen.dart.md) - Work assignments
+- [`lib/screens/employee/employee_create_screen.dart`](./lib/screens/employee/employee_create_screen.dart.md) - ✅ Comprehensive employee creation form with validation, skills selection, availability configuration, and role-based access control
+- [`lib/screens/employee/employee_edit_screen.dart`](./lib/screens/employee/employee_edit_screen.dart.md) - ✅ Comprehensive employee profile editing with dynamic skills, specializations, certifications, schedule, compensation, and status management
+- [`lib/screens/employee/employee_detail_screen.dart`](./lib/screens/employee/employee_detail_screen.dart.md) - ✅ Comprehensive employee profile view with performance metrics, skills display, work schedule, contact info, and role-based management actions
+- [`lib/screens/employee/employee_registration_screen.dart`](./lib/screens/employee/employee_registration_screen.dart.md) - Employee registration
+- [`lib/screens/employee/employee_performance_dashboard.dart`](./lib/screens/employee/employee_performance_dashboard.dart.md) - Performance analytics
+- [`lib/screens/employee/employee_analytics_screen.dart`](./lib/screens/employee/employee_analytics_screen.dart.md) - Employee analytics
+- [`lib/screens/employee/work_assignment_screen.dart`](./lib/screens/employee/work_assignment_screen.dart.md) - Work assignments
 
 ### 🛍️ Service Management
 - [`lib/screens/services/service_list_screen.dart`](./lib/screens/services/service_list_screen.md) - ✅ Advanced service management with analytics
@@ -207,9 +207,9 @@ lib/screens/dashboard/analytics_dashboard_screen.dart
 
 ## 📊 Documentation Statistics
 
-- **Total Files**: 95 files
-- **Core Application Files**: 60+ Dart files
-- **Documentation Files**: 15+ markdown files
+- **Total Files**: 200+ files
+- **Core Application Files**: 150+ Dart files
+- **Documentation Files**: 50+ markdown files
 - **Configuration Files**: 10+ config files
 - **Asset Files**: 10+ image/icon files
 - **Build Files**: 15+ generated build files

@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import '../models/order.dart';
-import '../models/product.dart';
-import '../providers/product_provider.dart';
+import '../models/product_models.dart';
+import '../product_data_access.dart';
 import '../providers/order_provider.dart';
+import '../providers/product_provider.dart';
 
 class SetupDemoOrders {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -90,7 +91,8 @@ class SetupDemoOrders {
         'shoulder': '18',
         'sleeve': '25'
       },
-      'specialInstructions': 'Customer wants double stitching for durability. Delivery by next Friday.',
+      'specialInstructions':
+          'Customer wants double stitching for durability. Delivery by next Friday.',
       'status': OrderStatus.confirmed,
       'assignedEmployee': 0,
       'daysAgo': 2
@@ -113,7 +115,8 @@ class SetupDemoOrders {
         'length': '42',
         'blouse_size': 'M'
       },
-      'specialInstructions': 'Urgent wedding order. Customer wants premium quality work. Delivery in 10 days.',
+      'specialInstructions':
+          'Urgent wedding order. Customer wants premium quality work. Delivery in 10 days.',
       'status': OrderStatus.inProduction,
       'assignedEmployee': 1,
       'daysAgo': 5
@@ -135,7 +138,8 @@ class SetupDemoOrders {
         'length': '24',
         'age': '12 years'
       },
-      'specialInstructions': 'School uniform for 3 children. Need school logo embroidered.',
+      'specialInstructions':
+          'School uniform for 3 children. Need school logo embroidered.',
       'status': OrderStatus.qualityCheck,
       'assignedEmployee': 2,
       'daysAgo': 7
@@ -156,7 +160,8 @@ class SetupDemoOrders {
         'length': '30',
         'inseam': '32'
       },
-      'specialInstructions': 'Customer lost weight, needs suit taken in. Keep same style and quality.',
+      'specialInstructions':
+          'Customer lost weight, needs suit taken in. Keep same style and quality.',
       'status': OrderStatus.completed,
       'assignedEmployee': 2,
       'daysAgo': 10
@@ -178,7 +183,8 @@ class SetupDemoOrders {
         'length': '28',
         'shoulder': '17'
       },
-      'specialInstructions': 'Corporate order with company branding. High quality required.',
+      'specialInstructions':
+          'Corporate order with company branding. High quality required.',
       'status': OrderStatus.assigned,
       'assignedEmployee': 0,
       'daysAgo': 1
@@ -199,7 +205,8 @@ class SetupDemoOrders {
         'length': '38',
         'inseam': '40'
       },
-      'specialInstructions': 'Festival season order. Need delivery before Diwali.',
+      'specialInstructions':
+          'Festival season order. Need delivery before Diwali.',
       'status': OrderStatus.pending,
       'assignedEmployee': null,
       'daysAgo': 0
@@ -220,7 +227,8 @@ class SetupDemoOrders {
         'length': '28',
         'sleeve': '25'
       },
-      'specialInstructions': 'Bulk order for office casual wear. Mix of colors.',
+      'specialInstructions':
+          'Bulk order for office casual wear. Mix of colors.',
       'status': OrderStatus.confirmed,
       'assignedEmployee': 3,
       'daysAgo': 3
@@ -242,24 +250,26 @@ class SetupDemoOrders {
         'hips': '36',
         'length': '48'
       },
-      'specialInstructions': 'Custom design based on customer sketch. High-end finishing required.',
+      'specialInstructions':
+          'Custom design based on customer sketch. High-end finishing required.',
       'status': OrderStatus.inProduction,
       'assignedEmployee': 3,
       'daysAgo': 8
     }
   ];
 
-  Future<void> createDemoOrders({
-    required ProductProvider productProvider,
-    required OrderProvider orderProvider
-  }) async {
+  Future<void> createDemoOrders(
+      {required ProductProvider productProvider,
+      required OrderProvider orderProvider}) async {
     try {
       print('🔧 Setting up demo orders...');
 
       // First, ensure we have products loaded
-      await productProvider.loadProducts();
+      productProvider.loadProducts();
+      // Wait a moment for products to load
+      await Future.delayed(const Duration(milliseconds: 500));
       if (productProvider.products.isEmpty) {
-        await productProvider.loadDemoData();
+        await productProvider.refreshProducts();
       }
 
       // Create demo customers in Firestore
@@ -295,11 +305,10 @@ class SetupDemoOrders {
   }
 
   Future<void> _createDemoOrder(
-    Map<String, dynamic> template,
-    ProductProvider productProvider,
-    OrderProvider orderProvider,
-    int index
-  ) async {
+      Map<String, dynamic> template,
+      ProductProvider productProvider,
+      OrderProvider orderProvider,
+      int index) async {
     try {
       // Get customer
       final customer = _demoCustomers[template['customerIndex']];
@@ -318,15 +327,14 @@ class SetupDemoOrders {
 
       // Create order item
       final orderItem = OrderItem(
-        id: 'demo-item-$index',
-        productId: product.id,
-        productName: template['productName'],
-        category: product.category.toString().split('.').last,
-        price: product.basePrice,
-        quantity: template['quantity'],
-        customizations: template['customizations'],
-        notes: template['specialInstructions']
-      );
+          id: 'demo-item-$index',
+          productId: product.id,
+          productName: template['productName'],
+          category: product.category.toString().split('.').last,
+          price: product.basePrice,
+          quantity: template['quantity'],
+          customizations: template['customizations'],
+          notes: template['specialInstructions']);
 
       // Calculate order totals
       final totalAmount = orderItem.price * orderItem.quantity;
@@ -340,49 +348,54 @@ class SetupDemoOrders {
 
       // Create order
       final order = Order(
-        id: '',
-        customerId: customer['id'],
-        items: [orderItem],
-        status: template['status'],
-        paymentStatus: PaymentStatus.paid, // Assume advance paid for demo
-        totalAmount: totalAmount,
-        advanceAmount: advanceAmount,
-        remainingAmount: remainingAmount,
-        orderDate: orderDate,
-        deliveryDate: deliveryDate,
-        specialInstructions: template['specialInstructions'],
-        measurements: template['measurements'],
-        orderImages: [], // Empty for demo
-        createdAt: orderDate,
-        updatedAt: orderDate,
-        assignedEmployeeId: template['assignedEmployee'] != null
-            ? _demoEmployees[template['assignedEmployee']]['id']
-            : null,
-        assignedEmployeeName: template['assignedEmployee'] != null
-            ? _demoEmployees[template['assignedEmployee']]['name']
-            : null,
-        assignedAt: template['assignedEmployee'] != null
-            ? orderDate.add(const Duration(hours: 2))
-            : null,
-        startedAt: template['status'] == OrderStatus.inProduction
-            ? orderDate.add(const Duration(hours: 4))
-            : null,
-        completedAt: template['status'] == OrderStatus.completed
-            ? orderDate.add(const Duration(days: 6))
-            : null,
-        workAssignments: template['assignedEmployee'] != null
-            ? {
-                _demoEmployees[template['assignedEmployee']]['id']: {
-                  'employeeName': _demoEmployees[template['assignedEmployee']]['name'],
-                  'assignedAt': orderDate.add(const Duration(hours: 2)).toIso8601String(),
-                  'specialization': _demoEmployees[template['assignedEmployee']]['specialization'],
-                  'status': _getWorkStatus(template['status']),
-                  'estimatedHours': _getEstimatedHours(template['productType']),
-                  'progress': _getProgressForStatus(template['status'])
+          id: '',
+          customerId: customer['id'],
+          items: [orderItem],
+          status: template['status'],
+          paymentStatus: PaymentStatus.paid, // Assume advance paid for demo
+          totalAmount: totalAmount,
+          advanceAmount: advanceAmount,
+          remainingAmount: remainingAmount,
+          orderDate: orderDate,
+          deliveryDate: deliveryDate,
+          specialInstructions: template['specialInstructions'],
+          measurements: template['measurements'],
+          orderImages: [], // Empty for demo
+          createdAt: orderDate,
+          updatedAt: orderDate,
+          assignedEmployeeId: template['assignedEmployee'] != null
+              ? _demoEmployees[template['assignedEmployee']]['id']
+              : null,
+          assignedEmployeeName: template['assignedEmployee'] != null
+              ? _demoEmployees[template['assignedEmployee']]['name']
+              : null,
+          assignedAt: template['assignedEmployee'] != null
+              ? orderDate.add(const Duration(hours: 2))
+              : null,
+          startedAt: template['status'] == OrderStatus.inProduction
+              ? orderDate.add(const Duration(hours: 4))
+              : null,
+          completedAt: template['status'] == OrderStatus.completed
+              ? orderDate.add(const Duration(days: 6))
+              : null,
+          workAssignments: template['assignedEmployee'] != null
+              ? {
+                  _demoEmployees[template['assignedEmployee']]['id']: {
+                    'employeeName': _demoEmployees[template['assignedEmployee']]
+                        ['name'],
+                    'assignedAt': orderDate
+                        .add(const Duration(hours: 2))
+                        .toIso8601String(),
+                    'specialization':
+                        _demoEmployees[template['assignedEmployee']]
+                            ['specialization'],
+                    'status': _getWorkStatus(template['status']),
+                    'estimatedHours':
+                        _getEstimatedHours(template['productType']),
+                    'progress': _getProgressForStatus(template['status'])
+                  }
                 }
-              }
-            : {}
-      );
+              : {});
 
       // Save to Firestore
       final orderData = order.toJson();
@@ -390,13 +403,13 @@ class SetupDemoOrders {
 
       final docRef = await _firestore.collection('orders').add(orderData);
 
-      print('✅ Created order #${index + 1}: ${template['productName']} for ${customer['name']}');
+      print(
+          '✅ Created order #${index + 1}: ${template['productName']} for ${customer['name']}');
 
       // Add order ID to customer document
       await _firestore.collection('customers').doc(customer['id']).update({
         'orderIds': FieldValue.arrayUnion([docRef.id])
       });
-
     } catch (e) {
       print('❌ Error creating demo order $index: $e');
     }
@@ -472,20 +485,21 @@ class SetupDemoOrders {
     }
   }
 
-  Future<void> initializeDemoOrdersIfNeeded({
-    required ProductProvider productProvider,
-    required OrderProvider orderProvider
-  }) async {
+  Future<void> initializeDemoOrdersIfNeeded(
+      {required ProductProvider productProvider,
+      required OrderProvider orderProvider}) async {
     try {
       final ordersExist = await demoOrdersExist();
       if (!ordersExist) {
         print('🔧 Demo orders not found, creating them...');
-        await createDemoOrders(
-          productProvider: productProvider,
-          orderProvider: orderProvider
-        );
+        final Future<void> demoOrdersTask = createDemoOrders(
+            productProvider: productProvider, orderProvider: orderProvider);
+        await demoOrdersTask;
+        print('✅ Demo orders created successfully');
+        return;
       } else {
         print('✅ Demo orders already exist');
+        return;
       }
     } catch (e) {
       print('❌ Error initializing demo orders: $e');
@@ -495,5 +509,6 @@ class SetupDemoOrders {
 
 // Helper function to setup demo orders (can be called from main)
 Future<void> setupDemoOrders() async {
-  print('Demo orders setup helper called - integrate with providers in main app');
+  print(
+      'Demo orders setup helper called - integrate with providers in main app');
 }

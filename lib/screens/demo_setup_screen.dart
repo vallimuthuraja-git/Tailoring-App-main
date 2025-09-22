@@ -4,8 +4,9 @@ import '../providers/theme_provider.dart';
 import '../services/setup_demo_employees.dart';
 import '../services/demo_work_assignments_service.dart';
 import '../services/setup_demo_orders.dart';
-import '../providers/product_provider.dart';
+import '../product_data_access.dart';
 import '../providers/order_provider.dart';
+import '../providers/product_provider.dart';
 import '../utils/theme_constants.dart';
 
 class DemoSetupScreen extends StatefulWidget {
@@ -21,7 +22,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
   bool _setupComplete = false;
 
   final SetupDemoEmployees _setupService = SetupDemoEmployees();
-  final DemoWorkAssignmentsService _workAssignmentsService = DemoWorkAssignmentsService();
+  final DemoWorkAssignmentsService _workAssignmentsService =
+      DemoWorkAssignmentsService();
   final SetupDemoOrders _demoOrdersSetup = SetupDemoOrders();
 
   @override
@@ -31,13 +33,19 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Demo Setup'),
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             elevation: 0,
             iconTheme: IconThemeData(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             titleTextStyle: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
@@ -73,10 +81,14 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.surface
+                            : AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: themeProvider.isDarkMode ? DarkAppColors.primary.withOpacity(0.3) : AppColors.primary.withOpacity(0.3),
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.primary.withOpacity(0.3)
+                              : AppColors.primary.withOpacity(0.3),
                         ),
                       ),
                       child: Column(
@@ -84,7 +96,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                           Icon(
                             Icons.build,
                             size: 64,
-                            color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.primary
+                                : AppColors.primary,
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -92,7 +106,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface
+                                  : AppColors.onSurface,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -100,7 +116,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             'Create demo employee accounts for testing the employee management system',
                             style: TextStyle(
                               fontSize: 16,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7),
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface.withOpacity(0.7)
+                                  : AppColors.onSurface.withOpacity(0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -116,7 +134,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.onBackground
+                            : AppColors.onBackground,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -177,7 +197,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                         child: Text(
                           _statusMessage!,
                           style: TextStyle(
-                            color: _setupComplete ? Colors.green.shade700 : null,
+                            color:
+                                _setupComplete ? Colors.green.shade700 : null,
                           ),
                         ),
                       ),
@@ -194,13 +215,20 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.play_arrow),
-                        label: Text(_isLoading ? 'Setting up...' : 'Setup Demo Employees'),
+                        label: Text(_isLoading
+                            ? 'Setting up...'
+                            : 'Setup Demo Employees'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                          foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                          backgroundColor: themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
+                          foregroundColor: themeProvider.isDarkMode
+                              ? DarkAppColors.onPrimary
+                              : AppColors.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -221,9 +249,13 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                           label: const Text('Cleanup Demo Employees'),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(
-                              color: themeProvider.isDarkMode ? DarkAppColors.error : AppColors.error,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.error
+                                  : AppColors.error,
                             ),
-                            foregroundColor: themeProvider.isDarkMode ? DarkAppColors.error : AppColors.error,
+                            foregroundColor: themeProvider.isDarkMode
+                                ? DarkAppColors.error
+                                : AppColors.error,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -239,17 +271,23 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.onBackground
+                            : AppColors.onBackground,
                       ),
                     ),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.surface
+                            : AppColors.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.3) : AppColors.onSurface.withOpacity(0.3),
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface.withOpacity(0.3)
+                              : AppColors.onSurface.withOpacity(0.3),
                         ),
                       ),
                       child: Column(
@@ -257,7 +295,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                           Icon(
                             Icons.shopping_cart,
                             size: 48,
-                            color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.primary
+                                : AppColors.primary,
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -265,7 +305,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface
+                                  : AppColors.onSurface,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -274,7 +316,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             'Set up realistic customer profiles, orders, and work assignments for testing',
                             style: TextStyle(
                               fontSize: 14,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7),
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface.withOpacity(0.7)
+                                  : AppColors.onSurface.withOpacity(0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -286,8 +330,12 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                               icon: const Icon(Icons.add_shopping_cart),
                               label: const Text('Setup Demo Orders'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                                foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                                backgroundColor: themeProvider.isDarkMode
+                                    ? DarkAppColors.primary
+                                    : AppColors.primary,
+                                foregroundColor: themeProvider.isDarkMode
+                                    ? DarkAppColors.onPrimary
+                                    : AppColors.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -305,10 +353,14 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.surface
+                            : AppColors.surface,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.3) : AppColors.onSurface.withOpacity(0.3),
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface.withOpacity(0.3)
+                              : AppColors.onSurface.withOpacity(0.3),
                         ),
                       ),
                       child: Column(
@@ -319,7 +371,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface
+                                  : AppColors.onSurface,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -331,7 +385,9 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             '5. Use password: password123 for all accounts',
                             style: TextStyle(
                               fontSize: 14,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7),
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface.withOpacity(0.7)
+                                  : AppColors.onSurface.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -347,14 +403,19 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
     );
   }
 
-  Widget _buildDemoAccountCard(String role, String email, String description, IconData icon, ThemeProvider themeProvider) {
+  Widget _buildDemoAccountCard(String role, String email, String description,
+      IconData icon, ThemeProvider themeProvider) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.3) : AppColors.onSurface.withOpacity(0.3),
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface.withOpacity(0.3)
+              : AppColors.onSurface.withOpacity(0.3),
         ),
       ),
       child: Row(
@@ -362,12 +423,16 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: themeProvider.isDarkMode ? DarkAppColors.primary.withOpacity(0.1) : AppColors.primary.withOpacity(0.1),
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.primary.withOpacity(0.1)
+                  : AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               icon,
-              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.primary
+                  : AppColors.primary,
             ),
           ),
           const SizedBox(width: 16),
@@ -380,21 +445,27 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                 ),
                 Text(
                   email,
                   style: TextStyle(
                     fontSize: 14,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.7) : AppColors.onSurface.withOpacity(0.7),
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface.withOpacity(0.7)
+                        : AppColors.onSurface.withOpacity(0.7),
                   ),
                 ),
                 Text(
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface.withOpacity(0.6) : AppColors.onSurface.withOpacity(0.6),
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface.withOpacity(0.6)
+                        : AppColors.onSurface.withOpacity(0.6),
                   ),
                 ),
               ],
@@ -430,12 +501,14 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
       // For this demo setup, we need to provide providers
       // Since we don't have context in this method, we'll note that orders setup
       // can be done separately or integrated in the main app
-      print('Note: Demo orders can be set up using SetupDemoOrders with ProductProvider and OrderProvider');
+      print(
+          'Note: Demo orders can be set up using SetupDemoOrders with ProductProvider and OrderProvider');
 
       setState(() {
         _isLoading = false;
         _setupComplete = true;
-        _statusMessage = '✅ Demo setup complete!\n\nEmployees, work assignments, and notes on orders setup.\nYou can now login using the demo employee accounts.\n\nTo setup demo orders, use the order setup functionality separately.';
+        _statusMessage =
+            '✅ Demo setup complete!\n\nEmployees, work assignments, and notes on orders setup.\nYou can now login using the demo employee accounts.\n\nTo setup demo orders, use the order setup functionality separately.';
       });
     } catch (e) {
       setState(() {
@@ -479,7 +552,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
 
     try {
       // Create instance of providers if needed, but use context
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
 
       await _demoOrdersSetup.initializeDemoOrdersIfNeeded(
@@ -489,7 +563,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
 
       setState(() {
         _isLoading = false;
-        _statusMessage = '✅ Demo orders setup complete!\nCustomers and orders have been created.';
+        _statusMessage =
+            '✅ Demo orders setup complete!\nCustomers and orders have been created.';
       });
     } catch (e) {
       setState(() {

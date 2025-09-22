@@ -3,7 +3,6 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/service.dart' as svc;
@@ -138,7 +137,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                 _buildTextField(
                   controller: _basePriceController,
                   label: 'Base Price (USD)',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter base price';
@@ -174,7 +174,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                 SwitchListTile(
                   title: const Text('Requires Measurement'),
                   value: _requiresMeasurement,
-                  onChanged: (value) => setState(() => _requiresMeasurement = value),
+                  onChanged: (value) =>
+                      setState(() => _requiresMeasurement = value),
                   tileColor: Theme.of(context).cardColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -184,7 +185,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                 SwitchListTile(
                   title: const Text('Requires Fitting'),
                   value: _requiresFitting,
-                  onChanged: (value) => setState(() => _requiresFitting = value),
+                  onChanged: (value) =>
+                      setState(() => _requiresFitting = value),
                   tileColor: Theme.of(context).cardColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -209,7 +211,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                   title: 'Service Features',
                   items: _features,
                   controller: _featuresController,
-                  hintText: 'Enter a feature (e.g., Professional draping technique)',
+                  hintText:
+                      'Enter a feature (e.g., Professional draping technique)',
                 ),
 
                 const SizedBox(height: 32),
@@ -220,14 +223,16 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                   title: 'Requirements',
                   items: _requirements,
                   controller: _requirementsController,
-                  hintText: 'Enter a requirement (e.g., Clean saree in good condition)',
+                  hintText:
+                      'Enter a requirement (e.g., Clean saree in good condition)',
                 ),
                 const SizedBox(height: 16),
                 _buildDynamicListSection(
                   title: 'Preparation Tips',
                   items: _preparationTips,
                   controller: _preparationTipsController,
-                  hintText: 'Enter a preparation tip (e.g., Dry clean saree before service)',
+                  hintText:
+                      'Enter a preparation tip (e.g., Dry clean saree before service)',
                 ),
 
                 const SizedBox(height: 32),
@@ -276,8 +281,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
@@ -406,8 +411,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
             Text(
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 12),
 
@@ -474,19 +479,22 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                 Text(
                   'Service Images (${_selectedImages.length + _uploadedImageUrls.length}/10)',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 if (_selectedImages.isNotEmpty || _uploadedImageUrls.isNotEmpty)
                   TextButton(
-                    onPressed: _isUploadingImages ? null : _uploadSelectedImages,
+                    onPressed:
+                        _isUploadingImages ? null : _uploadSelectedImages,
                     child: _isUploadingImages
                         ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_selectedImages.isNotEmpty ? 'Upload Images' : 'Upload Status'),
+                        : Text(_selectedImages.isNotEmpty
+                            ? 'Upload Images'
+                            : 'Upload Status'),
                   ),
               ],
             ),
@@ -498,7 +506,9 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: _selectedImages.length >= 10 ? null : _pickImagesFromGallery,
+                    onPressed: _selectedImages.length >= 10
+                        ? null
+                        : _pickImagesFromGallery,
                     icon: const Icon(Icons.photo_library),
                     label: const Text('Gallery'),
                     style: ElevatedButton.styleFrom(
@@ -510,7 +520,9 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: _selectedImages.length >= 10 ? null : _pickImageFromCamera,
+                    onPressed: _selectedImages.length >= 10
+                        ? null
+                        : _pickImageFromCamera,
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Camera'),
                     style: ElevatedButton.styleFrom(
@@ -552,7 +564,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                     ),
                     IconButton(
                       onPressed: () => setState(() => _uploadError = null),
-                      icon: const Icon(Icons.close, size: 16, color: Colors.red),
+                      icon:
+                          const Icon(Icons.close, size: 16, color: Colors.red),
                     ),
                   ],
                 ),
@@ -573,7 +586,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                   scrollDirection: Axis.horizontal,
                   itemCount: _selectedImages.length,
                   itemBuilder: (context, index) {
-                    return _buildImageThumbnail(_selectedImages[index], index, false);
+                    return _buildImageThumbnail(
+                        _selectedImages[index], index, false);
                   },
                 ),
               ),
@@ -593,7 +607,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
                   scrollDirection: Axis.horizontal,
                   itemCount: _uploadedImageUrls.length,
                   itemBuilder: (context, index) {
-                    return _buildUploadedImageThumbnail(_uploadedImageUrls[index], index);
+                    return _buildUploadedImageThumbnail(
+                        _uploadedImageUrls[index], index);
                   },
                 ),
               ),
@@ -756,7 +771,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
         if (_selectedImages.length + images.length > 10) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Maximum 10 images allowed per service')),
+              const SnackBar(
+                  content: Text('Maximum 10 images allowed per service')),
             );
           }
           return;
@@ -791,7 +807,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
         if (_selectedImages.length >= 10) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Maximum 10 images allowed per service')),
+              const SnackBar(
+                  content: Text('Maximum 10 images allowed per service')),
             );
           }
           return;
@@ -820,7 +837,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
   Future<void> _uploadSelectedImages() async {
     if (_selectedImages.isEmpty) return;
 
-    debugPrint('_uploadSelectedImages called with ${_selectedImages.length} images');
+    debugPrint(
+        '_uploadSelectedImages called with ${_selectedImages.length} images');
     final serviceId = 'service_${DateTime.now().millisecondsSinceEpoch}';
     final firebaseStorageService = FirebaseStorageService();
 
@@ -846,7 +864,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
         },
       );
 
-      debugPrint('_uploadSelectedImages: uploaded ${uploadedUrls.length} urls: $uploadedUrls');
+      debugPrint(
+          '_uploadSelectedImages: uploaded ${uploadedUrls.length} urls: $uploadedUrls');
       setState(() {
         _uploadedImageUrls.addAll(uploadedUrls);
         _selectedImages.clear();
@@ -854,7 +873,9 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Successfully uploaded ${uploadedUrls.length} images')),
+          SnackBar(
+              content:
+                  Text('Successfully uploaded ${uploadedUrls.length} images')),
         );
       }
     } catch (e) {
@@ -887,7 +908,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
 
     // Handle image uploads if there are selected images
     if (_selectedImages.isNotEmpty) {
-      debugPrint('_submitForm: handling uploads, ${_selectedImages.length} images');
+      debugPrint(
+          '_submitForm: handling uploads, ${_selectedImages.length} images');
       try {
         await _uploadSelectedImages();
 
@@ -895,7 +917,9 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
         if (_uploadError != null) {
           debugPrint('_submitForm: upload error: $_uploadError');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please upload images before creating the service')),
+            const SnackBar(
+                content:
+                    Text('Please upload images before creating the service')),
           );
           return;
         }
@@ -916,35 +940,37 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
     try {
       debugPrint('_submitForm: creating service object');
       final service = svc.Service(
-          id: 'service_${DateTime.now().millisecondsSinceEpoch}',
-          name: _nameController.text,
-          description: _descriptionController.text,
-          shortDescription: _shortDescriptionController.text,
-          category: _selectedCategory,
-          type: _selectedType,
-          duration: _selectedDuration,
-          complexity: _selectedComplexity,
-          basePrice: double.parse(_basePriceController.text),
-          features: _features,
-          requirements: _requirements,
-          preparationTips: _preparationTips,
-          recommendedFabrics: _recommendedFabrics,
-          isActive: _isActive,
-          requiresMeasurement: _requiresMeasurement,
-          requiresFitting: _requiresFitting,
-          estimatedHours: int.parse(_estimatedHoursController.text),
-          imageUrls: _uploadedImageUrls,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
+        id: 'service_${DateTime.now().millisecondsSinceEpoch}',
+        name: _nameController.text,
+        description: _descriptionController.text,
+        shortDescription: _shortDescriptionController.text,
+        category: _selectedCategory,
+        type: _selectedType,
+        duration: _selectedDuration,
+        complexity: _selectedComplexity,
+        basePrice: double.parse(_basePriceController.text),
+        features: _features,
+        requirements: _requirements,
+        preparationTips: _preparationTips,
+        recommendedFabrics: _recommendedFabrics,
+        isActive: _isActive,
+        requiresMeasurement: _requiresMeasurement,
+        requiresFitting: _requiresFitting,
+        estimatedHours: int.parse(_estimatedHoursController.text),
+        imageUrls: _uploadedImageUrls,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
       debugPrint('_submitForm: calling serviceProvider.createService');
-      final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+      final serviceProvider =
+          Provider.of<ServiceProvider>(context, listen: false);
       final success = await serviceProvider.createService(service);
       debugPrint('_submitForm: createService result: $success');
 
       if (success && mounted) {
-        debugPrint('_submitForm: service created successfully, navigating back');
+        debugPrint(
+            '_submitForm: service created successfully, navigating back');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Service created successfully!')),
         );

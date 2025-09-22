@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/demo_data_service.dart';
-import '../models/product.dart';
-import '../models/order.dart';
-import '../models/customer.dart';
+import '../../models/product_models.dart';
+import '../../models/order.dart';
+import '../../models/customer.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/theme_constants.dart';

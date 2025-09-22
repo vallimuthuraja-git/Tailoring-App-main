@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 extension ColorOpacityExtension on Color {
   /// Creates a color with the specified alpha value using withValues() for precision
   Color withThemeOpacity(double opacity) {
-    assert(opacity >= 0.0 && opacity <= 1.0, 'Opacity must be between 0.0 and 1.0');
+    assert(opacity >= 0.0 && opacity <= 1.0,
+        'Opacity must be between 0.0 and 1.0');
     return withValues(alpha: opacity);
   }
 
@@ -21,16 +22,16 @@ extension ColorOpacityExtension on Color {
   Color get o90 => withThemeOpacity(0.9);
 
   // Semantic opacity levels for common use cases
-  Color get subtle => withThemeOpacity(0.04);      // Very subtle backgrounds
-  Color get muted => withThemeOpacity(0.08);       // Muted backgrounds
-  Color get soft => withThemeOpacity(0.12);        // Soft borders/disabled states
-  Color get medium => withThemeOpacity(0.16);      // Medium emphasis text
-  Color get high => withThemeOpacity(0.24);        // High emphasis elements
-  Color get strong => withThemeOpacity(0.32);      // Strong emphasis elements
-  Color get intense => withThemeOpacity(0.48);     // Intense elements
-  Color get vibrant => withThemeOpacity(0.64);     // Vibrant elements
-  Color get bold => withThemeOpacity(0.80);        // Bold elements
-  Color get vivid => withThemeOpacity(0.96);       // Vivid elements
+  Color get subtle => withThemeOpacity(0.04); // Very subtle backgrounds
+  Color get muted => withThemeOpacity(0.08); // Muted backgrounds
+  Color get soft => withThemeOpacity(0.12); // Soft borders/disabled states
+  Color get medium => withThemeOpacity(0.16); // Medium emphasis text
+  Color get high => withThemeOpacity(0.24); // High emphasis elements
+  Color get strong => withThemeOpacity(0.32); // Strong emphasis elements
+  Color get intense => withThemeOpacity(0.48); // Intense elements
+  Color get vibrant => withThemeOpacity(0.64); // Vibrant elements
+  Color get bold => withThemeOpacity(0.80); // Bold elements
+  Color get vivid => withThemeOpacity(0.96); // Vivid elements
 }
 
 // Theme Opacity Utilities for consistent application across the app
@@ -65,14 +66,20 @@ class ThemeOpacity {
   }
 }
 
-
 class AppColors {
   // Light Theme Colors
   static const Color primary = Color(0xFF6366F1);
   static const Color primaryVariant = Color(0xFF4F46E5);
+  static const Color primaryContainer = Color(0xFFE0E7FF);
+  static const Color onPrimaryContainer = Color(0xFF1E1B4B);
   static const Color secondary = Color(0xFF10B981);
+  static const Color secondaryContainer = Color(0xFFECFDF5);
+  static const Color onSecondaryContainer = Color(0xFF064E3B);
   static const Color background = Color(0xFFFAFAFA);
   static const Color surface = Colors.white;
+  static const Color surfaceContainerHighest = Color(0xFFF8FAFC);
+  static const Color outline = Color(0xFFE2E8F0);
+  static const Color outlineVariant = Color(0xFFCBD5E1);
   static const Color error = Color(0xFFEF4444);
   static const Color onPrimary = Colors.white;
   static const Color onSecondary = Colors.white;
@@ -99,9 +106,16 @@ class DarkAppColors {
   // Dark Theme Colors
   static const Color primary = Color(0xFF818CF8);
   static const Color primaryVariant = Color(0xFF6366F1);
+  static const Color primaryContainer = Color(0xFF3730A3);
+  static const Color onPrimaryContainer = Color(0xFFE0E7FF);
   static const Color secondary = Color(0xFF34D399);
+  static const Color secondaryContainer = Color(0xFF064E3B);
+  static const Color onSecondaryContainer = Color(0xFFECFDF5);
   static const Color background = Color(0xFF0F172A);
   static const Color surface = Color(0xFF1E293B);
+  static const Color surfaceContainerHighest = Color(0xFF0F172A);
+  static const Color outline = Color(0xFF475569);
+  static const Color outlineVariant = Color(0xFF334155);
   static const Color error = Color(0xFFF87171);
   static const Color onPrimary = Color(0xFF0F172A);
   static const Color onSecondary = Color(0xFF0F172A);

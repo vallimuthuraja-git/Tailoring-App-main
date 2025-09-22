@@ -67,10 +67,10 @@ This comprehensive file structure overview documents all components of the AI-En
 ### Main Navigation Screens
 - `lib/screens/home/home_screen.dart` - Main dashboard with role-based navigation
 - `lib/screens/profile/profile_screen.dart` - User profile management
-- `lib/screens/catalog/modern_product_catalog_screen.dart` - Modern product listing interface
-- `lib/screens/catalog/product_catalog_screen.dart` - Legacy product catalog (being phased out)
-- `lib/screens/services/service_catalog_screen.dart` - Service offerings display
-- `lib/screens/cart/cart_screen.dart` - Shopping cart interface
+- `lib/screens/comprehensive_products_screen.dart` - Comprehensive product catalog display
+- `lib/screens/demo_overview_screen.dart` - Demo overview interface
+- `lib/screens/demo_setup_screen.dart` - Demo data setup
+- `lib/screens/wishlist_screen.dart` - Wishlist management
 - `lib/screens/orders/order_history_screen.dart` - Order history and tracking
 
 ### AI & Intelligence Screens
@@ -89,12 +89,19 @@ This comprehensive file structure overview documents all components of the AI-En
 - `lib/screens/employee/employee_edit_screen.dart` - Modify employee details
 - `lib/screens/employee/employee_detail_screen.dart` - Employee profile view
 - `lib/screens/employee/employee_list_screen.dart` - Employee directory
+- `lib/screens/employee/employee_list_simple.dart` - Simple employee list
+- `lib/screens/employee/simple_employee_list_screen.dart` - Alternative employee list
 - `lib/screens/employee/employee_dashboard_screen.dart` - Employee performance dashboard
+- `lib/screens/employee/employee_performance_dashboard.dart` - Performance analytics
 - `lib/screens/employee/employee_analytics_screen.dart` - Analytics and reporting
+- `lib/screens/employee/employee_registration_screen.dart` - Employee registration
+- `lib/screens/employee/work_assignment_screen.dart` - Work assignments
 
 ### Customer Relationship Management
 - `lib/screens/customer/customer_management_screen.dart` - Customer database management
 - `lib/screens/customer/customer_create_screen.dart` - Add new customer profiles
+- `lib/screens/customer/customer_detail_screen.dart` - Customer profile details
+- `lib/screens/customer/customer_analytics_screen.dart` - Customer analytics
 
 ### Order Processing Screens
 - `lib/screens/orders/order_creation_wizard.dart` - Guided order creation process
@@ -102,14 +109,22 @@ This comprehensive file structure overview documents all components of the AI-En
 - `lib/screens/orders/order_management_dashboard.dart` - Administrative order management
 
 ### Product Management Screens
+- `lib/screens/catalog/product_detail_screen.dart` - Product details view
 - `lib/screens/catalog/product_edit_screen.dart` - Product creation and editing
+- `lib/screens/services/service_catalog_screen.dart` - Service catalog
 - `lib/screens/services/service_create_screen.dart` - Service definition
 - `lib/screens/services/service_detail_screen.dart` - Service information display
+- `lib/screens/services/service_edit_screen.dart` - Service editing
+- `lib/screens/services/service_list_screen.dart` - Service list
+- `lib/screens/services/customer_service_detail_screen.dart` - Customer service details
+- `lib/screens/services/service_booking_wizard.dart` - Service booking wizard
 
 ### Profile & Settings Screens
+- `lib/screens/profile/profile_screen.dart` - User profile overview
 - `lib/screens/profile/personal_information_screen.dart` - Personal data management
 - `lib/screens/profile/change_password_screen.dart` - Password modification
 - `lib/screens/profile/measurements_screen.dart` - Body measurements management
+- `lib/screens/profile/measurements_3d_screen.dart` - 3D measurements
 - `lib/screens/profile/address_book_screen.dart` - Address management system
 
 ### Advanced Features Screens
@@ -118,10 +133,19 @@ This comprehensive file structure overview documents all components of the AI-En
 - `lib/screens/database/collection_list_screen.dart` - Firebase collection management
 - `lib/screens/database/collection_detail_screen.dart` - Collection content viewer
 - `lib/screens/database/document_edit_screen.dart` - Document editing interface
+- `lib/screens/database/bulk_operations_screen.dart` - Bulk data operations
+- `lib/screens/database/database_statistics_screen.dart` - Database performance metrics
 - `lib/screens/dashboard/analytics_dashboard_screen.dart` - Business analytics and insights
+- `lib/screens/avatar/avatar_customization_screen.dart` - Avatar customization
+- `lib/screens/avatar/avatar_demo_screen.dart` - Avatar demo
+- `lib/screens/cart/cart_screen.dart` - Shopping cart
+- `lib/screens/cart/checkout_screen.dart` - Checkout process
 
 ### Administrative & Utility Screens
 - `lib/screens/demo_setup_screen.dart` - Demo data initialization
+- `lib/screens/demo_overview_screen.dart` - Demo overview
+- `lib/screens/product_screens.dart` - Product screens collection
+- `lib/screens/ai/ai_assistance_screen.dart` - AI assistance interface
 - `lib/screens/database/bulk_operations_screen.dart` - Bulk data operations
 - `lib/screens/database/database_statistics_screen.dart` - Database performance metrics
 

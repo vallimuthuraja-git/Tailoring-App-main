@@ -1,7 +1,5 @@
 // User Role and Permission System for Scalable Tailoring Services
 
-
-
 /// Simplified user roles in the tailoring business
 enum UserRole {
   /// Shop Owner/Admin - Full access to everything including user management
@@ -109,7 +107,6 @@ class RolePermissions {
       Permission.systemSettings,
       Permission.businessConfig,
     },
-
     UserRole.employee: {
       // Employee permissions focused on their work
       Permission.readOrder,
@@ -118,7 +115,6 @@ class RolePermissions {
       Permission.updateWorkAssignment,
       Permission.viewReports,
     },
-
     UserRole.customer: {
       // Customer permissions focused on placing and managing their orders
       Permission.createOrder,
@@ -153,9 +149,9 @@ class RolePermissions {
         return 5;
       case UserRole.customer:
         return 1;
-      default:
-        return 0;
     }
+    // This should never be reached since we've covered all enum values
+    return 0;
   }
 
   /// Check if one role can access resources of another role

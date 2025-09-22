@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../models/customer.dart';
 import '../models/order.dart';
 import '../services/firebase_service.dart';
@@ -24,7 +23,8 @@ class CustomerProvider with ChangeNotifier {
 
   double get averageOrderValue {
     if (_customers.isEmpty) return 0.0;
-    double totalRevenue = _customers.fold(0.0, (sum, customer) => sum + customer.totalSpent);
+    double totalRevenue =
+        _customers.fold(0.0, (sum, customer) => sum + customer.totalSpent);
     return totalRevenue / _customers.length;
   }
 
@@ -32,7 +32,9 @@ class CustomerProvider with ChangeNotifier {
     final categories = <String, int>{};
     for (final customer in _customers) {
       // This would be based on customer preferences or order history
-      final category = customer.preferences.isNotEmpty ? customer.preferences.first : 'General';
+      final category = customer.preferences.isNotEmpty
+          ? customer.preferences.first
+          : 'General';
       categories[category] = (categories[category] ?? 0) + 1;
     }
     return categories;
@@ -45,7 +47,8 @@ class CustomerProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final docSnapshot = await _firebaseService.getDocument('customers', customerId);
+      final docSnapshot =
+          await _firebaseService.getDocument('customers', customerId);
       if (docSnapshot.exists) {
         final data = docSnapshot.data() as Map<String, dynamic>;
         data['id'] = docSnapshot.id;
@@ -62,29 +65,29 @@ class CustomerProvider with ChangeNotifier {
     }
   }
 
- // Load all customers (for shop owners)
- Future<void> loadAllCustomers() async {
-   _isLoading = true;
-   _errorMessage = null;
-   notifyListeners();
+  // Load all customers (for shop owners)
+  Future<void> loadAllCustomers() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
 
-   try {
-     final querySnapshot = await _firebaseService.getCollection('customers');
-     _customers = querySnapshot.docs.map((doc) {
-       final data = doc.data() as Map<String, dynamic>;
-       data['id'] = doc.id;
-       return Customer.fromJson(data);
-     }).toList();
+    try {
+      final querySnapshot = await _firebaseService.getCollection('customers');
+      _customers = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        return Customer.fromJson(data);
+      }).toList();
 
-     _isLoading = false;
-     notifyListeners();
-   } catch (e) {
-     _isLoading = false;
-     _errorMessage = 'Failed to load customers: $e';
-     notifyListeners();
-     debugPrint('ERROR: Failed to load customers: $e');
-   }
- }
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = 'Failed to load customers: $e';
+      notifyListeners();
+      debugPrint('ERROR: Failed to load customers: $e');
+    }
+  }
 
   // Stream customer profile for real-time updates
   Stream<Customer?> getCustomerProfileStream(String customerId) {
@@ -165,7 +168,8 @@ class CustomerProvider with ChangeNotifier {
       if (measurements != null) updates['measurements'] = measurements;
       if (preferences != null) updates['preferences'] = preferences;
 
-      await _firebaseService.updateDocument('customers', _currentCustomer!.id, updates);
+      await _firebaseService.updateDocument(
+          'customers', _currentCustomer!.id, updates);
 
       // Update local customer object
       _currentCustomer = Customer(
@@ -226,7 +230,9 @@ class CustomerProvider with ChangeNotifier {
 
   // Get customers by preference
   List<Customer> getCustomersByPreference(String preference) {
-    return _customers.where((customer) => customer.preferences.contains(preference)).toList();
+    return _customers
+        .where((customer) => customer.preferences.contains(preference))
+        .toList();
   }
 
   // Search customers
@@ -234,8 +240,8 @@ class CustomerProvider with ChangeNotifier {
     final lowerQuery = query.toLowerCase();
     return _customers.where((customer) {
       return customer.name.toLowerCase().contains(lowerQuery) ||
-             customer.email.toLowerCase().contains(lowerQuery) ||
-             customer.phone.contains(lowerQuery);
+          customer.email.toLowerCase().contains(lowerQuery) ||
+          customer.phone.contains(lowerQuery);
     }).toList();
   }
 
@@ -435,7 +441,8 @@ extension CustomerExtensions on Customer {
 
   bool get isActive {
     // Customer is considered active if updated within last 6 months
-    return updatedAt.isAfter(DateTime.now().subtract(const Duration(days: 180)));
+    return updatedAt
+        .isAfter(DateTime.now().subtract(const Duration(days: 180)));
   }
 
   String get loyaltyTier {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/order.dart';
-import '../models/product.dart';
+import '../models/product_models.dart';
 import '../services/firebase_service.dart';
 
 class OrderProvider with ChangeNotifier {
@@ -14,15 +14,19 @@ class OrderProvider with ChangeNotifier {
   String _searchQuery = '';
 
   // Getters
-  List<Order> get orders => _searchQuery.isEmpty && _selectedStatusFilter == null
-      ? _orders
-      : _filteredOrders;
+  List<Order> get orders =>
+      _searchQuery.isEmpty && _selectedStatusFilter == null
+          ? _orders
+          : _filteredOrders;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  List<Order> get pendingOrders => _orders.where((order) => order.status == OrderStatus.pending).toList();
-  List<Order> get inProgressOrders => _orders.where((order) => order.status == OrderStatus.inProgress).toList();
-  List<Order> get completedOrders => _orders.where((order) => order.status == OrderStatus.completed).toList();
+  List<Order> get pendingOrders =>
+      _orders.where((order) => order.status == OrderStatus.pending).toList();
+  List<Order> get inProgressOrders =>
+      _orders.where((order) => order.status == OrderStatus.inProgress).toList();
+  List<Order> get completedOrders =>
+      _orders.where((order) => order.status == OrderStatus.completed).toList();
 
   // Calculate statistics
   int get totalOrders => _orders.length;
@@ -56,13 +60,15 @@ class OrderProvider with ChangeNotifier {
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((order) {
         return order.id.toLowerCase().contains(_searchQuery) ||
-               order.customerId.toLowerCase().contains(_searchQuery);
+            order.customerId.toLowerCase().contains(_searchQuery);
       }).toList();
     }
 
     // Apply status filter
     if (_selectedStatusFilter != null) {
-      filtered = filtered.where((order) => order.status == _selectedStatusFilter).toList();
+      filtered = filtered
+          .where((order) => order.status == _selectedStatusFilter)
+          .toList();
     }
 
     _filteredOrders = filtered;
@@ -163,26 +169,34 @@ class OrderProvider with ChangeNotifier {
 
     try {
       // Calculate totals
-      double totalAmount = items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+      double totalAmount =
+          items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
 
       // Use provided advance amounts or calculate default (30% advance)
       double orderAdvanceAmount = advanceAmount ?? (totalAmount * 0.3);
-      double orderRemainingAmount = remainingAmount ?? (totalAmount - orderAdvanceAmount);
+      double orderRemainingAmount =
+          remainingAmount ?? (totalAmount - orderAdvanceAmount);
 
       // Handle scheduling data from measurements if available
-      String? finalPreferredDate = preferredDate ?? measurements['preferred_date'];
-      String? finalPreferredTimeSlot = preferredTimeSlot ?? measurements['preferred_time_slot'];
-      String? finalPaymentMethod = paymentMethod ?? measurements['payment_method'];
+      String? finalPreferredDate =
+          preferredDate ?? measurements['preferred_date'];
+      String? finalPreferredTimeSlot =
+          preferredTimeSlot ?? measurements['preferred_time_slot'];
+      String? finalPaymentMethod =
+          paymentMethod ?? measurements['payment_method'];
 
       // Store scheduling data in measurements if not already present
       final enhancedMeasurements = Map<String, dynamic>.from(measurements);
-      if (finalPreferredDate != null && !enhancedMeasurements.containsKey('preferred_date')) {
+      if (finalPreferredDate != null &&
+          !enhancedMeasurements.containsKey('preferred_date')) {
         enhancedMeasurements['preferred_date'] = finalPreferredDate;
       }
-      if (finalPreferredTimeSlot != null && !enhancedMeasurements.containsKey('preferred_time_slot')) {
+      if (finalPreferredTimeSlot != null &&
+          !enhancedMeasurements.containsKey('preferred_time_slot')) {
         enhancedMeasurements['preferred_time_slot'] = finalPreferredTimeSlot;
       }
-      if (finalPaymentMethod != null && !enhancedMeasurements.containsKey('payment_method')) {
+      if (finalPaymentMethod != null &&
+          !enhancedMeasurements.containsKey('payment_method')) {
         enhancedMeasurements['payment_method'] = finalPaymentMethod;
       }
 
@@ -196,7 +210,8 @@ class OrderProvider with ChangeNotifier {
         advanceAmount: orderAdvanceAmount,
         remainingAmount: orderRemainingAmount,
         orderDate: DateTime.now(),
-        deliveryDate: DateTime.now().add(const Duration(days: 7)), // Default 7 days
+        deliveryDate:
+            DateTime.now().add(const Duration(days: 7)), // Default 7 days
         specialInstructions: specialInstructions,
         measurements: enhancedMeasurements,
         orderImages: orderImages,
@@ -249,7 +264,8 @@ class OrderProvider with ChangeNotifier {
   }
 
   // Update payment status
-  Future<bool> updatePaymentStatus(String orderId, PaymentStatus newStatus, {double? paidAmount}) async {
+  Future<bool> updatePaymentStatus(String orderId, PaymentStatus newStatus,
+      {double? paidAmount}) async {
     _isLoading = true;
     notifyListeners();
 
@@ -331,9 +347,13 @@ class OrderProvider with ChangeNotifier {
     final thisMonth = DateTime(now.year, now.month, 1);
     final lastMonth = DateTime(now.year, now.month - 1, 1);
 
-    final thisMonthOrders = _orders.where((order) => order.createdAt.isAfter(thisMonth)).toList();
-    final lastMonthOrders = _orders.where((order) =>
-        order.createdAt.isAfter(lastMonth) && order.createdAt.isBefore(thisMonth)).toList();
+    final thisMonthOrders =
+        _orders.where((order) => order.createdAt.isAfter(thisMonth)).toList();
+    final lastMonthOrders = _orders
+        .where((order) =>
+            order.createdAt.isAfter(lastMonth) &&
+            order.createdAt.isBefore(thisMonth))
+        .toList();
 
     return {
       'totalOrders': _orders.length,
@@ -343,8 +363,11 @@ class OrderProvider with ChangeNotifier {
       'completedOrders': completedOrders.length,
       'totalRevenue': totalRevenue,
       'pendingPayments': pendingPayments,
-      'averageOrderValue': _orders.isEmpty ? 0.0 : totalRevenue / _orders.length,
-      'completionRate': _orders.isEmpty ? 0.0 : (completedOrders.length / _orders.length) * 100,
+      'averageOrderValue':
+          _orders.isEmpty ? 0.0 : totalRevenue / _orders.length,
+      'completionRate': _orders.isEmpty
+          ? 0.0
+          : (completedOrders.length / _orders.length) * 100,
     };
   }
 

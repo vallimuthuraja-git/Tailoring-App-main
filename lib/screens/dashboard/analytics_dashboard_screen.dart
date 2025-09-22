@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../../product_data_access.dart';
 import '../../models/customer.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/user_avatar.dart';
@@ -868,7 +869,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
       ProductProvider productProvider) async {
     await orderProvider.loadOrders();
     await customerProvider.loadAllCustomers();
-    await productProvider.loadProducts();
+    productProvider.loadProducts();
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

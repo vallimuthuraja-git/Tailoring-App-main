@@ -2,7 +2,6 @@
 // Handles secure image uploads with progress tracking and error handling
 
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -261,14 +260,18 @@ class FirebaseStorageService {
     for (int i = 0; i < imageFiles.length; i += maxConcurrent) {
       final batch = imageFiles.sublist(
         i,
-        i + maxConcurrent > imageFiles.length ? imageFiles.length : i + maxConcurrent,
+        i + maxConcurrent > imageFiles.length
+            ? imageFiles.length
+            : i + maxConcurrent,
       );
 
-      final batchFutures = batch.map((imageFile) => uploadImage(
-        imageFile,
-        folder: folder,
-        serviceId: serviceId,
-      )).toList();
+      final batchFutures = batch
+          .map((imageFile) => uploadImage(
+                imageFile,
+                folder: folder,
+                serviceId: serviceId,
+              ))
+          .toList();
 
       final batchResults = await Future.wait(batchFutures);
 

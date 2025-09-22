@@ -3,14 +3,10 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/cart_provider.dart';
-import '../../models/user_role.dart';
+import '../../providers/global_navigation_provider.dart';
 import '../../utils/theme_constants.dart';
 import '../../widgets/user_avatar.dart';
-import '../catalog/modern_product_catalog_screen.dart';
-import '../services/service_catalog_screen.dart';
-import '../orders/order_history_screen.dart';
 import '../orders/order_management_dashboard.dart';
-import '../profile/profile_screen.dart';
 import '../demo_setup_screen.dart';
 import '../employee/employee_management_home.dart';
 import '../database/database_management_home.dart';
@@ -22,146 +18,30 @@ import '../demo_overview_screen.dart';
 import '../employee/simple_employee_list_screen.dart';
 import '../dashboard/analytics_dashboard_screen.dart';
 import '../../utils/responsive_utils.dart';
+import '../../widgets/global_bottom_navigation_bar.dart';
 
 // Using beautiful theme-level opacity extensions
 // No more deprecated withValues(alpha:) calls - everything uses withValues() internally
 // ignore_for_file: deprecated_member_use
 
-class HomeScreen extends StatefulWidget {
+/// Navigation Container Screen that manages global navigation
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  int _selectedIndex = 0;
-
-  late List<Widget> _screens;
-  late List<BottomNavigationBarItem> _navItems;
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
-    );
-    _setupNavigation();
-    _fadeController.forward();
-  }
-
-  void _setupNavigation() {
-    // Default setup - will be updated when context is available in build
-    _screens = [
-      DashboardTab(
-        onNavigateToProducts: () => setState(() => _selectedIndex = 1),
-        onNavigateToServices: () => setState(() => _selectedIndex = 2),
-        onNavigateToOrders: () => setState(() => _selectedIndex = 3),
-      ),
-      const ModernProductCatalogScreen(),
-      const ServiceCatalogScreen(),
-      const OrderHistoryScreen(),
-      const ProfileScreen(),
-    ];
-    _navItems = const [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.dashboard),
-        label: 'Dashboard',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.shopping_bag),
-        label: 'Products',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.business),
-        label: 'Services',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.receipt_long),
-        label: 'Orders',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.person),
-        label: 'Profile',
-      ),
-    ];
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
-  }
-
-  void _reconfigureForEmployee() {
-    setState(() {
-      _selectedIndex = 0; // Reset to first tab
-      _screens = [
-        DashboardTab(
-          onNavigateToOrders: () => setState(() => _selectedIndex = 1),
-        ),
-        const OrderHistoryScreen(),
-        const ProfileScreen(),
-      ];
-      _navItems = const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
-          label: 'Dashboard',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.receipt_long),
-          label: 'Orders',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ];
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Consumer2<AuthProvider, ThemeProvider>(
-      builder: (context, authProvider, themeProvider, child) {
-        // Check user role and configure navigation accordingly
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (authProvider.userRole == UserRole.employee &&
-              _screens.length != 3) {
-            _reconfigureForEmployee();
-          } else if (authProvider.userRole != UserRole.employee &&
-              _screens.length != 5) {
-            _setupNavigation();
-          }
-        });
+    return Consumer<GlobalNavigationProvider>(
+      builder: (context, navProvider, child) {
+        // Initialize navigation if needed
+        if (!navProvider.isInitialized) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            navProvider.initializeNavigation(context);
+          });
+        }
 
         return Scaffold(
-          body: _screens[_selectedIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: themeProvider.isDarkMode
-                ? DarkAppColors.surface
-                : AppColors.surface,
-            selectedItemColor: themeProvider.isDarkMode
-                ? DarkAppColors.primary
-                : AppColors.primary,
-            unselectedItemColor: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withValues(alpha: 0.6)
-                : AppColors.onSurface.withValues(alpha: 0.6),
-            items: _navItems,
-          ),
+          body: navProvider.currentScreen,
+          bottomNavigationBar: const GlobalBottomNavigationBar(),
         );
       },
     );
@@ -220,6 +100,7 @@ class DashboardTab extends StatelessWidget {
                               ? DarkAppColors.onSurface
                               : AppColors.onSurface,
                         ),
+                        tooltip: 'Cart',
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -260,13 +141,27 @@ class DashboardTab extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(
+                  Icons.logout,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
+                ),
+                tooltip: 'Logout',
+                onPressed: () => _showLogoutDialog(context),
+              ),
+              IconButton(
+                icon: Icon(
                   Icons.notifications,
                   color: themeProvider.isDarkMode
                       ? DarkAppColors.onSurface
                       : AppColors.onSurface,
                 ),
+                tooltip: 'Notifications',
                 onPressed: () {
                   // Navigate to notifications
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Notifications coming soon!')),
+                  );
                 },
               ),
               IconButton(
@@ -276,6 +171,7 @@ class DashboardTab extends StatelessWidget {
                       ? DarkAppColors.onSurface
                       : AppColors.onSurface,
                 ),
+                tooltip: 'AI Assistant',
                 onPressed: () {
                   // Open AI chatbot
                   _showChatbot(context);
@@ -472,6 +368,37 @@ class DashboardTab extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => const DemoOverviewScreen(),
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close dialog
+                final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                await authProvider.signOut();
+                // The AuthWrapper will handle navigation to login screen
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
     );
   }
 

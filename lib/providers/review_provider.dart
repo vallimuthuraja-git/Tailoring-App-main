@@ -3,15 +3,14 @@
 
 import 'package:flutter/material.dart';
 import '../models/review.dart';
-import '../models/service.dart';
 import '../services/firebase_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReviewProvider with ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
 
-  Map<String, List<Review>> _reviews = {}; // serviceId -> reviews
-  Map<String, ReviewSummary> _reviewSummaries = {}; // serviceId -> summary
+  final Map<String, List<Review>> _reviews = {}; // serviceId -> reviews
+  final Map<String, ReviewSummary> _reviewSummaries =
+      {}; // serviceId -> summary
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -48,7 +47,8 @@ class ReviewProvider with ChangeNotifier {
       _reviews[serviceId] = serviceReviews;
 
       // Calculate and cache summary
-      _reviewSummaries[serviceId] = ReviewSummary.fromReviews(serviceId, serviceReviews);
+      _reviewSummaries[serviceId] =
+          ReviewSummary.fromReviews(serviceId, serviceReviews);
 
       _isLoading = false;
       notifyListeners();
@@ -96,7 +96,8 @@ class ReviewProvider with ChangeNotifier {
   }
 
   // Update existing review
-  Future<bool> updateReview(String reviewId, Map<String, dynamic> updates) async {
+  Future<bool> updateReview(
+      String reviewId, Map<String, dynamic> updates) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -106,8 +107,8 @@ class ReviewProvider with ChangeNotifier {
 
       // Find and update local review
       for (final serviceId in _reviews.keys) {
-        final reviewIndex = _reviews[serviceId]!
-            .indexWhere((review) => review.id == reviewId);
+        final reviewIndex =
+            _reviews[serviceId]!.indexWhere((review) => review.id == reviewId);
         if (reviewIndex != -1) {
           final oldReview = _reviews[serviceId]![reviewIndex];
           final updatedReview = oldReview.copyWith(
@@ -120,8 +121,8 @@ class ReviewProvider with ChangeNotifier {
           _reviews[serviceId]![reviewIndex] = updatedReview;
 
           // Recalculate summary
-          _reviewSummaries[serviceId] = ReviewSummary.fromReviews(
-              serviceId, _reviews[serviceId]!);
+          _reviewSummaries[serviceId] =
+              ReviewSummary.fromReviews(serviceId, _reviews[serviceId]!);
           break;
         }
       }
@@ -151,8 +152,8 @@ class ReviewProvider with ChangeNotifier {
 
       // Recalculate summary
       if (_reviews[serviceId] != null) {
-        _reviewSummaries[serviceId] = ReviewSummary.fromReviews(
-            serviceId, _reviews[serviceId]!);
+        _reviewSummaries[serviceId] =
+            ReviewSummary.fromReviews(serviceId, _reviews[serviceId]!);
       }
 
       _isLoading = false;
@@ -254,11 +255,13 @@ class ReviewProvider with ChangeNotifier {
     }
 
     final totalReviews = allReviews.length;
-    final averageRating = allReviews.map((r) => r.rating).reduce((a, b) => a + b) / totalReviews;
+    final averageRating =
+        allReviews.map((r) => r.rating).reduce((a, b) => a + b) / totalReviews;
 
     final ratingDistribution = <int, int>{};
     for (int i = 1; i <= 5; i++) {
-      ratingDistribution[i] = allReviews.where((r) => r.rating.round() == i).length;
+      ratingDistribution[i] =
+          allReviews.where((r) => r.rating.round() == i).length;
     }
 
     final recentReviews = allReviews.where((r) => r.isRecent).length;
@@ -271,8 +274,7 @@ class ReviewProvider with ChangeNotifier {
       }
     }
 
-    final topServices = serviceRatings.entries
-        .toList()
+    final topServices = serviceRatings.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value))
       ..take(5);
 

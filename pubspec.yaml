@@ -34,6 +34,10 @@ dependencies:
   connectivity_plus: ^7.0.0
   shimmer: ^3.0.0
 
+  # State Management
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.7
+
   # Logging
   logging: ^1.2.0
 
@@ -48,6 +52,15 @@ shimmer: ^3.0.0
 
 # Carousel for banners
 carousel_slider: ^5.0.0
+
+# Image caching for performance
+cached_network_image: ^3.4.1
+
+# Staggered grid for Pinterest-like layouts
+flutter_staggered_grid_view: ^0.6.2
+
+# Sharing functionality
+share_plus: ^10.1.0
 
 # Platform-specific packages (updated versions)
 characters: ^1.4.1

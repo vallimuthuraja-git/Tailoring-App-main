@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item.dart';
-import '../models/product.dart';
+import '../models/product_models.dart';
 import '../models/order.dart';
 import '../providers/order_provider.dart';
 import 'dart:convert';
@@ -19,7 +19,8 @@ class CartProvider with ChangeNotifier {
   // Calculated properties
   int get itemCount => _items.length;
   int get totalQuantity => _items.fold(0, (sum, item) => sum + item.quantity);
-  double get totalAmount => _items.fold(0.0, (sum, item) => sum + item.totalPrice);
+  double get totalAmount =>
+      _items.fold(0.0, (sum, item) => sum + item.totalPrice);
 
   // Check if product is in cart
   bool isInCart(String productId) {
@@ -36,13 +37,17 @@ class CartProvider with ChangeNotifier {
   }
 
   // Add product to cart
-  Future<bool> addToCart(Product product, {int quantity = 1, Map<String, dynamic> customizations = const {}, String? notes}) async {
+  Future<bool> addToCart(Product product,
+      {int quantity = 1,
+      Map<String, dynamic> customizations = const {},
+      String? notes}) async {
     try {
       _isLoading = true;
       _errorMessage = null;
       notifyListeners();
 
-      final existingItemIndex = _items.indexWhere((item) => item.product.id == product.id);
+      final existingItemIndex =
+          _items.indexWhere((item) => item.product.id == product.id);
 
       if (existingItemIndex >= 0) {
         // Update existing item quantity
@@ -236,7 +241,9 @@ class CartProvider with ChangeNotifier {
           'productName': item.product.name,
           'productBasePrice': item.product.basePrice,
           'productCategory': item.product.category.index,
-          'productImageUrl': item.product.imageUrls.isNotEmpty ? item.product.imageUrls.first : '',
+          'productImageUrl': item.product.imageUrls.isNotEmpty
+              ? item.product.imageUrls.first
+              : '',
           'quantity': item.quantity,
           'customizations': item.customizations,
           'notes': item.notes,

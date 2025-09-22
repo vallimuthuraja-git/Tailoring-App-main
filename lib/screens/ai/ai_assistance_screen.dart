@@ -7,6 +7,7 @@ import '../../services/chatbot_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../../product_data_access.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
 
@@ -21,7 +22,8 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
-  final String _conversationId = DateTime.now().millisecondsSinceEpoch.toString();
+  final String _conversationId =
+      DateTime.now().millisecondsSinceEpoch.toString();
 
   late ChatbotService _chatbotService;
   bool _isTyping = false;
@@ -98,7 +100,8 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
 
     final messages = await _chatbotService.processUserMessage(
       conversationId: _conversationId,
@@ -143,13 +146,19 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
           appBar: AppBar(
             title: const Text('AI Assistant'),
             toolbarHeight: kToolbarHeight + 5,
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             elevation: 0,
             iconTheme: IconThemeData(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             titleTextStyle: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
@@ -157,9 +166,12 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
               IconButton(
                 icon: Icon(
                   Icons.info_outline,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
-                onPressed: () => _showCapabilitiesDialog(context, _chatbotService),
+                onPressed: () =>
+                    _showCapabilitiesDialog(context, _chatbotService),
               ),
             ],
           ),
@@ -221,11 +233,13 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                             decoration: BoxDecoration(
                               color: themeProvider.isGlassyMode
                                   ? (themeProvider.isDarkMode
-                                          ? Colors.white.withValues(alpha: 0.1)
-                                          : Colors.white.withValues(alpha: 0.2))
-                                      : (themeProvider.isDarkMode
-                                          ? DarkAppColors.surface.withValues(alpha: 0.95)
-                                          : AppColors.surface.withValues(alpha: 0.95)),
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : Colors.white.withValues(alpha: 0.2))
+                                  : (themeProvider.isDarkMode
+                                      ? DarkAppColors.surface
+                                          .withValues(alpha: 0.95)
+                                      : AppColors.surface
+                                          .withValues(alpha: 0.95)),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: themeProvider.isDarkMode
@@ -259,10 +273,26 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
 
   Widget _buildQuickActions(BuildContext context, ThemeProvider themeProvider) {
     final quickActions = [
-      {'icon': Icons.shopping_bag, 'label': 'Browse Products', 'action': 'show me your products'},
-      {'icon': Icons.receipt, 'label': 'Order Status', 'action': 'check my order status'},
-      {'icon': Icons.schedule, 'label': 'Book Appointment', 'action': 'schedule an appointment'},
-      {'icon': Icons.straighten, 'label': 'Measurements', 'action': 'help with measurements'},
+      {
+        'icon': Icons.shopping_bag,
+        'label': 'Browse Products',
+        'action': 'show me your products'
+      },
+      {
+        'icon': Icons.receipt,
+        'label': 'Order Status',
+        'action': 'check my order status'
+      },
+      {
+        'icon': Icons.schedule,
+        'label': 'Book Appointment',
+        'action': 'schedule an appointment'
+      },
+      {
+        'icon': Icons.straighten,
+        'label': 'Measurements',
+        'action': 'help with measurements'
+      },
     ];
 
     return Container(
@@ -286,7 +316,8 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -323,7 +354,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
             child: Icon(
               Icons.smart_toy,
               size: 48,
-              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.primary
+                  : AppColors.primary,
             ),
           ),
           const SizedBox(height: 16),
@@ -332,7 +365,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
           ),
           const SizedBox(height: 8),
@@ -364,11 +399,13 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message, bool isUser, ThemeProvider themeProvider) {
+  Widget _buildMessageBubble(
+      ChatMessage message, bool isUser, ThemeProvider themeProvider) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isUser) ...[
             Container(
@@ -376,7 +413,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
               height: 32,
               margin: const EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
-                color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -391,7 +430,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: isUser
-                    ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                    ? (themeProvider.isDarkMode
+                        ? DarkAppColors.primary
+                        : AppColors.primary)
                     : (themeProvider.isDarkMode
                         ? DarkAppColors.surface.withValues(alpha: 0.8)
                         : Colors.white),
@@ -417,16 +458,21 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                     style: TextStyle(
                       color: isUser
                           ? Colors.white
-                          : (themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface),
+                          : (themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface
+                              : AppColors.onSurface),
                     ),
                   ),
-                  if (message.metadata != null && message.metadata!['quickReplies'] != null)
+                  if (message.metadata != null &&
+                      message.metadata!['quickReplies'] != null)
                     Container(
                       margin: const EdgeInsets.only(top: 12),
                       child: Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: (message.metadata!['quickReplies'] as List<String>).map((reply) {
+                        children:
+                            (message.metadata!['quickReplies'] as List<String>)
+                                .map((reply) {
                           return ElevatedButton(
                             onPressed: () => _handleQuickReply(reply),
                             style: ElevatedButton.styleFrom(
@@ -439,7 +485,8 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
                             ),
                             child: Text(
                               reply,
@@ -468,7 +515,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
             height: 32,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.primary
+                  : AppColors.primary,
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -499,7 +548,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                 Text(
                   'AI is typing',
                   style: TextStyle(
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                     fontSize: 14,
                   ),
                 ),
@@ -513,7 +564,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                         height: 2,
                         margin: const EdgeInsets.only(right: 2),
                         decoration: BoxDecoration(
-                          color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.primary
+                              : AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                       );
@@ -559,7 +612,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
                 ),
               ),
               style: TextStyle(
-                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.onSurface
+                    : AppColors.onSurface,
               ),
               maxLines: null,
               textInputAction: TextInputAction.send,
@@ -569,7 +624,9 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
           IconButton(
             icon: Icon(
               Icons.send,
-              color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.primary
+                  : AppColors.primary,
             ),
             onPressed: () => _sendMessage(_messageController.text),
           ),
@@ -578,7 +635,8 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
     );
   }
 
-  void _showCapabilitiesDialog(BuildContext context, ChatbotService chatbotService) {
+  void _showCapabilitiesDialog(
+      BuildContext context, ChatbotService chatbotService) {
     final capabilities = chatbotService.getChatbotCapabilities();
 
     showDialog(

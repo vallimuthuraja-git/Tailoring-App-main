@@ -1,6 +1,7 @@
 import '../models/chat.dart';
 import '../providers/order_provider.dart';
 import '../providers/product_provider.dart';
+import '../product_data_access.dart';
 
 class ChatbotService {
   final List<ChatbotIntent> _intents = tailoringChatbotIntents;
@@ -43,7 +44,8 @@ class ChatbotService {
   }
 
   // Generate response based on intent
-  BotResponse generateResponse(String message, {
+  BotResponse generateResponse(
+    String message, {
     String? userId,
     String? userName,
     OrderProvider? orderProvider,
@@ -54,19 +56,26 @@ class ChatbotService {
 
     switch (intent) {
       case 'greeting':
-        final greetingIntent = _intents.firstWhere((i) => i.intent == 'greeting');
+        final greetingIntent =
+            _intents.firstWhere((i) => i.intent == 'greeting');
         return BotResponse(
           message: userName != null
               ? 'Hello $userName! 👋 Welcome to our tailoring shop. How can I help you today?'
               : greetingIntent.response,
           type: greetingIntent.responseType,
           metadata: greetingIntent.metadata,
-          quickReplies: ['Browse Products', 'Check Order Status', 'Get Pricing Info', 'Book Appointment'],
+          quickReplies: [
+            'Browse Products',
+            'Check Order Status',
+            'Get Pricing Info',
+            'Book Appointment'
+          ],
         );
 
       case 'order_status':
         return BotResponse(
-          message: 'I can help you check your order status. Could you please provide your order number (8 characters)?',
+          message:
+              'I can help you check your order status. Could you please provide your order number (8 characters)?',
           type: MessageType.text,
           metadata: {'action': 'request_order_number'},
           quickReplies: ['I need help with order', 'Check different order'],
@@ -81,11 +90,15 @@ class ChatbotService {
           return BotResponse(
             message: 'Let me check the status of order $orderNumber for you...',
             type: MessageType.orderStatus,
-            metadata: {'orderNumber': orderNumber, 'action': 'check_order_status'},
+            metadata: {
+              'orderNumber': orderNumber,
+              'action': 'check_order_status'
+            },
           );
         }
         return BotResponse(
-          message: 'I couldn\'t identify the order number. Please provide an 8-character order number.',
+          message:
+              'I couldn\'t identify the order number. Please provide an 8-character order number.',
           type: MessageType.text,
         );
 
@@ -100,7 +113,8 @@ class ChatbotService {
 
       case 'appointment':
         return BotResponse(
-          message: 'I\'d be happy to help you schedule an appointment! 📅\n\nOur working hours:\n🕐 Monday - Saturday: 10:00 AM - 8:00 PM\n🕐 Sunday: 11:00 AM - 6:00 PM\n\nPlease let me know your preferred date and time.',
+          message:
+              'I\'d be happy to help you schedule an appointment! 📅\n\nOur working hours:\n🕐 Monday - Saturday: 10:00 AM - 8:00 PM\n🕐 Sunday: 11:00 AM - 6:00 PM\n\nPlease let me know your preferred date and time.',
           type: MessageType.appointment,
           metadata: {'action': 'schedule_appointment'},
           quickReplies: ['Today', 'Tomorrow', 'This Week', 'Next Week'],
@@ -108,10 +122,15 @@ class ChatbotService {
 
       case 'measurements':
         return BotResponse(
-          message: 'Perfect fit starts with accurate measurements! 📏\n\nWe offer:\n\n🏪 Professional measurement service at shop\n📱 Digital measurement guide\n📝 Measurement form for self-measurement\n\nWhich option would you prefer?',
+          message:
+              'Perfect fit starts with accurate measurements! 📏\n\nWe offer:\n\n🏪 Professional measurement service at shop\n📱 Digital measurement guide\n📝 Measurement form for self-measurement\n\nWhich option would you prefer?',
           type: MessageType.text,
           metadata: {'action': 'provide_measurement_help'},
-          quickReplies: ['Professional Service', 'Digital Guide', 'Measurement Form'],
+          quickReplies: [
+            'Professional Service',
+            'Digital Guide',
+            'Measurement Form'
+          ],
         );
 
       case 'help':
@@ -119,11 +138,17 @@ class ChatbotService {
         return BotResponse(
           message: helpIntent.response,
           type: helpIntent.responseType,
-          quickReplies: ['Browse Products', 'Check Order Status', 'Get Pricing', 'Book Appointment'],
+          quickReplies: [
+            'Browse Products',
+            'Check Order Status',
+            'Get Pricing',
+            'Book Appointment'
+          ],
         );
 
       case 'location':
-        final locationIntent = _intents.firstWhere((i) => i.intent == 'location');
+        final locationIntent =
+            _intents.firstWhere((i) => i.intent == 'location');
         return BotResponse(
           message: locationIntent.response,
           type: locationIntent.responseType,
@@ -133,7 +158,8 @@ class ChatbotService {
       default:
         // Try to find the best matching intent
         for (final intentData in _intents) {
-          if (intentData.keywords.any((keyword) => lowerMessage.contains(keyword))) {
+          if (intentData.keywords
+              .any((keyword) => lowerMessage.contains(keyword))) {
             return BotResponse(
               message: intentData.response,
               type: intentData.responseType,
@@ -145,9 +171,15 @@ class ChatbotService {
 
         // If no match found, provide helpful response
         return BotResponse(
-          message: 'I\'m here to help you with your tailoring needs! 🤗\n\nYou can ask me about:\n\n• Product catalog and pricing\n• Order status and tracking\n• Appointment booking\n• Measurement guidance\n• Alteration services\n• Shop location and hours\n\nWhat would you like to know about?',
+          message:
+              'I\'m here to help you with your tailoring needs! 🤗\n\nYou can ask me about:\n\n• Product catalog and pricing\n• Order status and tracking\n• Appointment booking\n• Measurement guidance\n• Alteration services\n• Shop location and hours\n\nWhat would you like to know about?',
           type: MessageType.text,
-          quickReplies: ['Browse Products', 'Check Order Status', 'Get Pricing Info', 'Book Appointment'],
+          quickReplies: [
+            'Browse Products',
+            'Check Order Status',
+            'Get Pricing Info',
+            'Book Appointment'
+          ],
         );
     }
   }
@@ -278,8 +310,30 @@ class ChatbotService {
 
   // Analyze message sentiment (basic implementation)
   String analyzeSentiment(String message) {
-    final positiveWords = ['good', 'great', 'excellent', 'amazing', 'love', 'perfect', 'happy', 'satisfied', 'thank you', 'thanks'];
-    final negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'angry', 'disappointed', 'frustrated', 'problem', 'issue', 'complaint'];
+    final positiveWords = [
+      'good',
+      'great',
+      'excellent',
+      'amazing',
+      'love',
+      'perfect',
+      'happy',
+      'satisfied',
+      'thank you',
+      'thanks'
+    ];
+    final negativeWords = [
+      'bad',
+      'terrible',
+      'awful',
+      'horrible',
+      'angry',
+      'disappointed',
+      'frustrated',
+      'problem',
+      'issue',
+      'complaint'
+    ];
 
     final lowerMessage = message.toLowerCase();
     int positiveScore = 0;

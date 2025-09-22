@@ -9,12 +9,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/employee_provider.dart';
 import 'employee_create_screen.dart';
 import 'employee_detail_screen.dart';
-import 'employee_edit_screen.dart';
 import 'employee_performance_dashboard.dart';
-import 'employee_dashboard_screen.dart';
-import 'work_assignment_screen.dart';
-import 'employee_analytics_screen.dart';
-import 'employee_management_home.dart';
 
 class EmployeeManagementHelper {
   // Use regular instance, not const

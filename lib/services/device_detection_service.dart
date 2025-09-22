@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:device_info_plus/device_info_plus.dart'; // TODO: Re-enable when dependency is resolved
@@ -128,39 +127,18 @@ class DeviceDetectionService {
   // final DeviceInfoPlugin? deviceInfo = DeviceInfoPlugin(); // TODO: Re-enable when dependency is resolved
   final dynamic deviceInfo = null;
 
-  // Web-specific method to detect system theme preference
-  Future<Brightness?> _getWebSystemBrightness() async {
-    if (!kIsWeb) return null;
-
-    try {
-      // Use JavaScript to detect prefers-color-scheme
-      final result = html.window.matchMedia('(prefers-color-scheme: dark)');
-      return result.matches ? Brightness.dark : Brightness.light;
-    } catch (e) {
-      // Fallback to null if detection fails
-      return null;
-    }
+  // Platform-independent method to detect system theme preference
+  Future<Brightness?> _getSystemBrightness() async {
+    // For web and other platforms, rely on MediaQuery brightness
+    // This is handled in getDeviceInfo method using MediaQuery.of(context)
+    return null;
   }
 
-  // Setup web system theme change listener
-  void setupWebThemeListener(Function(Brightness) onThemeChanged) {
-    if (!kIsWeb) return;
-
-    try {
-      final mediaQuery = html.window.matchMedia('(prefers-color-scheme: dark)');
-
-      // Listen for changes to the system theme
-      mediaQuery.addEventListener('change', (html.Event event) {
-        if (event is html.MediaQueryListEvent) {
-          final brightness =
-              event.matches! ? Brightness.dark : Brightness.light;
-          onThemeChanged(brightness);
-        }
-      });
-    } catch (e) {
-      // If setting up listener fails, continue without it
-      debugPrint('Failed to setup web theme listener: $e');
-    }
+  // Setup system theme change listener (simplified for cross-platform)
+  void setupThemeListener(Function(Brightness) onThemeChanged) {
+    // Platform-independent theme detection is handled through MediaQuery
+    // in Flutter, which automatically responds to system theme changes
+    // No additional setup needed as Flutter handles this automatically
   }
 
   Future<DeviceInfo> getDeviceInfo(BuildContext context) async {
@@ -170,8 +148,8 @@ class DeviceDetectionService {
       Brightness brightness = mediaQuery.platformBrightness;
 
       if (kIsWeb) {
-        // Web platform detection with enhanced system theme detection
-        brightness = await _getWebSystemBrightness() ?? brightness;
+        // Web platform detection with system theme detection
+        brightness = await _getSystemBrightness() ?? brightness;
         return DeviceInfo(
           platform: 'web',
           model: 'Web Browser',

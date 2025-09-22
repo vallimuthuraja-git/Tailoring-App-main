@@ -15,20 +15,17 @@ class AppException implements Exception {
 
 /// Network-related errors
 class NetworkError extends AppException {
-  NetworkError(String message, {String? code, dynamic originalError})
-      : super(message, code: code, originalError: originalError);
+  NetworkError(super.message, {super.code, super.originalError});
 }
 
 /// Firebase-related errors
 class FirebaseError extends AppException {
-  FirebaseError(String message, {String? code, dynamic originalError})
-      : super(message, code: code, originalError: originalError);
+  FirebaseError(super.message, {super.code, super.originalError});
 }
 
 /// Validation errors
 class ValidationError extends AppException {
-  ValidationError(String message, {String? code, dynamic originalError})
-      : super(message, code: code, originalError: originalError);
+  ValidationError(super.message, {super.code, super.originalError});
 }
 
 /// Logger instance for error handling

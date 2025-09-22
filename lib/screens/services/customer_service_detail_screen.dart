@@ -206,7 +206,7 @@ class _CustomerServiceDetailScreenState
           );
         } else {
           return DropdownButtonFormField<String>(
-            value: selectedValue?.toString(),
+            initialValue: selectedValue?.toString(),
             items: customization.options
                 .map((option) => DropdownMenuItem<String>(
                       value: option,

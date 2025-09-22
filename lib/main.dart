@@ -2,19 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'services/firebase_service.dart';
 import 'providers/auth_provider.dart';
-import 'providers/product_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/customer_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/product_provider.dart';
 import 'providers/employee_provider.dart';
 import 'providers/service_provider.dart';
 import 'providers/wishlist_provider.dart';
 import 'providers/review_provider.dart';
+import 'providers/global_navigation_provider.dart';
+import 'core/injection_container.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/ai/ai_assistance_screen.dart';
+import 'screens/profile/profile_screen.dart';
+import 'screens/wishlist_screen.dart';
 import 'services/setup_demo_users.dart';
 import 'services/setup_demo_employees.dart';
 import 'widgets/theme_toggle_widget.dart';
@@ -74,6 +79,15 @@ Future<void> initializeApp(InitializationProvider initProvider) async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Initialize FirebaseService explicitly
+    initProvider.updateProgress(0.4, 'Initializing Firebase Service...');
+    final firebaseService = FirebaseService();
+    await firebaseService.initializeFirebase();
+
+    // Initialize dependency injection container
+    initProvider.updateProgress(0.5, 'Initializing Services...');
+    await injectionContainer.initialize();
 
     // Setup demo users if needed
     initProvider.updateProgress(0.6, 'Setting up demo users...');
@@ -183,7 +197,11 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider.value(value: _initProvider),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(
+          create: (_) => ProductProvider(
+            injectionContainer.productBloc,
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
@@ -191,6 +209,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ServiceProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ChangeNotifierProvider(create: (_) => GlobalNavigationProvider()),
         ChangeNotifierProvider.value(value: _themeProvider),
       ],
       child: Consumer<ThemeProvider>(
@@ -201,6 +220,46 @@ class _MyAppState extends State<MyApp> {
             themeMode: themeProvider.currentTheme,
             home: const AuthWrapper(),
             debugShowCheckedModeBanner: false,
+            routes: {
+              '/wishlist': (context) => const WishlistScreen(),
+              '/profile': (context) => const ProfileScreen(),
+              '/settings': (context) => const Scaffold(
+                  body: Center(child: Text('Settings - Coming Soon'))),
+              '/catalog': (context) => Scaffold(
+                  appBar: AppBar(title: Text('Product Catalog')),
+                  body: Center(child: Text('Product Catalog - Coming Soon'))),
+              // '/new-products': (context) => const NewProductsScreen(),
+            },
+            onGenerateRoute: (settings) {
+              // Handle dynamic routes
+              if (settings.name?.startsWith('/product/') == true) {
+                final productId = settings.name!.split('/').last;
+                debugPrint(
+                    '[DEBUG] Main: Navigating to product detail for ID: $productId');
+                return MaterialPageRoute(
+                  builder: (context) => Scaffold(
+                    appBar: AppBar(title: const Text('Product Detail')),
+                    body: Center(
+                        child:
+                            Text('Product Detail: $productId - Coming Soon')),
+                  ),
+                );
+              }
+              if (settings.name?.startsWith('/service/') == true) {
+                final serviceId = settings.name!.split('/').last;
+                debugPrint(
+                    '[DEBUG] Main: Navigating to service detail for ID: $serviceId');
+                return MaterialPageRoute(
+                  builder: (context) => Scaffold(
+                    appBar: AppBar(title: const Text('Service Detail')),
+                    body: Center(
+                        child:
+                            Text('Service Detail: $serviceId - Coming Soon')),
+                  ),
+                );
+              }
+              return null;
+            },
           );
         },
       ),
@@ -224,7 +283,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
       if (themeProvider.isAutoDetectEnabled) {
         themeProvider.initializeAutoTheme(context);
-        themeProvider.setupWebThemeListener(context);
+        themeProvider.setupThemeListener(context);
       }
     });
   }

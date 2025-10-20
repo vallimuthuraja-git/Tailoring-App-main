@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 // Service Create Screen with Offline Support
 // Form to create new tailoring services with comprehensive customization options
 
@@ -1003,6 +1003,3 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
     }
   }
 }
-
-
-

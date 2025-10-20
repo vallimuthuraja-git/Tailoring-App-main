@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 import 'package:flutter/material.dart';
 import '../../../../models/product_models.dart';
 import '../../../models/service.dart';
@@ -162,6 +162,3 @@ class NavigationController {
     // No resources to dispose for now
   }
 }
-
-
-

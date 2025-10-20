@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/employee_provider.dart';
@@ -471,6 +471,3 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
     );
   }
 }
-
-
-

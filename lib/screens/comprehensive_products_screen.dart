@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/injection_container.dart';
@@ -463,6 +463,3 @@ extension ThemeProviderExtension on ThemeProvider {
   void
       toggleViewMode() {} // Placeholder - implement based on your ThemeProvider
 }
-
-
-

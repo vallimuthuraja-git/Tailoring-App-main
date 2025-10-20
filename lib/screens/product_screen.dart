@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -456,6 +456,3 @@ extension on CartProvider {
     return items.fold(0, (sum, item) => sum + item.quantity);
   }
 }
-
-
-

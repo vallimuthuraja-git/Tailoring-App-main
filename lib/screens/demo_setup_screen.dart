@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
@@ -575,6 +575,3 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
     }
   }
 }
-
-
-

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+﻿
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -815,6 +815,3 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
     });
   }
 }
-
-
-

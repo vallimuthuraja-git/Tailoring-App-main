@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1389,7 +1390,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } catch (e) {
       // If loading fails, continue without saved credentials
-      debugPrint('Error loading saved credentials: $e');
+      debugdebugPrint('Error loading saved credentials: $e');
     }
   }
 
@@ -1407,7 +1408,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setBool('remember_me', false);
       }
     } catch (e) {
-      debugPrint('Error saving credentials: $e');
+      debugdebugPrint('Error saving credentials: $e');
     }
   }
 
@@ -1419,7 +1420,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.remove('saved_password');
       await prefs.setBool('remember_me', false);
     } catch (e) {
-      debugPrint('Error clearing credentials: $e');
+      debugdebugPrint('Error clearing credentials: $e');
     }
   }
 
@@ -1544,3 +1545,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+

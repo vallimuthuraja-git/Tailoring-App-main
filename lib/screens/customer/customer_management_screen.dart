@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -134,7 +135,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                   children: [
                     Icon(Icons.bug_report),
                     SizedBox(width: 8),
-                    Text('🔧 Test Customer Creation'),
+                    Text('ðŸ”§ Test Customer Creation'),
                   ],
                 ),
               ),
@@ -381,14 +382,14 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           ),
           _buildStatCard(
             'Total Revenue',
-            '₹${stats['totalRevenue'].toStringAsFixed(0)}',
+            'â‚¹${stats['totalRevenue'].toStringAsFixed(0)}',
             Icons.attach_money,
             themeProvider,
             color: Colors.purple,
           ),
           _buildStatCard(
             'Avg Order Value',
-            '₹${stats['avgOrderValue'].toStringAsFixed(0)}',
+            'â‚¹${stats['avgOrderValue'].toStringAsFixed(0)}',
             Icons.trending_up,
             themeProvider,
             color: Colors.orange,
@@ -551,9 +552,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     };
 
     try {
-      debugPrint('🧪 Creating quick test customer...');
+      debugdebugPrint('ðŸ§ª Creating quick test customer...');
       await firebaseService.addDocument('customers', customerData);
-      debugPrint('✅ Quick customer created successfully');
+      debugdebugPrint('âœ… Quick customer created successfully');
 
       // Refresh the list
       customerProvider.loadAllCustomers();
@@ -561,7 +562,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Quick customer added successfully!')));
     } catch (e) {
-      debugPrint('❌ Quick customer creation failed: $e');
+      debugdebugPrint('âŒ Quick customer creation failed: $e');
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to add customer: $e')));
     }
@@ -650,7 +651,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Total Spent: ₹${customer.totalSpent.toStringAsFixed(0)}',
+                          'Total Spent: â‚¹${customer.totalSpent.toStringAsFixed(0)}',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -860,7 +861,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
               _buildDetailRow(
                   'Loyalty Tier', customer.loyaltyTier.name.toUpperCase()),
               _buildDetailRow(
-                  'Total Spent', '₹${customer.totalSpent.toStringAsFixed(0)}'),
+                  'Total Spent', 'â‚¹${customer.totalSpent.toStringAsFixed(0)}'),
               _buildDetailRow('Member Since',
                   '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}'),
               const SizedBox(height: 16),
@@ -1446,20 +1447,20 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         'isActive': true,
       };
 
-      debugPrint('🔥 Attempting Firebase write...');
+      debugdebugPrint('ðŸ”¥ Attempting Firebase write...');
       await firebaseService.addDocument('customers', testCustomer);
-      debugPrint('✅ Firebase write successful!');
+      debugdebugPrint('âœ… Firebase write successful!');
 
       Navigator.of(context).pop(); // Close loading dialog
 
       // Force refresh
-      debugPrint('🔄 Forcing customer list refresh...');
+      debugdebugPrint('ðŸ”„ Forcing customer list refresh...');
       customerProvider.loadAllCustomers();
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('✅ Test Customer Created!'),
+          title: const Text('âœ… Test Customer Created!'),
           content: const Text(
               'Test customer added to database\nRefresh the screen to see it'),
           actions: [
@@ -1471,13 +1472,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         ),
       );
     } catch (e) {
-      debugPrint('❌ Test customer creation failed: $e');
+      debugdebugPrint('âŒ Test customer creation failed: $e');
       Navigator.of(context).pop(); // Close loading dialog
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('❌ Test Failed'),
+          title: const Text('âŒ Test Failed'),
           content: Text('Error: $e'),
           actions: [
             TextButton(
@@ -1560,14 +1561,14 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('✅ Demo Customer Created!'),
+              title: const Text('âœ… Demo Customer Created!'),
               content: const Text(
                   'Demo Customer has been successfully added to the database with:\n\n'
-                  '• Complete profile information\n'
-                  '• Body measurements\n'
-                  '• Customer preferences\n'
-                  '• Contact details\n'
-                  '• Active status\n\n'
+                  'â€¢ Complete profile information\n'
+                  'â€¢ Body measurements\n'
+                  'â€¢ Customer preferences\n'
+                  'â€¢ Contact details\n'
+                  'â€¢ Active status\n\n'
                   'You can now edit, update, and manage this customer using the action buttons.'),
               actions: [
                 TextButton(
@@ -1581,7 +1582,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('❌ Error'),
+              title: const Text('âŒ Error'),
               content: const Text(
                   'Failed to create Demo Customer. Please try again.'),
               actions: [
@@ -1601,7 +1602,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('❌ Error'),
+            title: const Text('âŒ Error'),
             content: Text('Error creating Demo Customer: $e'),
             actions: [
               TextButton(
@@ -1624,10 +1625,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         content: const Text(
             'This will add 35 demo customers with sample data to your database.\n\n'
             'Features included:\n'
-            '• Diverse customer profiles\n'
-            '• Multiple loyalty tiers\n'
-            '• Body measurements\n'
-            '• Purchase history\n\n'
+            'â€¢ Diverse customer profiles\n'
+            'â€¢ Multiple loyalty tiers\n'
+            'â€¢ Body measurements\n'
+            'â€¢ Purchase history\n\n'
             'Proceed with adding demo data?'),
         actions: [
           TextButton(
@@ -1693,7 +1694,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
           successCount++;
         } catch (e) {
-          debugPrint('Failed to prepare customer ${demoCustomers[i].name}: $e');
+          debugdebugPrint('Failed to prepare customer ${demoCustomers[i].name}: $e');
         }
       }
 
@@ -1710,14 +1711,14 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('✅ Demo Data Added Successfully!'),
+            title: const Text('âœ… Demo Data Added Successfully!'),
             content: Text(
                 'Successfully added $successCount demo customers to your database!\n\n'
                 'Demo customers include:\n'
-                '• Diverse loyalty tiers (Bronze, Silver, Gold, Platinum)\n'
-                '• Realistic contact information\n'
-                '• Body measurements and preferences\n'
-                '• Purchase history and spending patterns\n\n'
+                'â€¢ Diverse loyalty tiers (Bronze, Silver, Gold, Platinum)\n'
+                'â€¢ Realistic contact information\n'
+                'â€¢ Body measurements and preferences\n'
+                'â€¢ Purchase history and spending patterns\n\n'
                 'These customers are now visible in your customer management system!'),
             actions: [
               TextButton(
@@ -1737,7 +1738,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('❌ Error'),
+            title: const Text('âŒ Error'),
             content: Text('Failed to add demo customers: $e'),
             actions: [
               TextButton(
@@ -1751,3 +1752,5 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     }
   }
 }
+
+

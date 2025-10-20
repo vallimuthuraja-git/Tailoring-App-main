@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../../models/product_models.dart';
 import '../../../models/service.dart';
@@ -8,87 +9,87 @@ import '../../ai/ai_assistance_screen.dart';
 
 class NavigationController {
   void navigateToProducts(BuildContext context) {
-    debugPrint('[DEBUG] NavigationController: Navigating to products');
+    debugdebugPrint('[DEBUG] NavigationController: Navigating to products');
     try {
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Would navigate to ModernProductCatalogScreen, but class import failed');
       Navigator.pushNamed(context, '/catalog');
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Successfully navigated to products');
     } catch (e) {
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Error navigating to products: $e');
     }
   }
 
   void navigateToServices(BuildContext context) {
-    debugPrint('[DEBUG] NavigationController: Navigating to services');
+    debugdebugPrint('[DEBUG] NavigationController: Navigating to services');
     try {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const ServiceCatalogScreen()),
       );
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Successfully navigated to services');
     } catch (e) {
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Error navigating to services: $e');
     }
   }
 
   void navigateToOrders(BuildContext context) {
-    debugPrint('[DEBUG] NavigationController: Navigating to orders');
+    debugdebugPrint('[DEBUG] NavigationController: Navigating to orders');
     try {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const OrderHistoryScreen()),
       );
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Successfully navigated to orders');
     } catch (e) {
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Error navigating to orders: $e');
     }
   }
 
   void navigateToCart(BuildContext context) {
-    debugPrint('[DEBUG] NavigationController: Navigating to cart');
+    debugdebugPrint('[DEBUG] NavigationController: Navigating to cart');
     try {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const CartScreen()),
       );
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Successfully navigated to cart');
     } catch (e) {
-      debugPrint('[DEBUG] NavigationController: Error navigating to cart: $e');
+      debugdebugPrint('[DEBUG] NavigationController: Error navigating to cart: $e');
     }
   }
 
   void navigateToWishlist(BuildContext context) {
-    debugPrint(
+    debugdebugPrint(
         '[DEBUG] NavigationController: Navigating to wishlist via named route /wishlist');
     try {
       Navigator.pushNamed(context, '/wishlist');
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Successfully navigated to wishlist');
     } catch (e) {
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Error navigating to wishlist: $e');
     }
   }
 
   void navigateToAIAssistant(BuildContext context) {
-    debugPrint('[DEBUG] NavigationController: Navigating to AI assistant');
+    debugdebugPrint('[DEBUG] NavigationController: Navigating to AI assistant');
     try {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const AIAssistanceScreen()),
       );
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Successfully navigated to AI assistant');
     } catch (e) {
-      debugPrint(
+      debugdebugPrint(
           '[DEBUG] NavigationController: Error navigating to AI assistant: $e');
     }
   }
@@ -107,16 +108,16 @@ class NavigationController {
         break;
       default:
         // Navigate to filtered catalog
-        debugPrint(
+        debugdebugPrint(
             '[DEBUG] NavigationController: Navigating to category ${category['name']}');
         try {
-          debugPrint(
+          debugdebugPrint(
               '[DEBUG] NavigationController: Would navigate to ModernProductCatalogScreen for category ${category['name']}, but class import failed');
           Navigator.pushNamed(context, '/catalog');
-          debugPrint(
+          debugdebugPrint(
               '[DEBUG] NavigationController: Successfully navigated to category ${category['name']}');
         } catch (e) {
-          debugPrint(
+          debugdebugPrint(
               '[DEBUG] NavigationController: Error navigating to category: $e');
         }
     }
@@ -161,3 +162,5 @@ class NavigationController {
     // No resources to dispose for now
   }
 }
+
+

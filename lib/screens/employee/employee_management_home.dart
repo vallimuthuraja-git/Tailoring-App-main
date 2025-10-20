@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -47,33 +48,33 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
   }
 
   void _ensureTabsAreSetup() {
-    debugPrint('🔧 EmployeeManagementHome: Ensuring tabs are setup');
+    debugdebugPrint('ðŸ”§ EmployeeManagementHome: Ensuring tabs are setup');
     // Only setup if not already done
     if (_tabs.isEmpty) {
-      debugPrint('📝 EmployeeManagementHome: Tabs are empty, setting up...');
+      debugdebugPrint('ðŸ“ EmployeeManagementHome: Tabs are empty, setting up...');
       _setupTabs();
-      debugPrint(
-          '✅ EmployeeManagementHome: Setup complete, tabs length: ${_tabs.length}');
+      debugdebugPrint(
+          'âœ… EmployeeManagementHome: Setup complete, tabs length: ${_tabs.length}');
     } else {
-      debugPrint(
-          '🚦 EmployeeManagementHome: Tabs already setup (${_tabs.length} tabs)');
+      debugdebugPrint(
+          'ðŸš¦ EmployeeManagementHome: Tabs already setup (${_tabs.length} tabs)');
     }
   }
 
   void _setupTabs() {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      debugPrint(
-          '🔐 EmployeeManagementHome: Auth provider user: ${authProvider.user?.email}');
-      debugPrint(
-          '👑 EmployeeManagementHome: isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
-      debugPrint(
-          '🎭 EmployeeManagementHome: userRole: ${authProvider.userRole}');
+      debugdebugPrint(
+          'ðŸ” EmployeeManagementHome: Auth provider user: ${authProvider.user?.email}');
+      debugdebugPrint(
+          'ðŸ‘‘ EmployeeManagementHome: isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
+      debugdebugPrint(
+          'ðŸŽ­ EmployeeManagementHome: userRole: ${authProvider.userRole}');
 
       final isShopOwnerOrAdmin = authProvider.isShopOwnerOrAdmin;
 
       if (isShopOwnerOrAdmin) {
-        debugPrint('👨‍💼 EmployeeManagementHome: Setting up admin tabs');
+        debugdebugPrint('ðŸ‘¨â€ðŸ’¼ EmployeeManagementHome: Setting up admin tabs');
         // Shop owner/admin tabs
         _tabs = [
           const EmployeeListSimple(),
@@ -88,7 +89,7 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
           Icons.analytics,
         ];
       } else {
-        debugPrint('👷 EmployeeManagementHome: Setting up employee tabs');
+        debugdebugPrint('ðŸ‘· EmployeeManagementHome: Setting up employee tabs');
         // Employee tabs
         _tabs = [
           const EmployeeDashboardScreen(),
@@ -105,13 +106,13 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
       }
 
       setState(() {}); // Trigger rebuild after setting up tabs
-      debugPrint(
-          '📱 EmployeeManagementHome: Tabs setup complete with ${_tabs.length} tabs');
+      debugdebugPrint(
+          'ðŸ“± EmployeeManagementHome: Tabs setup complete with ${_tabs.length} tabs');
     } catch (e) {
-      debugPrint('❌ EmployeeManagementHome: Error setting up tabs: $e');
+      debugdebugPrint('âŒ EmployeeManagementHome: Error setting up tabs: $e');
 
       // Fallback tabs in case of error
-      debugPrint('🔄 EmployeeManagementHome: Using fallback tabs due to error');
+      debugdebugPrint('ðŸ”„ EmployeeManagementHome: Using fallback tabs due to error');
       _tabs = [
         const EmployeeListSimple(),
       ];
@@ -126,11 +127,11 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('🔄 EmployeeManagementHome: Building widget');
+    debugdebugPrint('ðŸ”„ EmployeeManagementHome: Building widget');
 
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        debugPrint('🔐 EmployeeManagementHome build: Checking permissions');
+        debugdebugPrint('ðŸ” EmployeeManagementHome build: Checking permissions');
         // Check if user has permission to access employee management
         final hasEmployeeManagementAccess = authProvider.isShopOwnerOrAdmin ||
             authProvider.hasRole(UserRole.employee) ||
@@ -140,11 +141,11 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
             authProvider.hasRole(UserRole.supervisor) ||
             authProvider.hasRole(UserRole.apprentice);
 
-        debugPrint(
-            '🔑 EmployeeManagementHome: hasEmployeeManagementAccess: $hasEmployeeManagementAccess');
+        debugdebugPrint(
+            'ðŸ”‘ EmployeeManagementHome: hasEmployeeManagementAccess: $hasEmployeeManagementAccess');
 
         if (!hasEmployeeManagementAccess) {
-          debugPrint('❌ EmployeeManagementHome: Access denied');
+          debugdebugPrint('âŒ EmployeeManagementHome: Access denied');
           return Scaffold(
             appBar: AppBar(
               title: const Text('Access Denied'),
@@ -177,8 +178,8 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
           );
         }
 
-        debugPrint(
-            '✅ EmployeeManagementHome: Building main scaffold with ${_tabs.length} tabs');
+        debugdebugPrint(
+            'âœ… EmployeeManagementHome: Building main scaffold with ${_tabs.length} tabs');
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -275,8 +276,8 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
                                   const SizedBox(height: 24),
                                   ElevatedButton(
                                     onPressed: () {
-                                      debugPrint(
-                                          '🔄 EmployeeManagementHome: Manual retry triggered');
+                                      debugdebugPrint(
+                                          'ðŸ”„ EmployeeManagementHome: Manual retry triggered');
                                       _ensureTabsAreSetup();
                                     },
                                     child: const Text('Retry Setup'),
@@ -310,8 +311,8 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
                             const SizedBox(height: 24),
                             ElevatedButton(
                               onPressed: () {
-                                debugPrint(
-                                    '🔄 EmployeeManagementHome: Manual retry triggered');
+                                debugdebugPrint(
+                                    'ðŸ”„ EmployeeManagementHome: Manual retry triggered');
                                 _ensureTabsAreSetup();
                               },
                               child: const Text('Retry Setup'),
@@ -368,3 +369,5 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
     );
   }
 }
+
+

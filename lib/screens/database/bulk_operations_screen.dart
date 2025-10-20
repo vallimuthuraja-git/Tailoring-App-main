@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BulkOperationsScreen extends StatefulWidget {
@@ -225,9 +225,9 @@ class _BulkOperationsScreenState extends State<BulkOperationsScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(12),
-          color: color.withOpacity(0.05),
+          color: color.withValues(alpha: 0.05),
         ),
         child: Row(
           children: [
@@ -258,7 +258,7 @@ class _BulkOperationsScreenState extends State<BulkOperationsScreen> {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: color.withOpacity(0.5),
+              color: color.withValues(alpha: 0.5),
               size: 16,
             ),
           ],
@@ -600,7 +600,7 @@ class _BulkOperationsScreenState extends State<BulkOperationsScreen> {
           child: ListView(
             children: issues.map((issue) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Text('• $issue'),
+              child: Text('â€¢ $issue'),
             )).toList(),
           ),
         ),
@@ -620,3 +620,4 @@ class _BulkOperationsScreenState extends State<BulkOperationsScreen> {
     }).join(' ');
   }
 }
+

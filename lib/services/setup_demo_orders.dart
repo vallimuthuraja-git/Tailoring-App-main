@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import '../models/order.dart';
 import '../models/product_models.dart';
@@ -262,7 +263,7 @@ class SetupDemoOrders {
       {required ProductProvider productProvider,
       required OrderProvider orderProvider}) async {
     try {
-      print('🔧 Setting up demo orders...');
+      debugPrint('ðŸ”§ Setting up demo orders...');
 
       // First, ensure we have products loaded
       productProvider.loadProducts();
@@ -281,14 +282,14 @@ class SetupDemoOrders {
         await _createDemoOrder(template, productProvider, orderProvider, i);
       }
 
-      print('✅ Demo orders setup completed successfully!');
+      debugPrint('âœ… Demo orders setup completed successfully!');
     } catch (e) {
-      print('❌ Error setting up demo orders: $e');
+      debugPrint('âŒ Error setting up demo orders: $e');
     }
   }
 
   Future<void> _createDemoCustomers() async {
-    print('📝 Creating demo customers...');
+    debugPrint('ðŸ“ Creating demo customers...');
 
     for (final customer in _demoCustomers) {
       try {
@@ -297,9 +298,9 @@ class SetupDemoOrders {
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         });
-        print('✅ Created customer: ${customer['name']}');
+        debugPrint('âœ… Created customer: ${customer['name']}');
       } catch (e) {
-        print('⚠️ Customer ${customer['name']} may already exist: $e');
+        debugPrint('âš ï¸ Customer ${customer['name']} may already exist: $e');
       }
     }
   }
@@ -319,7 +320,7 @@ class SetupDemoOrders {
           .toList();
 
       if (products.isEmpty) {
-        print('⚠️ No products found for category ${template['productType']}');
+        debugPrint('âš ï¸ No products found for category ${template['productType']}');
         return;
       }
 
@@ -403,15 +404,15 @@ class SetupDemoOrders {
 
       final docRef = await _firestore.collection('orders').add(orderData);
 
-      print(
-          '✅ Created order #${index + 1}: ${template['productName']} for ${customer['name']}');
+      debugPrint(
+          'âœ… Created order #${index + 1}: ${template['productName']} for ${customer['name']}');
 
       // Add order ID to customer document
       await _firestore.collection('customers').doc(customer['id']).update({
         'orderIds': FieldValue.arrayUnion([docRef.id])
       });
     } catch (e) {
-      print('❌ Error creating demo order $index: $e');
+      debugPrint('âŒ Error creating demo order $index: $e');
     }
   }
 
@@ -480,7 +481,7 @@ class SetupDemoOrders {
       final querySnapshot = await _firestore.collection('orders').get();
       return querySnapshot.docs.any((doc) => doc.id.startsWith('demo-order-'));
     } catch (e) {
-      print('❌ Error checking demo orders: $e');
+      debugPrint('âŒ Error checking demo orders: $e');
       return false;
     }
   }
@@ -491,24 +492,26 @@ class SetupDemoOrders {
     try {
       final ordersExist = await demoOrdersExist();
       if (!ordersExist) {
-        print('🔧 Demo orders not found, creating them...');
+        debugPrint('ðŸ”§ Demo orders not found, creating them...');
         final Future<void> demoOrdersTask = createDemoOrders(
             productProvider: productProvider, orderProvider: orderProvider);
         await demoOrdersTask;
-        print('✅ Demo orders created successfully');
+        debugPrint('âœ… Demo orders created successfully');
         return;
       } else {
-        print('✅ Demo orders already exist');
+        debugPrint('âœ… Demo orders already exist');
         return;
       }
     } catch (e) {
-      print('❌ Error initializing demo orders: $e');
+      debugPrint('âŒ Error initializing demo orders: $e');
     }
   }
 }
 
 // Helper function to setup demo orders (can be called from main)
 Future<void> setupDemoOrders() async {
-  print(
+  debugPrint(
       'Demo orders setup helper called - integrate with providers in main app');
 }
+
+

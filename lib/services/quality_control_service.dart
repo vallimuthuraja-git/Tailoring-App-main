@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/employee.dart' as emp;
 
@@ -325,7 +326,7 @@ class QualityControlService {
       await _firestore.collection('quality_checkpoints').doc(checkpointId).update(updateData);
       return true;
     } catch (e) {
-      print('Error submitting quality inspection: $e');
+      debugPrint('Error submitting quality inspection: $e');
       return false;
     }
   }
@@ -356,7 +357,7 @@ class QualityControlService {
 
       return true;
     } catch (e) {
-      print('Error adding quality issue: $e');
+      debugPrint('Error adding quality issue: $e');
       return false;
     }
   }
@@ -408,7 +409,7 @@ class QualityControlService {
 
       return true;
     } catch (e) {
-      print('Error resolving quality issue: $e');
+      debugPrint('Error resolving quality issue: $e');
       return false;
     }
   }
@@ -483,7 +484,7 @@ class QualityControlService {
         'commonIssues': _getCommonIssues(checkpoints),
       };
     } catch (e) {
-      print('Error getting employee quality stats: $e');
+      debugPrint('Error getting employee quality stats: $e');
       return {
         'totalInspections': 0,
         'averageScore': 0.0,
@@ -627,3 +628,5 @@ class QualityCheckpointTemplate {
     required this.requiredMeasurements,
   });
 }
+
+

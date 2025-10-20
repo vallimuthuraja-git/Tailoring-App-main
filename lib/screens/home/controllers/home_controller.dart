@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomeController with ChangeNotifier {
@@ -29,12 +30,12 @@ class HomeController with ChangeNotifier {
     if (query.isEmpty) return;
     // Navigate to search results
     // Implementation depends on existing search functionality
-    print('Searching for: $query');
+    debugPrint('Searching for: $query');
   }
 
   void handleVoiceSearch(BuildContext context) {
     // Implement voice search
-    print('Voice search activated');
+    debugPrint('Voice search activated');
   }
 
   List<Map<String, dynamic>> getCategories(bool isShopOwner) {
@@ -124,3 +125,5 @@ class HomeController with ChangeNotifier {
     notifyListeners();
   }
 }
+
+

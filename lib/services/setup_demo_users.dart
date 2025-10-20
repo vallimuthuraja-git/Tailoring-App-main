@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_service.dart';
@@ -9,7 +10,7 @@ class SetupDemoUsers {
 
   // Create demo users in Firebase Auth and Firestore
   Future<void> createDemoUsers() async {
-    print('🔧 Setting up demo users...');
+    debugPrint('ðŸ”§ Setting up demo users...');
 
     // Demo customer
     try {
@@ -20,7 +21,7 @@ class SetupDemoUsers {
         role: UserRole.customer,
       );
     } catch (e) {
-      print('❌ Error creating demo customer: $e');
+      debugPrint('âŒ Error creating demo customer: $e');
     }
 
     // Demo shop owner
@@ -32,7 +33,7 @@ class SetupDemoUsers {
         role: UserRole.shopOwner,
       );
     } catch (e) {
-      print('❌ Error creating demo shop owner: $e');
+      debugPrint('âŒ Error creating demo shop owner: $e');
     }
 
     // Demo admin
@@ -44,10 +45,10 @@ class SetupDemoUsers {
         role: UserRole.admin,
       );
     } catch (e) {
-      print('❌ Error creating demo admin: $e');
+      debugPrint('âŒ Error creating demo admin: $e');
     }
 
-    print('✅ Demo users setup completed successfully!');
+    debugPrint('âœ… Demo users setup completed successfully!');
   }
 
   // Create individual demo user
@@ -58,7 +59,7 @@ class SetupDemoUsers {
     required UserRole role,
   }) async {
     try {
-      print('🔍 Checking if user $email already exists...');
+      debugPrint('ðŸ” Checking if user $email already exists...');
 
       // First, try to check if user exists by attempting to create
       try {
@@ -87,25 +88,25 @@ class SetupDemoUsers {
             .doc(userCredential.user!.uid)
             .set(userModel.toJson());
 
-        print(
-            '✅ Successfully created demo user: $email with role ${role.name}');
+        debugPrint(
+            'âœ… Successfully created demo user: $email with role ${role.name}');
         if (email == 'admin@demo.com') {
-          print(
-              '🔍 ADMIN CREATION: User role set to ${role.name} in Firestore');
+          debugPrint(
+              'ðŸ” ADMIN CREATION: User role set to ${role.name} in Firestore');
         }
         return;
       } catch (e) {
         if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
-          print('⚠️ User $email already exists in Auth, checking profile...');
+          debugPrint('âš ï¸ User $email already exists in Auth, checking profile...');
           await _ensureUserProfileExists(email, displayName, role);
           return;
         } else {
-          // print('❌ Error creating demo user $email: $e');
+          // debugPrint('âŒ Error creating demo user $email: $e');
           rethrow;
         }
       }
     } catch (e) {
-      // print('❌ Error in demo user creation process for $email: $e');
+      // debugPrint('âŒ Error in demo user creation process for $email: $e');
       rethrow;
     }
   }
@@ -139,55 +140,55 @@ class SetupDemoUsers {
             .doc(user.user!.uid)
             .set(userModel.toJson());
 
-        // print('✅ Created missing profile for existing user: $email');
-        print(
-            '✅ Created missing profile for existing user: $email with role ${role.name}');
+        // debugPrint('âœ… Created missing profile for existing user: $email');
+        debugPrint(
+            'âœ… Created missing profile for existing user: $email with role ${role.name}');
         if (email == 'admin@demo.com') {
-          print(
-              '🔍 ADMIN PROFILE: Created missing admin profile with role ${role.name}');
+          debugPrint(
+              'ðŸ” ADMIN PROFILE: Created missing admin profile with role ${role.name}');
         }
       }
 
       await _auth.signOut();
     } catch (e) {
-      // print('❌ Error ensuring user profile exists: $e');
+      // debugPrint('âŒ Error ensuring user profile exists: $e');
     }
   }
 
   // Check if demo users exist in Firebase Auth
   Future<bool> demoUsersExist() async {
     try {
-      print('🔍 Checking if demo users exist in Firebase Auth...');
+      debugPrint('ðŸ” Checking if demo users exist in Firebase Auth...');
 
       // Check customer
       bool customerExists =
           await _userExistsInAuth(DemoConstants.customerEmail);
-      print('Customer exists in Auth: $customerExists');
+      debugPrint('Customer exists in Auth: $customerExists');
 
       // Check shop owner
       bool shopExists = await _userExistsInAuth(DemoConstants.shopOwnerEmail);
-      print('Shop owner exists in Auth: $shopExists');
+      debugPrint('Shop owner exists in Auth: $shopExists');
 
       // Check admin
       bool adminExists = await _userExistsInAuth(DemoConstants.adminEmail);
-      print('Admin exists in Auth: $adminExists');
+      debugPrint('Admin exists in Auth: $adminExists');
       if (adminExists) {
         final adminInfo = await getDemoUserInfo(DemoConstants.adminEmail);
         if (adminInfo != null) {
-          print('🔍 ADMIN EXISTENCE: Role in Firestore: ${adminInfo['role']}');
+          debugPrint('ðŸ” ADMIN EXISTENCE: Role in Firestore: ${adminInfo['role']}');
         } else {
-          print('❌ ADMIN EXISTENCE: No Firestore profile found for admin');
+          debugPrint('âŒ ADMIN EXISTENCE: No Firestore profile found for admin');
         }
       }
 
       bool allExist = customerExists && shopExists && adminExists;
-      print('All demo users exist: $allExist');
-      print('Missing admin: ${!adminExists}');
-      print('One/more demo user missing: ${!allExist}');
+      debugPrint('All demo users exist: $allExist');
+      debugPrint('Missing admin: ${!adminExists}');
+      debugPrint('One/more demo user missing: ${!allExist}');
 
       return allExist;
     } catch (e) {
-      print('❌ Error checking demo users: $e');
+      debugPrint('âŒ Error checking demo users: $e');
       return false;
     }
   }
@@ -214,7 +215,7 @@ class SetupDemoUsers {
       if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
         return true; // User exists
       }
-      // print('❌ Error checking if user $email exists in Auth: $e');
+      // debugPrint('âŒ Error checking if user $email exists in Auth: $e');
       return false;
     }
   }
@@ -232,7 +233,7 @@ class SetupDemoUsers {
       }
       return null;
     } catch (e) {
-      // print('❌ Error getting demo user info: $e');
+      // debugPrint('âŒ Error getting demo user info: $e');
       return null;
     }
   }
@@ -240,18 +241,18 @@ class SetupDemoUsers {
   // Initialize demo data if needed
   Future<void> initializeDemoDataIfNeeded() async {
     try {
-      print('🚀 Starting demo data initialization check...');
+      debugPrint('ðŸš€ Starting demo data initialization check...');
       final usersExist = await demoUsersExist();
       if (!usersExist) {
-        print('🔧 Demo users not found or incomplete, creating them...');
+        debugPrint('ðŸ”§ Demo users not found or incomplete, creating them...');
         await createDemoUsers();
-        print('✅ Demo users creation completed!');
+        debugPrint('âœ… Demo users creation completed!');
       } else {
-        print('✅ All demo users already exist, no action needed');
+        debugPrint('âœ… All demo users already exist, no action needed');
       }
-      print('🎉 Demo data initialization check finished');
+      debugPrint('ðŸŽ‰ Demo data initialization check finished');
     } catch (e) {
-      print('❌ Error initializing demo data: $e');
+      debugPrint('âŒ Error initializing demo data: $e');
     }
   }
 }
@@ -261,3 +262,5 @@ Future<void> setupDemoUsers() async {
   final setup = SetupDemoUsers();
   await setup.initializeDemoDataIfNeeded();
 }
+
+

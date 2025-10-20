@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseStatisticsScreen extends StatefulWidget {
@@ -341,7 +341,7 @@ class _DatabaseStatisticsScreenState extends State<DatabaseStatisticsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -512,12 +512,13 @@ class _DatabaseStatisticsScreenState extends State<DatabaseStatisticsScreen> {
 
   String _formatStatValue(String key, dynamic value) {
     if (value is double && key.contains('Revenue')) {
-      return '₹${value.toStringAsFixed(0)}';
+      return 'â‚¹${value.toStringAsFixed(0)}';
     } else if (value is double && key.contains('Value')) {
-      return '₹${value.toStringAsFixed(0)}';
+      return 'â‚¹${value.toStringAsFixed(0)}';
     } else if (value is double) {
       return value.toStringAsFixed(2);
     }
     return value.toString();
   }
 }
+

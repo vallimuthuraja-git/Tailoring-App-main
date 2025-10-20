@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/employee.dart' as emp;
 
@@ -5,7 +6,7 @@ class DemoWorkAssignmentsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> createDemoWorkAssignments() async {
-    print('🚀 Creating demo work assignments...');
+    debugPrint('ðŸš€ Creating demo work assignments...');
 
     // Get all demo employees
     final demoEmployees = await _getDemoEmployees();
@@ -14,7 +15,7 @@ class DemoWorkAssignmentsService {
       await _createWorkAssignmentsForEmployee(employee);
     }
 
-    print('✅ Demo work assignments created successfully!');
+    debugPrint('âœ… Demo work assignments created successfully!');
   }
 
   Future<List<emp.Employee>> _getDemoEmployees() async {
@@ -55,7 +56,7 @@ class DemoWorkAssignmentsService {
       await _firestore.collection('work_assignments').add(assignmentData);
     }
 
-    print('✅ Created ${assignments.length} assignments for ${employee.displayName}');
+    debugPrint('âœ… Created ${assignments.length} assignments for ${employee.displayName}');
   }
 
   List<emp.WorkAssignment> _generateWorkAssignmentsForEmployee(emp.Employee employee) {
@@ -688,7 +689,7 @@ class DemoWorkAssignmentsService {
 
   // Clean up demo assignments
   Future<void> cleanupDemoAssignments() async {
-    print('🧹 Cleaning up demo work assignments...');
+    debugPrint('ðŸ§¹ Cleaning up demo work assignments...');
 
     final demoOrderIds = [
       'order_001', 'order_002', 'order_003', 'order_004', 'order_005',
@@ -707,6 +708,8 @@ class DemoWorkAssignmentsService {
       }
     }
 
-    print('✅ Demo work assignments cleanup complete!');
+    debugPrint('âœ… Demo work assignments cleanup complete!');
   }
 }
+
+

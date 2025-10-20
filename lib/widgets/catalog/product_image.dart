@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../models/product_models.dart';
 import '../../providers/theme_provider.dart';
@@ -59,8 +59,8 @@ class ProductImage extends StatelessWidget {
                                 Icons.inventory_2,
                                 size: 32,
                                 color: themeProvider.isDarkMode
-                                    ? DarkAppColors.onSurface.withOpacity(0.3)
-                                    : AppColors.onSurface.withOpacity(0.3),
+                                    ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                                    : AppColors.onSurface.withValues(alpha: 0.3),
                               ),
                             ),
                           ),
@@ -73,8 +73,8 @@ class ProductImage extends StatelessWidget {
                             Icons.inventory_2,
                             size: 32,
                             color: themeProvider.isDarkMode
-                                ? DarkAppColors.onSurface.withOpacity(0.3)
-                                : AppColors.onSurface.withOpacity(0.3),
+                                ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                                : AppColors.onSurface.withValues(alpha: 0.3),
                           ),
                         ),
                 ),
@@ -100,11 +100,11 @@ class ProductImage extends StatelessWidget {
                                         horizontal: 4, vertical: 1),
                                     decoration: BoxDecoration(
                                       color: _getBadgeColor(badge)
-                                          .withOpacity(0.9),
+                                          .withValues(alpha: 0.9),
                                       borderRadius: BorderRadius.circular(4),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
+                                          color: Colors.black.withValues(alpha: 0.2),
                                           blurRadius: 2,
                                           offset: const Offset(0, 1),
                                         ),
@@ -133,11 +133,11 @@ class ProductImage extends StatelessWidget {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 3,
                           offset: const Offset(0, 1),
                         ),
@@ -178,8 +178,8 @@ class ProductImage extends StatelessWidget {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withOpacity(0.8),
-                          Colors.black.withOpacity(0.4),
+                          Colors.black.withValues(alpha: 0.8),
+                          Colors.black.withValues(alpha: 0.4),
                           Colors.transparent,
                         ],
                       ),
@@ -222,3 +222,4 @@ class ProductImage extends StatelessWidget {
     }
   }
 }
+

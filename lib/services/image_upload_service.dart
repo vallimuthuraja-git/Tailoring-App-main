@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
@@ -29,7 +29,7 @@ class ImageUploadService {
       );
       return image;
     } catch (e) {
-      debugPrint('Error picking image: $e');
+      debugdebugPrint('Error picking image: $e');
       return null;
     }
   }
@@ -51,7 +51,7 @@ class ImageUploadService {
 
       return images;
     } catch (e) {
-      debugPrint('Error picking multiple images: $e');
+      debugdebugPrint('Error picking multiple images: $e');
       return null;
     }
   }
@@ -66,7 +66,7 @@ class ImageUploadService {
         return await _uploadToMobileService(imageFile);
       }
     } catch (e) {
-      debugPrint('Error uploading image: $e');
+      debugdebugPrint('Error uploading image: $e');
       return getDemoImageUrl('default');
     }
   }
@@ -102,7 +102,7 @@ class ImageUploadService {
       // Fallback to demo images
       return getDemoImageUrl('default');
     } catch (e) {
-      debugPrint('Error uploading to web service: $e');
+      debugdebugPrint('Error uploading to web service: $e');
       return getDemoImageUrl('default');
     }
   }
@@ -121,7 +121,7 @@ class ImageUploadService {
       // Fallback to demo images
       return getDemoImageUrl('default');
     } catch (e) {
-      debugPrint('Error uploading to mobile service: $e');
+      debugdebugPrint('Error uploading to mobile service: $e');
       return getDemoImageUrl('default');
     }
   }
@@ -152,7 +152,7 @@ class ImageUploadService {
 
       return null;
     } catch (e) {
-      debugPrint('Error uploading to Imgur web: $e');
+      debugdebugPrint('Error uploading to Imgur web: $e');
       return null;
     }
   }
@@ -183,7 +183,7 @@ class ImageUploadService {
 
       return null;
     } catch (e) {
-      debugPrint('Error uploading to Imgur mobile: $e');
+      debugdebugPrint('Error uploading to Imgur mobile: $e');
       return null;
     }
   }
@@ -261,3 +261,4 @@ class ImageUploadService {
     }
   }
 }
+

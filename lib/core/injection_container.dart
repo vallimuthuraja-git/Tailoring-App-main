@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import '../product_data_access.dart' as data_access;
@@ -65,7 +66,7 @@ class InjectionContainer {
       connectivity: _connectivity,
     );
 
-    debugPrint('✅ All dependencies initialized');
+    debugdebugPrint('âœ… All dependencies initialized');
   }
 
   // Getters for accessing dependencies
@@ -102,7 +103,7 @@ class InjectionContainer {
   /// Dispose of all resources
   Future<void> dispose() async {
     await _productBloc.close();
-    debugPrint('✅ Dependencies disposed');
+    debugdebugPrint('âœ… Dependencies disposed');
   }
 
   /// Reset all dependencies (useful for testing)
@@ -114,3 +115,5 @@ class InjectionContainer {
 
 /// Global instance for easy access
 final injectionContainer = InjectionContainer();
+
+

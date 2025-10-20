@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
@@ -127,8 +127,8 @@ class ProductCardSkeleton extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: themeProvider.isDarkMode
-                                ? DarkAppColors.surface.withOpacity(0.5)
-                                : AppColors.surface.withOpacity(0.5),
+                                ? DarkAppColors.surface.withValues(alpha: 0.5)
+                                : AppColors.surface.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -151,8 +151,8 @@ class ProductCardSkeleton extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: themeProvider.isDarkMode
-                                ? DarkAppColors.surface.withOpacity(0.5)
-                                : AppColors.surface.withOpacity(0.5),
+                                ? DarkAppColors.surface.withValues(alpha: 0.5)
+                                : AppColors.surface.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -167,16 +167,16 @@ class ProductCardSkeleton extends StatelessWidget {
                       width: 80,
                       decoration: BoxDecoration(
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.surface.withOpacity(0.3)
-                            : AppColors.surface.withOpacity(0.3),
+                            ? DarkAppColors.surface.withValues(alpha: 0.3)
+                            : AppColors.surface.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: _SkeletonAnimation(
                         child: Container(
                           decoration: BoxDecoration(
                             color: themeProvider.isDarkMode
-                                ? DarkAppColors.surface.withOpacity(0.5)
-                                : AppColors.surface.withOpacity(0.5),
+                                ? DarkAppColors.surface.withValues(alpha: 0.5)
+                                : AppColors.surface.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -191,8 +191,8 @@ class ProductCardSkeleton extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.surface.withOpacity(0.3)
-                            : AppColors.surface.withOpacity(0.3),
+                            ? DarkAppColors.surface.withValues(alpha: 0.3)
+                            : AppColors.surface.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(
                             ProductScreenConstants.borderRadiusMedium),
                       ),
@@ -200,8 +200,8 @@ class ProductCardSkeleton extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: themeProvider.isDarkMode
-                                ? DarkAppColors.surface.withOpacity(0.5)
-                                : AppColors.surface.withOpacity(0.5),
+                                ? DarkAppColors.surface.withValues(alpha: 0.5)
+                                : AppColors.surface.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(
                                 ProductScreenConstants.borderRadiusMedium),
                           ),
@@ -250,8 +250,8 @@ class ProductListItemSkeleton extends StatelessWidget {
               height: ProductScreenConstants.listItemHeight,
               decoration: BoxDecoration(
                 color: themeProvider.isDarkMode
-                    ? DarkAppColors.surface.withOpacity(0.3)
-                    : AppColors.surface.withOpacity(0.3),
+                    ? DarkAppColors.surface.withValues(alpha: 0.3)
+                    : AppColors.surface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(
                     ProductScreenConstants.borderRadiusSmall),
               ),
@@ -260,8 +260,8 @@ class ProductListItemSkeleton extends StatelessWidget {
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: themeProvider.isDarkMode
-                        ? DarkAppColors.surface.withOpacity(0.5)
-                        : AppColors.surface.withOpacity(0.5),
+                        ? DarkAppColors.surface.withValues(alpha: 0.5)
+                        : AppColors.surface.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -281,16 +281,16 @@ class ProductListItemSkeleton extends StatelessWidget {
                     width: 80,
                     decoration: BoxDecoration(
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.surface.withOpacity(0.3)
-                          : AppColors.surface.withOpacity(0.3),
+                          ? DarkAppColors.surface.withValues(alpha: 0.3)
+                          : AppColors.surface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: _SkeletonAnimation(
                       child: Container(
                         decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.surface.withOpacity(0.5)
-                              : AppColors.surface.withOpacity(0.5),
+                              ? DarkAppColors.surface.withValues(alpha: 0.5)
+                              : AppColors.surface.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -305,16 +305,16 @@ class ProductListItemSkeleton extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.surface.withOpacity(0.3)
-                          : AppColors.surface.withOpacity(0.3),
+                          ? DarkAppColors.surface.withValues(alpha: 0.3)
+                          : AppColors.surface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: _SkeletonAnimation(
                       child: Container(
                         decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.surface.withOpacity(0.5)
-                              : AppColors.surface.withOpacity(0.5),
+                              ? DarkAppColors.surface.withValues(alpha: 0.5)
+                              : AppColors.surface.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -329,16 +329,16 @@ class ProductListItemSkeleton extends StatelessWidget {
                     width: screenWidth * 0.7,
                     decoration: BoxDecoration(
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.surface.withOpacity(0.3)
-                          : AppColors.surface.withOpacity(0.3),
+                          ? DarkAppColors.surface.withValues(alpha: 0.3)
+                          : AppColors.surface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: _SkeletonAnimation(
                       child: Container(
                         decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.surface.withOpacity(0.5)
-                              : AppColors.surface.withOpacity(0.5),
+                              ? DarkAppColors.surface.withValues(alpha: 0.5)
+                              : AppColors.surface.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -355,16 +355,16 @@ class ProductListItemSkeleton extends StatelessWidget {
                         width: 60,
                         decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.surface.withOpacity(0.3)
-                              : AppColors.surface.withOpacity(0.3),
+                              ? DarkAppColors.surface.withValues(alpha: 0.3)
+                              : AppColors.surface.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: _SkeletonAnimation(
                           child: Container(
                             decoration: BoxDecoration(
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.surface.withOpacity(0.5)
-                                  : AppColors.surface.withOpacity(0.5),
+                                  ? DarkAppColors.surface.withValues(alpha: 0.5)
+                                  : AppColors.surface.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -376,16 +376,16 @@ class ProductListItemSkeleton extends StatelessWidget {
                         width: 50,
                         decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.surface.withOpacity(0.3)
-                              : AppColors.surface.withOpacity(0.3),
+                              ? DarkAppColors.surface.withValues(alpha: 0.3)
+                              : AppColors.surface.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: _SkeletonAnimation(
                           child: Container(
                             decoration: BoxDecoration(
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.surface.withOpacity(0.5)
-                                  : AppColors.surface.withOpacity(0.5),
+                                  ? DarkAppColors.surface.withValues(alpha: 0.5)
+                                  : AppColors.surface.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -408,16 +408,16 @@ class ProductListItemSkeleton extends StatelessWidget {
                   width: 70,
                   decoration: BoxDecoration(
                     color: themeProvider.isDarkMode
-                        ? DarkAppColors.surface.withOpacity(0.3)
-                        : AppColors.surface.withOpacity(0.3),
+                        ? DarkAppColors.surface.withValues(alpha: 0.3)
+                        : AppColors.surface.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: _SkeletonAnimation(
                     child: Container(
                       decoration: BoxDecoration(
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.surface.withOpacity(0.5)
-                            : AppColors.surface.withOpacity(0.5),
+                            ? DarkAppColors.surface.withValues(alpha: 0.5)
+                            : AppColors.surface.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -667,8 +667,8 @@ class _ProgressiveLoadingIndicatorState
                     style: TextStyle(
                       fontSize: 14,
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withOpacity(0.7)
-                          : AppColors.onSurface.withOpacity(0.7),
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                          : AppColors.onSurface.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -971,3 +971,4 @@ class StaggeredFadeIn extends StatelessWidget {
     );
   }
 }
+

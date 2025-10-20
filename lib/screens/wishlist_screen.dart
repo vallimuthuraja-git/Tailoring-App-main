@@ -1,4 +1,4 @@
-// Wishlist Screen to view user's favorite services
+﻿// Wishlist Screen to view user's favorite services
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/service.dart';
@@ -149,7 +149,7 @@ class _WishlistScreenState extends State<WishlistScreen>
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: _getServiceColor(service.category).withOpacity(0.1),
+              color: _getServiceColor(service.category).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -182,7 +182,7 @@ class _WishlistScreenState extends State<WishlistScreen>
             ),
             const SizedBox(height: 4),
             Text(
-              '\$${service.effectivePrice.toStringAsFixed(0)} • ${service.durationText}',
+              '\$${service.effectivePrice.toStringAsFixed(0)} â€¢ ${service.durationText}',
               style: TextStyle(
                 fontSize: 12,
                 color: themeProvider.isDarkMode
@@ -327,7 +327,7 @@ class _EmptyWishlistView extends StatelessWidget {
           ),
           SizedBox(height: 24),
           Text(
-            '💡 Tap the heart icon on services to add them here',
+            'ðŸ’¡ Tap the heart icon on services to add them here',
             style: TextStyle(fontSize: 14, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
@@ -379,3 +379,4 @@ class _ServiceDetailPlaceholder extends StatelessWidget {
     );
   }
 }
+

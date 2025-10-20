@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -234,7 +235,7 @@ class _MyAppState extends State<MyApp> {
               // Handle dynamic routes
               if (settings.name?.startsWith('/product/') == true) {
                 final productId = settings.name!.split('/').last;
-                debugPrint(
+                debugdebugPrint(
                     '[DEBUG] Main: Navigating to product detail for ID: $productId');
                 return MaterialPageRoute(
                   builder: (context) => Scaffold(
@@ -247,7 +248,7 @@ class _MyAppState extends State<MyApp> {
               }
               if (settings.name?.startsWith('/service/') == true) {
                 final serviceId = settings.name!.split('/').last;
-                debugPrint(
+                debugdebugPrint(
                     '[DEBUG] Main: Navigating to service detail for ID: $serviceId');
                 return MaterialPageRoute(
                   builder: (context) => Scaffold(
@@ -477,7 +478,7 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    '🚀 Demo Credentials',
+                    'ðŸš€ Demo Credentials',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -504,7 +505,7 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                     child: const Text(
-                      '🎯 Employee Management Demo: Available for ALL users in the dashboard!',
+                      'ðŸŽ¯ Employee Management Demo: Available for ALL users in the dashboard!',
                       style: TextStyle(
                         color: Color(0xFF2E7D32),
                         fontWeight: FontWeight.bold,
@@ -719,3 +720,5 @@ class _ActionButton extends StatelessWidget {
     );
   }
 }
+
+

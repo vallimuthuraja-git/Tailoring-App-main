@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/injection_container.dart';
@@ -47,7 +48,7 @@ class _ComprehensiveProductsScreenState
       try {
         Provider.of<ProductProvider>(context, listen: false).loadProducts();
       } catch (e) {
-        debugPrint('Error loading products: $e');
+        debugdebugPrint('Error loading products: $e');
       }
     });
   }
@@ -462,3 +463,5 @@ extension ThemeProviderExtension on ThemeProvider {
   void
       toggleViewMode() {} // Placeholder - implement based on your ThemeProvider
 }
+
+

@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+﻿import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../firebase_options.dart';
@@ -14,7 +14,7 @@ class FirebaseDebug {
   // Test Firebase connection
   Future<void> testFirebaseConnection() async {
     try {
-      debugPrint('🔍 Testing Firebase connection...');
+      debugdebugPrint('ðŸ” Testing Firebase connection...');
 
       // Test Firestore connection
       await _testFirestoreConnection();
@@ -22,34 +22,34 @@ class FirebaseDebug {
       // Test Auth connection
       await _testAuthConnection();
 
-      debugPrint('✅ Firebase connection test completed successfully');
+      debugdebugPrint('âœ… Firebase connection test completed successfully');
     } catch (e) {
-      debugPrint('❌ Firebase connection test failed: $e');
+      debugdebugPrint('âŒ Firebase connection test failed: $e');
     }
   }
 
   // Test Firestore connection
   Future<void> _testFirestoreConnection() async {
     try {
-      debugPrint('📊 Testing Firestore connection...');
+      debugdebugPrint('ðŸ“Š Testing Firestore connection...');
 
       // Try to read from users collection
       final usersSnapshot = await _firestore.collection('users').limit(1).get();
-      debugPrint(
-          '✅ Firestore read successful. Found ${usersSnapshot.docs.length} documents');
+      debugdebugPrint(
+          'âœ… Firestore read successful. Found ${usersSnapshot.docs.length} documents');
 
       // Try to write a test document
       final testDoc = await _firestore.collection('test').add({
         'test': true,
         'timestamp': DateTime.now().toIso8601String(),
       });
-      debugPrint('✅ Firestore write successful. Document ID: ${testDoc.id}');
+      debugdebugPrint('âœ… Firestore write successful. Document ID: ${testDoc.id}');
 
       // Clean up test document
       await _firestore.collection('test').doc(testDoc.id).delete();
-      debugPrint('✅ Firestore delete successful');
+      debugdebugPrint('âœ… Firestore delete successful');
     } catch (e) {
-      debugPrint('❌ Firestore test failed: $e');
+      debugdebugPrint('âŒ Firestore test failed: $e');
       rethrow;
     }
   }
@@ -57,20 +57,20 @@ class FirebaseDebug {
   // Test Auth connection
   Future<void> _testAuthConnection() async {
     try {
-      debugPrint('🔐 Testing Firebase Auth connection...');
+      debugdebugPrint('ðŸ” Testing Firebase Auth connection...');
 
       // Check current user
       final currentUser = _auth.currentUser;
       if (currentUser != null) {
-        debugPrint('✅ Current user found: ${currentUser.email}');
+        debugdebugPrint('âœ… Current user found: ${currentUser.email}');
       } else {
-        debugPrint('ℹ️ No current user (expected if not logged in)');
+        debugdebugPrint('â„¹ï¸ No current user (expected if not logged in)');
       }
 
       // Test with demo credentials
       await _testDemoLogin();
     } catch (e) {
-      debugPrint('❌ Auth test failed: $e');
+      debugdebugPrint('âŒ Auth test failed: $e');
       rethrow;
     }
   }
@@ -78,7 +78,7 @@ class FirebaseDebug {
   // Test demo login
   Future<void> _testDemoLogin() async {
     try {
-      debugPrint('👤 Testing demo login...');
+      debugdebugPrint('ðŸ‘¤ Testing demo login...');
 
       // Try to sign in with demo customer
       final userCredential = await _auth.signInWithEmailAndPassword(
@@ -86,16 +86,16 @@ class FirebaseDebug {
         password: 'password123',
       );
 
-      debugPrint('✅ Demo login successful: ${userCredential.user?.email}');
+      debugdebugPrint('âœ… Demo login successful: ${userCredential.user?.email}');
 
       // Test user profile retrieval
       await _testUserProfile(userCredential.user!.uid);
 
       // Sign out
       await _auth.signOut();
-      debugPrint('✅ Demo logout successful');
+      debugdebugPrint('âœ… Demo logout successful');
     } catch (e) {
-      debugPrint('❌ Demo login test failed: $e');
+      debugdebugPrint('âŒ Demo login test failed: $e');
       rethrow;
     }
   }
@@ -103,17 +103,17 @@ class FirebaseDebug {
   // Test user profile retrieval
   Future<void> _testUserProfile(String userId) async {
     try {
-      debugPrint('👤 Testing user profile retrieval for ID: $userId');
+      debugdebugPrint('ðŸ‘¤ Testing user profile retrieval for ID: $userId');
 
       final userDoc = await _firestore.collection('users').doc(userId).get();
 
       if (userDoc.exists) {
-        debugPrint('✅ User profile found: ${userDoc.data()}');
+        debugdebugPrint('âœ… User profile found: ${userDoc.data()}');
       } else {
-        debugPrint('❌ User profile not found for ID: $userId');
+        debugdebugPrint('âŒ User profile not found for ID: $userId');
       }
     } catch (e) {
-      debugPrint('❌ User profile test failed: $e');
+      debugdebugPrint('âŒ User profile test failed: $e');
       rethrow;
     }
   }
@@ -121,7 +121,7 @@ class FirebaseDebug {
   // Check demo users existence
   Future<void> checkDemoUsers() async {
     try {
-      debugPrint('🔍 Checking demo users...');
+      debugdebugPrint('ðŸ” Checking demo users...');
 
       // Check customer
       final customerQuery = await _firestore
@@ -130,9 +130,9 @@ class FirebaseDebug {
           .get();
 
       if (customerQuery.docs.isNotEmpty) {
-        debugPrint('✅ Demo customer found: ${customerQuery.docs.first.data()}');
+        debugdebugPrint('âœ… Demo customer found: ${customerQuery.docs.first.data()}');
       } else {
-        debugPrint('❌ Demo customer not found');
+        debugdebugPrint('âŒ Demo customer not found');
       }
 
       // Check shop owner
@@ -142,38 +142,38 @@ class FirebaseDebug {
           .get();
 
       if (shopQuery.docs.isNotEmpty) {
-        debugPrint('✅ Demo shop owner found: ${shopQuery.docs.first.data()}');
+        debugdebugPrint('âœ… Demo shop owner found: ${shopQuery.docs.first.data()}');
       } else {
-        debugPrint('❌ Demo shop owner not found');
+        debugdebugPrint('âŒ Demo shop owner not found');
       }
     } catch (e) {
-      debugPrint('❌ Demo users check failed: $e');
+      debugdebugPrint('âŒ Demo users check failed: $e');
     }
   }
 
   // Get Firebase configuration info
   Future<void> printFirebaseConfig() async {
     try {
-      debugPrint('🔧 Firebase Configuration:');
-      debugPrint(
+      debugdebugPrint('ðŸ”§ Firebase Configuration:');
+      debugdebugPrint(
           'Project ID: ${DefaultFirebaseOptions.currentPlatform.projectId}');
-      debugPrint('API Key: ${DefaultFirebaseOptions.currentPlatform.apiKey}');
-      debugPrint(
+      debugdebugPrint('API Key: ${DefaultFirebaseOptions.currentPlatform.apiKey}');
+      debugdebugPrint(
           'Auth Domain: ${DefaultFirebaseOptions.currentPlatform.authDomain}');
-      debugPrint(
+      debugdebugPrint(
           'Storage Bucket: ${DefaultFirebaseOptions.currentPlatform.storageBucket}');
-      debugPrint(
+      debugdebugPrint(
           'Messaging Sender ID: ${DefaultFirebaseOptions.currentPlatform.messagingSenderId}');
-      debugPrint('App ID: ${DefaultFirebaseOptions.currentPlatform.appId}');
+      debugdebugPrint('App ID: ${DefaultFirebaseOptions.currentPlatform.appId}');
     } catch (e) {
-      debugPrint('❌ Error printing Firebase config: $e');
+      debugdebugPrint('âŒ Error printing Firebase config: $e');
     }
   }
 
   // Test complete user flow
   Future<void> testCompleteUserFlow() async {
     try {
-      debugPrint('🔄 Testing complete user flow...');
+      debugdebugPrint('ðŸ”„ Testing complete user flow...');
 
       // Test customer flow
       await _testUserFlow(
@@ -182,7 +182,7 @@ class FirebaseDebug {
       // Test shop owner flow
       await _testUserFlow('shop@demo.com', 'password123', UserRole.shopOwner);
     } catch (e) {
-      debugPrint('❌ Complete user flow test failed: $e');
+      debugdebugPrint('âŒ Complete user flow test failed: $e');
     }
   }
 
@@ -190,14 +190,14 @@ class FirebaseDebug {
   Future<void> _testUserFlow(
       String email, String password, UserRole role) async {
     try {
-      debugPrint('👤 Testing user flow for: $email');
+      debugdebugPrint('ðŸ‘¤ Testing user flow for: $email');
 
       // 1. Sign in user
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      debugPrint('✅ Login successful: ${userCredential.user?.email}');
+      debugdebugPrint('âœ… Login successful: ${userCredential.user?.email}');
 
       // 2. Test user profile retrieval
       final userProfile = await _firestore
@@ -205,9 +205,9 @@ class FirebaseDebug {
           .doc(userCredential.user!.uid)
           .get();
       if (userProfile.exists) {
-        debugPrint('✅ User profile found: ${userProfile.data()}');
+        debugdebugPrint('âœ… User profile found: ${userProfile.data()}');
       } else {
-        debugPrint('❌ User profile not found');
+        debugdebugPrint('âŒ User profile not found');
       }
 
       // 3. Test user data update
@@ -218,20 +218,20 @@ class FirebaseDebug {
         'lastLogin': DateTime.now().toIso8601String(),
         'updatedAt': DateTime.now().toIso8601String(),
       });
-      debugPrint('✅ User profile update successful');
+      debugdebugPrint('âœ… User profile update successful');
 
       // 4. Sign out
       await _auth.signOut();
-      debugPrint('✅ Logout successful');
+      debugdebugPrint('âœ… Logout successful');
     } catch (e) {
-      debugPrint('❌ User flow test failed for $email: $e');
+      debugdebugPrint('âŒ User flow test failed for $email: $e');
     }
   }
 
   // Test customer data operations
   Future<void> testCustomerOperations() async {
     try {
-      debugPrint('👥 Testing customer data operations...');
+      debugdebugPrint('ðŸ‘¥ Testing customer data operations...');
 
       // Create test customer
       final testCustomer = models.Customer(
@@ -251,15 +251,15 @@ class FirebaseDebug {
       // Add to Firestore
       final docRef =
           await _firestore.collection('customers').add(testCustomer.toJson());
-      debugPrint('✅ Customer creation successful: ${docRef.id}');
+      debugdebugPrint('âœ… Customer creation successful: ${docRef.id}');
 
       // Retrieve customer
       final customerDoc =
           await _firestore.collection('customers').doc(docRef.id).get();
       if (customerDoc.exists) {
         final retrievedCustomer = models.Customer.fromJson(customerDoc.data()!);
-        debugPrint(
-            '✅ Customer retrieval successful: ${retrievedCustomer.name}');
+        debugdebugPrint(
+            'âœ… Customer retrieval successful: ${retrievedCustomer.name}');
       }
 
       // Update customer
@@ -268,20 +268,20 @@ class FirebaseDebug {
         'loyaltyTier': models.LoyaltyTier.silver.index,
         'updatedAt': DateTime.now().toIso8601String(),
       });
-      debugPrint('✅ Customer update successful');
+      debugdebugPrint('âœ… Customer update successful');
 
       // Delete test customer
       await _firestore.collection('customers').doc(docRef.id).delete();
-      debugPrint('✅ Customer deletion successful');
+      debugdebugPrint('âœ… Customer deletion successful');
     } catch (e) {
-      debugPrint('❌ Customer operations test failed: $e');
+      debugdebugPrint('âŒ Customer operations test failed: $e');
     }
   }
 
   // Test order data operations
   Future<void> testOrderOperations() async {
     try {
-      debugPrint('📋 Testing order data operations...');
+      debugdebugPrint('ðŸ“‹ Testing order data operations...');
 
       // Create test order
       final testOrder = models.Order(
@@ -316,14 +316,14 @@ class FirebaseDebug {
       // Add to Firestore
       final docRef =
           await _firestore.collection('orders').add(testOrder.toJson());
-      debugPrint('✅ Order creation successful: ${docRef.id}');
+      debugdebugPrint('âœ… Order creation successful: ${docRef.id}');
 
       // Retrieve order
       final orderDoc =
           await _firestore.collection('orders').doc(docRef.id).get();
       if (orderDoc.exists) {
         final retrievedOrder = models.Order.fromJson(orderDoc.data()!);
-        debugPrint('✅ Order retrieval successful: ${retrievedOrder.id}');
+        debugdebugPrint('âœ… Order retrieval successful: ${retrievedOrder.id}');
       }
 
       // Update order status
@@ -331,20 +331,20 @@ class FirebaseDebug {
         'status': models.OrderStatus.confirmed.index,
         'updatedAt': DateTime.now().toIso8601String(),
       });
-      debugPrint('✅ Order update successful');
+      debugdebugPrint('âœ… Order update successful');
 
       // Delete test order
       await _firestore.collection('orders').doc(docRef.id).delete();
-      debugPrint('✅ Order deletion successful');
+      debugdebugPrint('âœ… Order deletion successful');
     } catch (e) {
-      debugPrint('❌ Order operations test failed: $e');
+      debugdebugPrint('âŒ Order operations test failed: $e');
     }
   }
 
   // Test product data operations
   Future<void> testProductOperations() async {
     try {
-      debugPrint('📦 Testing product data operations...');
+      debugdebugPrint('ðŸ“¦ Testing product data operations...');
 
       // Create test product
       final testProduct = models.Product(
@@ -366,14 +366,14 @@ class FirebaseDebug {
       // Add to Firestore
       final docRef =
           await _firestore.collection('products').add(testProduct.toJson());
-      debugPrint('✅ Product creation successful: ${docRef.id}');
+      debugdebugPrint('âœ… Product creation successful: ${docRef.id}');
 
       // Retrieve product
       final productDoc =
           await _firestore.collection('products').doc(docRef.id).get();
       if (productDoc.exists) {
         final retrievedProduct = models.Product.fromJson(productDoc.data()!);
-        debugPrint('✅ Product retrieval successful: ${retrievedProduct.name}');
+        debugdebugPrint('âœ… Product retrieval successful: ${retrievedProduct.name}');
       }
 
       // Update product
@@ -381,63 +381,63 @@ class FirebaseDebug {
         'basePrice': 249.99,
         'updatedAt': DateTime.now().toIso8601String(),
       });
-      debugPrint('✅ Product update successful');
+      debugdebugPrint('âœ… Product update successful');
 
       // Delete test product
       await _firestore.collection('products').doc(docRef.id).delete();
-      debugPrint('✅ Product deletion successful');
+      debugdebugPrint('âœ… Product deletion successful');
     } catch (e) {
-      debugPrint('❌ Product operations test failed: $e');
+      debugdebugPrint('âŒ Product operations test failed: $e');
     }
   }
 
   // Test data integrity and relationships
   Future<void> testDataIntegrity() async {
     try {
-      debugPrint('🔗 Testing data integrity and relationships...');
+      debugdebugPrint('ðŸ”— Testing data integrity and relationships...');
 
       // Test user-orders relationship
       final usersSnapshot = await _firestore.collection('users').limit(5).get();
-      debugPrint(
-          '✅ Users collection accessible: ${usersSnapshot.docs.length} documents');
+      debugdebugPrint(
+          'âœ… Users collection accessible: ${usersSnapshot.docs.length} documents');
 
       // Test user-customers relationship
       final customersSnapshot =
           await _firestore.collection('customers').limit(5).get();
-      debugPrint(
-          '✅ Customers collection accessible: ${customersSnapshot.docs.length} documents');
+      debugdebugPrint(
+          'âœ… Customers collection accessible: ${customersSnapshot.docs.length} documents');
 
       // Test user-orders relationship
       final ordersSnapshot =
           await _firestore.collection('orders').limit(5).get();
-      debugPrint(
-          '✅ Orders collection accessible: ${ordersSnapshot.docs.length} documents');
+      debugdebugPrint(
+          'âœ… Orders collection accessible: ${ordersSnapshot.docs.length} documents');
 
       // Test products collection
       final productsSnapshot =
           await _firestore.collection('products').limit(5).get();
-      debugPrint(
-          '✅ Products collection accessible: ${productsSnapshot.docs.length} documents');
+      debugdebugPrint(
+          'âœ… Products collection accessible: ${productsSnapshot.docs.length} documents');
 
-      debugPrint('✅ All collections accessible and relationships intact');
+      debugdebugPrint('âœ… All collections accessible and relationships intact');
     } catch (e) {
-      debugPrint('❌ Data integrity test failed: $e');
+      debugdebugPrint('âŒ Data integrity test failed: $e');
     }
   }
 
   // Production readiness check
   Future<void> productionReadinessCheck() async {
     try {
-      debugPrint('🏭 Production readiness check...');
+      debugdebugPrint('ðŸ­ Production readiness check...');
 
       // Check Firebase configuration
       final configValid = _validateFirebaseConfig();
-      debugPrint(
-          '✅ Firebase configuration: ${configValid ? 'VALID' : 'INVALID'}');
+      debugdebugPrint(
+          'âœ… Firebase configuration: ${configValid ? 'VALID' : 'INVALID'}');
 
       // Check security rules deployment status
-      debugPrint(
-          '⚠️  Manual check required: Firestore security rules deployment');
+      debugdebugPrint(
+          'âš ï¸  Manual check required: Firestore security rules deployment');
 
       // Check data consistency
       await testDataIntegrity();
@@ -445,9 +445,9 @@ class FirebaseDebug {
       // Check authentication flow
       await testCompleteUserFlow();
 
-      debugPrint('✅ Production readiness check completed');
+      debugdebugPrint('âœ… Production readiness check completed');
     } catch (e) {
-      debugPrint('❌ Production readiness check failed: $e');
+      debugdebugPrint('âŒ Production readiness check failed: $e');
     }
   }
 
@@ -460,7 +460,7 @@ class FirebaseDebug {
           config.projectId.isNotEmpty &&
           config.storageBucket?.isNotEmpty == true;
     } catch (e) {
-      debugPrint('❌ Firebase config validation error: $e');
+      debugdebugPrint('âŒ Firebase config validation error: $e');
       return false;
     }
   }
@@ -468,40 +468,40 @@ class FirebaseDebug {
   // Comprehensive debug function
   Future<void> runFullDebug() async {
     try {
-      debugPrint('🐛 Starting comprehensive Firebase debug...');
-      debugPrint('=' * 50);
+      debugdebugPrint('ðŸ› Starting comprehensive Firebase debug...');
+      debugdebugPrint('=' * 50);
 
       await printFirebaseConfig();
-      debugPrint('');
+      debugdebugPrint('');
 
       await testFirebaseConnection();
-      debugPrint('');
+      debugdebugPrint('');
 
       await checkDemoUsers();
-      debugPrint('');
+      debugdebugPrint('');
 
       await testCompleteUserFlow();
-      debugPrint('');
+      debugdebugPrint('');
 
       await testCustomerOperations();
-      debugPrint('');
+      debugdebugPrint('');
 
       await testOrderOperations();
-      debugPrint('');
+      debugdebugPrint('');
 
       await testProductOperations();
-      debugPrint('');
+      debugdebugPrint('');
 
       await testDataIntegrity();
-      debugPrint('');
+      debugdebugPrint('');
 
       await productionReadinessCheck();
-      debugPrint('');
+      debugdebugPrint('');
 
-      debugPrint('🐛 Firebase debug completed successfully');
-      debugPrint('=' * 50);
+      debugdebugPrint('ðŸ› Firebase debug completed successfully');
+      debugdebugPrint('=' * 50);
     } catch (e) {
-      debugPrint('❌ Full debug failed: $e');
+      debugdebugPrint('âŒ Full debug failed: $e');
     }
   }
 }
@@ -511,3 +511,4 @@ Future<void> runFirebaseDebug() async {
   final debug = FirebaseDebug();
   await debug.runFullDebug();
 }
+

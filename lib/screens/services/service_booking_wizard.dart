@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/service.dart';
 import '../../models/order.dart';
@@ -227,8 +227,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
                                 ? DarkAppColors.primary
                                 : AppColors.primary)
                             : (themeProvider.isDarkMode
-                                ? DarkAppColors.onSurface.withOpacity(0.3)
-                                : AppColors.onSurface.withOpacity(0.3)),
+                                ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                                : AppColors.onSurface.withValues(alpha: 0.3)),
                   ),
                   child: Center(
                     child: isCompleted
@@ -250,8 +250,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
                             ? DarkAppColors.primary
                             : AppColors.primary)
                         : (themeProvider.isDarkMode
-                            ? DarkAppColors.onSurface.withOpacity(0.6)
-                            : AppColors.onSurface.withOpacity(0.6)),
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                            : AppColors.onSurface.withValues(alpha: 0.6)),
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 12,
                   ),
@@ -262,8 +262,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
                     child: Container(
                       height: 2,
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withOpacity(0.2)
-                          : AppColors.onSurface.withOpacity(0.2),
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.2)
+                          : AppColors.onSurface.withValues(alpha: 0.2),
                     ),
                   ),
                 ],
@@ -298,8 +298,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
               'Please provide your contact information',
               style: TextStyle(
                 color: themeProvider.isDarkMode
-                    ? DarkAppColors.onSurface.withOpacity(0.7)
-                    : AppColors.onSurface.withOpacity(0.7),
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                    : AppColors.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
@@ -461,8 +461,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
             'Choose your preferred date and time slot',
             style: TextStyle(
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                  : AppColors.onSurface.withOpacity(0.7),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                  : AppColors.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -714,8 +714,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
             'Please provide accurate measurements for the best fit',
             style: TextStyle(
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                  : AppColors.onSurface.withOpacity(0.7),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                  : AppColors.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -773,8 +773,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
             'Complete your service booking by selecting a payment method',
             style: TextStyle(
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                  : AppColors.onSurface.withOpacity(0.7),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                  : AppColors.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -1200,8 +1200,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
         border: Border(
           top: BorderSide(
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withOpacity(0.1)
-                : AppColors.onSurface.withOpacity(0.1),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                : AppColors.onSurface.withValues(alpha: 0.1),
           ),
         ),
       ),
@@ -1286,3 +1286,4 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
     await _createServiceOrder();
   }
 }
+

@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 // Service Create Screen with Offline Support
 // Form to create new tailoring services with comprehensive customization options
 
@@ -837,7 +838,7 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
   Future<void> _uploadSelectedImages() async {
     if (_selectedImages.isEmpty) return;
 
-    debugPrint(
+    debugdebugPrint(
         '_uploadSelectedImages called with ${_selectedImages.length} images');
     final serviceId = 'service_${DateTime.now().millisecondsSinceEpoch}';
     final firebaseStorageService = FirebaseStorageService();
@@ -850,21 +851,21 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
     });
 
     try {
-      debugPrint('_uploadSelectedImages: calling uploadMultipleImages');
+      debugdebugPrint('_uploadSelectedImages: calling uploadMultipleImages');
       final uploadedUrls = await firebaseStorageService.uploadMultipleImages(
         _selectedImages,
         folder: 'services',
         serviceId: serviceId,
         onProgress: (progress) {
-          debugPrint('_uploadSelectedImages: progress $progress');
+          debugdebugPrint('_uploadSelectedImages: progress $progress');
           setState(() => _uploadProgress = progress);
         },
         onImageComplete: (completed, total) {
-          debugPrint('Uploaded $completed of $total images');
+          debugdebugPrint('Uploaded $completed of $total images');
         },
       );
 
-      debugPrint(
+      debugdebugPrint(
           '_uploadSelectedImages: uploaded ${uploadedUrls.length} urls: $uploadedUrls');
       setState(() {
         _uploadedImageUrls.addAll(uploadedUrls);
@@ -879,7 +880,7 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
         );
       }
     } catch (e) {
-      debugPrint('_uploadSelectedImages: error $e');
+      debugdebugPrint('_uploadSelectedImages: error $e');
       setState(() => _uploadError = e.toString());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -892,14 +893,14 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
   }
 
   void _submitForm() async {
-    debugPrint('_submitForm called');
+    debugdebugPrint('_submitForm called');
     if (!_formKey.currentState!.validate()) {
-      debugPrint('_submitForm: validation failed');
+      debugdebugPrint('_submitForm: validation failed');
       return;
     }
 
     if (_features.isEmpty) {
-      debugPrint('_submitForm: no features, showing snackbar');
+      debugdebugPrint('_submitForm: no features, showing snackbar');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please add at least one feature')),
       );
@@ -908,14 +909,14 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
 
     // Handle image uploads if there are selected images
     if (_selectedImages.isNotEmpty) {
-      debugPrint(
+      debugdebugPrint(
           '_submitForm: handling uploads, ${_selectedImages.length} images');
       try {
         await _uploadSelectedImages();
 
         // If upload failed, don't proceed
         if (_uploadError != null) {
-          debugPrint('_submitForm: upload error: $_uploadError');
+          debugdebugPrint('_submitForm: upload error: $_uploadError');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content:
@@ -924,21 +925,21 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
           return;
         }
       } catch (e) {
-        debugPrint('_submitForm: upload exception: $e');
+        debugdebugPrint('_submitForm: upload exception: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload images: $e')),
         );
         return;
       }
     } else {
-      debugPrint('_submitForm: no images to upload');
+      debugdebugPrint('_submitForm: no images to upload');
     }
 
-    debugPrint('_submitForm: image handling done, urls: $_uploadedImageUrls');
+    debugdebugPrint('_submitForm: image handling done, urls: $_uploadedImageUrls');
     setState(() => _isLoading = true);
 
     try {
-      debugPrint('_submitForm: creating service object');
+      debugdebugPrint('_submitForm: creating service object');
       final service = svc.Service(
         id: 'service_${DateTime.now().millisecondsSinceEpoch}',
         name: _nameController.text,
@@ -962,14 +963,14 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
         updatedAt: DateTime.now(),
       );
 
-      debugPrint('_submitForm: calling serviceProvider.createService');
+      debugdebugPrint('_submitForm: calling serviceProvider.createService');
       final serviceProvider =
           Provider.of<ServiceProvider>(context, listen: false);
       final success = await serviceProvider.createService(service);
-      debugPrint('_submitForm: createService result: $success');
+      debugdebugPrint('_submitForm: createService result: $success');
 
       if (success && mounted) {
-        debugPrint(
+        debugdebugPrint(
             '_submitForm: service created successfully, navigating back');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Service created successfully!')),
@@ -985,11 +986,11 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
 
         Navigator.pop(context);
       } else {
-        debugPrint('_submitForm: createService failed');
+        debugdebugPrint('_submitForm: createService failed');
         throw Exception('Failed to create service');
       }
     } catch (e) {
-      debugPrint('_submitForm: error creating service: $e');
+      debugdebugPrint('_submitForm: error creating service: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
@@ -1002,3 +1003,5 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
     }
   }
 }
+
+

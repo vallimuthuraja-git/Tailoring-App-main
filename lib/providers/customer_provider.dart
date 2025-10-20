@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/customer.dart';
 import '../models/order.dart';
@@ -85,7 +86,7 @@ class CustomerProvider with ChangeNotifier {
       _isLoading = false;
       _errorMessage = 'Failed to load customers: $e';
       notifyListeners();
-      debugPrint('ERROR: Failed to load customers: $e');
+      debugdebugPrint('ERROR: Failed to load customers: $e');
     }
   }
 
@@ -336,7 +337,7 @@ class CustomerProvider with ChangeNotifier {
     guide.writeln('');
 
     measurements.forEach((key, description) {
-      guide.writeln('📏 $key: $description');
+      guide.writeln('ðŸ“ $key: $description');
     });
 
     return guide.toString();
@@ -474,3 +475,5 @@ extension CustomerExtensions on Customer {
     return name;
   }
 }
+
+

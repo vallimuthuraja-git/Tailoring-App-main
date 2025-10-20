@@ -1,4 +1,4 @@
-import 'dart:math';
+﻿import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import '../models/product_models.dart';
@@ -23,7 +23,7 @@ class ComprehensiveDemoDataService {
 
   /// Main method to populate all demo data
   static Future<void> populateAllDemoData() async {
-    debugPrint('🚀 Starting comprehensive demo data population...');
+    debugdebugPrint('ðŸš€ Starting comprehensive demo data population...');
 
     try {
       // Generate and populate data in order of dependencies
@@ -34,17 +34,17 @@ class ComprehensiveDemoDataService {
       await _populateWorkAssignments();
       await _populateChatConversations();
 
-      debugPrint('✅ Comprehensive demo data population completed!');
-      debugPrint('📊 Generated:');
-      debugPrint('   - $_customerCount customers');
-      debugPrint('   - $_productCount products');
-      debugPrint('   - $_employeeCount employees');
-      debugPrint('   - $_serviceCount services');
-      debugPrint('   - $_workAssignmentCount work assignments');
-      debugPrint('   - $_chatConversationCount chat conversations');
-      debugPrint('   - Ready for full system testing!');
+      debugdebugPrint('âœ… Comprehensive demo data population completed!');
+      debugdebugPrint('ðŸ“Š Generated:');
+      debugdebugPrint('   - $_customerCount customers');
+      debugdebugPrint('   - $_productCount products');
+      debugdebugPrint('   - $_employeeCount employees');
+      debugdebugPrint('   - $_serviceCount services');
+      debugdebugPrint('   - $_workAssignmentCount work assignments');
+      debugdebugPrint('   - $_chatConversationCount chat conversations');
+      debugdebugPrint('   - Ready for full system testing!');
     } catch (e) {
-      debugPrint('❌ Error during demo data population: $e');
+      debugdebugPrint('âŒ Error during demo data population: $e');
       rethrow;
     }
   }
@@ -57,7 +57,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate customers with all loyalty tiers and diverse profiles
   static Future<void> _populateCustomers() async {
-    debugPrint('👥 Generating customers...');
+    debugdebugPrint('ðŸ‘¥ Generating customers...');
 
     final customers = _generateCustomers();
     final batch = _firestore.batch();
@@ -68,12 +68,12 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugPrint('✅ Generated ${customers.length} customers');
+    debugdebugPrint('âœ… Generated ${customers.length} customers');
   }
 
   /// Generate products across all categories
   static Future<void> _populateProducts() async {
-    debugPrint('📦 Generating products...');
+    debugdebugPrint('ðŸ“¦ Generating products...');
 
     final products = _generateProducts();
     final batch = _firestore.batch();
@@ -84,7 +84,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugPrint('✅ Generated ${products.length} products');
+    debugdebugPrint('âœ… Generated ${products.length} products');
   }
 
   /// Generate diverse customer profiles with all loyalty tiers
@@ -192,7 +192,7 @@ class ComprehensiveDemoDataService {
         description: template['description'] as String,
         category: category,
         basePrice: (template['basePrice'] as double) *
-            (0.8 + _random.nextDouble() * 0.4), // ±20% variation
+            (0.8 + _random.nextDouble() * 0.4), // Â±20% variation
         imageUrls: [
           'https://via.placeholder.com/300x300?text=${template['name'].toString().replaceAll(' ', '+')}'
         ],
@@ -370,7 +370,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate employees with all skill combinations and diverse profiles
   static Future<void> _populateEmployees() async {
-    debugPrint('👷 Generating employees...');
+    debugdebugPrint('ðŸ‘· Generating employees...');
 
     final employees = _generateEmployees();
     final batch = _firestore.batch();
@@ -381,7 +381,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugPrint('✅ Generated ${employees.length} employees');
+    debugdebugPrint('âœ… Generated ${employees.length} employees');
   }
 
   /// Generate diverse employee profiles with all skill combinations
@@ -754,7 +754,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate services with all types and complexities
   static Future<void> _populateServices() async {
-    debugPrint('🏷️ Generating services...');
+    debugdebugPrint('ðŸ·ï¸ Generating services...');
 
     final services = _generateServices();
     final batch = _firestore.batch();
@@ -765,7 +765,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugPrint('✅ Generated ${services.length} services');
+    debugdebugPrint('âœ… Generated ${services.length} services');
   }
 
   /// Generate diverse services across all categories and types
@@ -1319,7 +1319,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate work assignments linking employees to orders
   static Future<void> _populateWorkAssignments() async {
-    print('📋 Generating work assignments...');
+    debugPrint('ðŸ“‹ Generating work assignments...');
 
     final workAssignments = _generateWorkAssignments();
     final batch = _firestore.batch();
@@ -1331,7 +1331,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated ${workAssignments.length} work assignments');
+    debugPrint('âœ… Generated ${workAssignments.length} work assignments');
   }
 
   /// Generate diverse work assignments linking employees to orders
@@ -1573,7 +1573,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate chat conversations for customer support
   static Future<void> _populateChatConversations() async {
-    print('💬 Generating chat conversations...');
+    debugPrint('ðŸ’¬ Generating chat conversations...');
 
     final conversations = _generateChatConversations();
     final batch = _firestore.batch();
@@ -1585,7 +1585,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated ${conversations.length} chat conversations');
+    debugPrint('âœ… Generated ${conversations.length} chat conversations');
 
     // Generate messages for each conversation
     await _populateChatMessages(conversations);
@@ -1650,7 +1650,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated chat messages for all conversations');
+    debugPrint('âœ… Generated chat messages for all conversations');
   }
 
   static String _generateRandomMessage() {
@@ -1682,11 +1682,11 @@ class ComprehensiveDemoDataService {
     } else {
       const botMessages = [
         'Hello! I\'d be happy to help you with your tailoring needs.',
-        'Our shirt stitching starts from ₹1,299. Would you like to see our catalog?',
+        'Our shirt stitching starts from â‚¹1,299. Would you like to see our catalog?',
         'Dress alteration takes 3-5 business days. Express service is available.',
         'I can send you our detailed measurement guide. Would you like that?',
         'We have a wide variety of fabrics. What type of garment are you looking for?',
-        'We offer free delivery within the city. Express delivery is ₹199 extra.',
+        'We offer free delivery within the city. Express delivery is â‚¹199 extra.',
         'You\'re welcome! Is there anything else I can assist you with?',
         'We accept cash, card, UPI, and bank transfers. Which is convenient for you?',
       ];
@@ -1882,3 +1882,4 @@ class ComprehensiveDemoDataService {
     };
   }
 }
+

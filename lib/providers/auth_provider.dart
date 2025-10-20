@@ -83,7 +83,7 @@ class AuthProvider with ChangeNotifier {
       try {
         _userProfile = await _authService.getUserProfile(_user!.uid);
         if (_userProfile?.email == 'admin@demo.com') {
-          print(
+          debugPrint(
               '🔍 AUTH PROVIDER LOAD: Admin user profile loaded with role: ${_userProfile?.role.name}');
         }
         notifyListeners();
@@ -547,23 +547,23 @@ class AuthProvider with ChangeNotifier {
     final password = account['password']!;
     final displayName = account['displayName']!;
 
-    print('🔑 DEMO LOGIN START FOR: $accountKey');
-    print('📧 Email: $email');
-    print('🔒 Password: ***********'); // Hide actual password
-    print('👤 Display Name: $displayName');
-    print('⚡ Role: $role');
+    debugPrint('🔑 DEMO LOGIN START FOR: $accountKey');
+    debugPrint('📧 Email: $email');
+    debugPrint('🔒 Password: ***********'); // Hide actual password
+    debugPrint('👤 Display Name: $displayName');
+    debugPrint('⚡ Role: $role');
 
     debugPrint('🔑 DEMO LOGIN START: $accountKey - Email: $email, Role: $role');
 
     try {
-      print(
+      debugPrint(
           '🚀 DEMO LOGIN START: Attempting to login as $displayName ($email)');
       _isLoading = true;
       _errorMessage = 'Logging in as $displayName...';
       notifyListeners();
 
       debugPrint('🔄 DEMO LOGIN: Setting loading state');
-      print('🔍 DEMO LOGIN: Current user before login: $_user');
+      debugPrint('🔍 DEMO LOGIN: Current user before login: $_user');
 
       // First, try to sign in with existing demo account
       try {
@@ -591,7 +591,7 @@ class AuthProvider with ChangeNotifier {
         debugPrint(
             '✅ DEMO LOGIN: Profile loaded. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
         if (_userProfile?.email == 'admin@demo.com') {
-          print(
+          debugPrint(
               '🔍 AUTH PROVIDER: Admin demo login - assigned role: ${_userProfile?.role.name}');
         }
       } catch (e) {
@@ -722,9 +722,9 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (e) {
       debugPrint('💥 DEMO LOGIN ERROR: $e');
-      print('❌ DEMO LOGIN FAILURE: Detailed error: $e');
-      print('🔍 DEMO LOGIN FAILURE: Error type: ${e.runtimeType.toString()}');
-      print('🔍 DEMO LOGIN FAILURE: User profile after failure: $_userProfile');
+      debugPrint('❌ DEMO LOGIN FAILURE: Detailed error: $e');
+      debugPrint('🔍 DEMO LOGIN FAILURE: Error type: ${e.runtimeType.toString()}');
+      debugPrint('🔍 DEMO LOGIN FAILURE: User profile after failure: $_userProfile');
 
       _isLoading = false;
       _errorMessage = 'Demo login failed: $e';
@@ -802,3 +802,4 @@ class AuthProvider with ChangeNotifier {
     }
   }
 }
+

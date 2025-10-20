@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -199,26 +200,26 @@ class AuthService {
     required String password,
   }) async {
     try {
-      print('🔐 Attempting to sign in user: $email');
+      debugPrint('ðŸ” Attempting to sign in user: $email');
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print('✅ Successfully signed in user: ${userCredential.user?.email}');
+      debugPrint('âœ… Successfully signed in user: ${userCredential.user?.email}');
 
       // Fetch and log user role for debugging
       if (email == 'admin@demo.com') {
         final profile = await getUserProfile(userCredential.user!.uid);
         if (profile != null) {
-          print('🔍 ADMIN LOGIN: User role assigned is ${profile.role.name}');
+          debugPrint('ðŸ” ADMIN LOGIN: User role assigned is ${profile.role.name}');
         } else {
-          print('❌ ADMIN LOGIN: No profile found for admin user');
+          debugPrint('âŒ ADMIN LOGIN: No profile found for admin user');
         }
       }
 
       return userCredential;
     } catch (e) {
-      print('❌ Sign in error for $email: $e');
+      debugPrint('âŒ Sign in error for $email: $e');
       throw _handleAuthError(e);
     }
   }
@@ -352,28 +353,28 @@ class AuthService {
   // Get user profile from Firestore
   Future<UserModel?> getUserProfile(String userId) async {
     try {
-      print('🔍 Fetching user profile for ID: $userId');
+      debugPrint('ðŸ” Fetching user profile for ID: $userId');
       DocumentSnapshot doc =
           await _firestore.collection('users').doc(userId).get();
       if (doc.exists) {
         final userModel =
             UserModel.fromJson(doc.data() as Map<String, dynamic>);
-        print(
-            '✅ User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
+        debugPrint(
+            'âœ… User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
         if (userModel.email == 'admin@demo.com') {
-          print('🔍 ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
+          debugPrint('ðŸ” ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
         }
         return userModel;
       } else {
-        print('❌ No user profile found for $userId');
+        debugPrint('âŒ No user profile found for $userId');
         if ('admin@demo.com' == 'admin@demo.com') {
           // placeholder, but actually check if this is admin id
-          print('❌ ADMIN PROFILE FETCH: No profile exists');
+          debugPrint('âŒ ADMIN PROFILE FETCH: No profile exists');
         }
         return null;
       }
     } catch (e) {
-      print('❌ Error fetching user profile for $userId: $e');
+      debugPrint('âŒ Error fetching user profile for $userId: $e');
       throw _handleAuthError(e);
     }
   }
@@ -545,3 +546,5 @@ class AuthService {
     },
   };
 }
+
+

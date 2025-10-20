@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/employee.dart' as emp;
 
@@ -61,7 +62,7 @@ class WorkAssignmentService {
 
       return recommendations.take(5).toList(); // Return top 5 recommendations
     } catch (e) {
-      // print('Error getting assignment recommendations: $e');
+      // debugPrint('Error getting assignment recommendations: $e');
       return [];
     }
   }
@@ -359,13 +360,13 @@ class WorkAssignmentService {
       );
 
       if (recommendations.isEmpty) {
-        // print('No suitable employees found for auto-assignment');
+        // debugPrint('No suitable employees found for auto-assignment');
         return false;
       }
 
       final bestMatch = recommendations.first;
       if (bestMatch.confidenceLevel < 0.6) {
-        // print('Best match has low confidence (${bestMatch.confidenceLevel}), manual assignment recommended');
+        // debugPrint('Best match has low confidence (${bestMatch.confidenceLevel}), manual assignment recommended');
         return false;
       }
 
@@ -398,10 +399,10 @@ class WorkAssignmentService {
         'lastActive': Timestamp.fromDate(DateTime.now()),
       });
 
-      // print('Successfully auto-assigned work to ${bestMatch.employeeName}');
+      // debugPrint('Successfully auto-assigned work to ${bestMatch.employeeName}');
       return true;
     } catch (e) {
-      // print('Error in auto-assignment: $e');
+      // debugPrint('Error in auto-assignment: $e');
       return false;
     }
   }
@@ -438,7 +439,7 @@ class WorkAssignmentService {
         'assignmentOptimization': _generateAssignmentOptimization(assignments),
       };
     } catch (e) {
-      // print('Error getting assignment analytics: $e');
+      // debugPrint('Error getting assignment analytics: $e');
       return {};
     }
   }
@@ -573,3 +574,5 @@ class WorkAssignmentService {
     };
   }
 }
+
+

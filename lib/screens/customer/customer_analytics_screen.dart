@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -138,7 +138,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
               Expanded(
                 child: _buildSummaryCard(
                   title: 'Total Revenue',
-                  value: '₹${totalRevenue.toStringAsFixed(0)}',
+                  value: 'â‚¹${totalRevenue.toStringAsFixed(0)}',
                   icon: Icons.attach_money,
                   color: Colors.purple,
                   isDark: isDark,
@@ -229,7 +229,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -255,7 +255,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
             style: TextStyle(
               fontSize: 12,
               color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-                  .withOpacity(0.7),
+                  .withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -276,7 +276,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -341,7 +341,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
                 style: TextStyle(
                   color:
                       (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-                          .withOpacity(0.7),
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -351,7 +351,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
             value: percentage / 100,
             backgroundColor:
                 (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-                    .withOpacity(0.1),
+                    .withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation(
               isDark ? DarkAppColors.primary : AppColors.primary,
             ),
@@ -385,7 +385,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -417,14 +417,14 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
                     fontSize: 12,
                     color:
                         (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-                            .withOpacity(0.7),
+                            .withValues(alpha: 0.7),
                   ),
                 ),
               ],
             ),
           ),
           Text(
-            '₹${customer.totalSpent.toStringAsFixed(0)}',
+            'â‚¹${customer.totalSpent.toStringAsFixed(0)}',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: isDark ? DarkAppColors.primary : AppColors.primary,
@@ -455,7 +455,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: (isDark ? DarkAppColors.primary : AppColors.primary)
-                  .withOpacity(0.1),
+                  .withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -479,3 +479,4 @@ extension _StringExtension on String {
     return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
+

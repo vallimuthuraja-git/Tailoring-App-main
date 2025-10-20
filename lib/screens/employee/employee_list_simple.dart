@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,9 +48,9 @@ class EmployeeManagementHelper {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('✅ Success!'),
+            title: const Text('âœ… Success!'),
             content: const Text(
-                'Added 5 demo employees to the database!\n\nEmployees added:\n• Esther (Owner)\n• Rajesh Kumar (Tailor)\n• Priya Sharma (Designer)\n• Amit Patel (Cutter)\n• Sneha Gupta (Finisher)'),
+                'Added 5 demo employees to the database!\n\nEmployees added:\nâ€¢ Esther (Owner)\nâ€¢ Rajesh Kumar (Tailor)\nâ€¢ Priya Sharma (Designer)\nâ€¢ Amit Patel (Cutter)\nâ€¢ Sneha Gupta (Finisher)'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -68,7 +69,7 @@ class EmployeeManagementHelper {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('❌ Error'),
+            title: const Text('âŒ Error'),
             content: Text('Failed to add demo employees: $e'),
             actions: [
               TextButton(
@@ -80,7 +81,7 @@ class EmployeeManagementHelper {
         );
       } else {
         // Log error silently
-        debugPrint('Failed to silently populate demo employees: $e');
+        debugdebugPrint('Failed to silently populate demo employees: $e');
       }
     }
   }
@@ -90,13 +91,13 @@ class EmployeeManagementHelper {
     try {
       final querySnapshot = await _firebaseService.getCollection('employees');
       if (querySnapshot.docs.isEmpty) {
-        debugPrint('No employees found. Auto-populating demo data...');
+        debugdebugPrint('No employees found. Auto-populating demo data...');
         await populateDemoEmployees(context, silent: true);
         return true; // Data was populated
       }
       return false; // Data already exists
     } catch (e) {
-      debugPrint('Error checking for employees: $e');
+      debugdebugPrint('Error checking for employees: $e');
       return false;
     }
   }
@@ -303,33 +304,33 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
   @override
   void initState() {
     super.initState();
-    debugPrint('🏗️ EmployeeListSimple initState - starting initialization');
+    debugdebugPrint('ðŸ—ï¸ EmployeeListSimple initState - starting initialization');
     // Start with a simple loading state
     _loading = true;
     _initComplete = false;
 
     // Use a simple delayed initialization to avoid complex async issues
     Future.delayed(const Duration(milliseconds: 500), () {
-      debugPrint('⏰ EmployeeListSimple delayed initialization triggered');
+      debugdebugPrint('â° EmployeeListSimple delayed initialization triggered');
       if (mounted) {
         _initializeSimple();
       } else {
-        debugPrint(
-            '⚠️ EmployeeListSimple not mounted during delayed initialization');
+        debugdebugPrint(
+            'âš ï¸ EmployeeListSimple not mounted during delayed initialization');
       }
     });
   }
 
   void _initializeSimple() {
-    debugPrint(
-        '🚀 EmployeeListSimple _initializeSimple - starting simple initialization');
+    debugdebugPrint(
+        'ðŸš€ EmployeeListSimple _initializeSimple - starting simple initialization');
     // Simple synchronous initialization first
     setState(() {
       _loading = false;
       _initComplete = true;
     });
-    debugPrint(
-        '✅ EmployeeListSimple simple initialization complete, now loading data');
+    debugdebugPrint(
+        'âœ… EmployeeListSimple simple initialization complete, now loading data');
 
     // Then try to load data asynchronously
     _loadEmployeeData();
@@ -337,60 +338,60 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
   Future<void> _loadEmployeeData() async {
     try {
-      debugPrint(
-          '🚀 EmployeeListSimple _loadEmployeeData - starting data load');
-      debugPrint('📦 Checking EmployeeProvider availability');
+      debugdebugPrint(
+          'ðŸš€ EmployeeListSimple _loadEmployeeData - starting data load');
+      debugdebugPrint('ðŸ“¦ Checking EmployeeProvider availability');
       final employeeProvider =
           Provider.of<EmployeeProvider>(context, listen: false);
-      debugPrint('✅ EmployeeProvider obtained successfully');
+      debugdebugPrint('âœ… EmployeeProvider obtained successfully');
 
       // Simple load with timeout
       await employeeProvider.loadEmployees().timeout(
         const Duration(seconds: 10),
         onTimeout: () {
-          debugPrint('⚠️ Employee load timed out');
+          debugdebugPrint('âš ï¸ Employee load timed out');
           throw Exception('Loading timed out - please check your connection');
         },
       );
 
-      debugPrint('✅ EmployeeListSimple data loaded successfully');
-      debugPrint('📈 Found ${employeeProvider.employees.length} employees');
+      debugdebugPrint('âœ… EmployeeListSimple data loaded successfully');
+      debugdebugPrint('ðŸ“ˆ Found ${employeeProvider.employees.length} employees');
 
       if (mounted) {
-        debugPrint('🔄 EmployeeListSimple - clearing error and updating state');
+        debugdebugPrint('ðŸ”„ EmployeeListSimple - clearing error and updating state');
         setState(() {
           _initError = null;
         });
       } else {
-        debugPrint(
-            '⚠️ EmployeeListSimple not mounted when setting success state');
+        debugdebugPrint(
+            'âš ï¸ EmployeeListSimple not mounted when setting success state');
       }
     } catch (e) {
-      debugPrint('❌ EmployeeListSimple failed to load employee data: $e');
+      debugdebugPrint('âŒ EmployeeListSimple failed to load employee data: $e');
       if (mounted) {
-        debugPrint('🔄 EmployeeListSimple - setting error state');
+        debugdebugPrint('ðŸ”„ EmployeeListSimple - setting error state');
         setState(() {
           _initError = 'Failed to load employees: $e';
         });
       } else {
-        debugPrint(
-            '⚠️ EmployeeListSimple not mounted when setting error state');
+        debugdebugPrint(
+            'âš ï¸ EmployeeListSimple not mounted when setting error state');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('🔄 EmployeeListSimple build - rebuilding widget');
+    debugdebugPrint('ðŸ”„ EmployeeListSimple build - rebuilding widget');
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        debugPrint(
-            '🔐 EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
-        debugPrint('👑 isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
+        debugdebugPrint(
+            'ðŸ” EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
+        debugdebugPrint('ðŸ‘‘ isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
         // Check if user has permission to view employee list
         if (!authProvider.isShopOwnerOrAdmin) {
-          debugPrint(
-              '❌ EmployeeListSimple access denied - user is not shop owner or admin');
+          debugdebugPrint(
+              'âŒ EmployeeListSimple access denied - user is not shop owner or admin');
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -416,19 +417,19 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
           );
         }
 
-        debugPrint(
-            '✅ EmployeeListSimple access granted - building main content');
+        debugdebugPrint(
+            'âœ… EmployeeListSimple access granted - building main content');
         return Expanded(
           child: Consumer<EmployeeProvider>(
             builder: (context, employeeProvider, child) {
-              debugPrint('📊 EmployeeListSimple building with provider state:');
-              debugPrint('  - _initComplete: $_initComplete');
-              debugPrint(
+              debugdebugPrint('ðŸ“Š EmployeeListSimple building with provider state:');
+              debugdebugPrint('  - _initComplete: $_initComplete');
+              debugdebugPrint(
                   '  - employeeProvider.isLoading: ${employeeProvider.isLoading}');
-              debugPrint('  - _initError: $_initError');
-              debugPrint(
+              debugdebugPrint('  - _initError: $_initError');
+              debugdebugPrint(
                   '  - employeeProvider.errorMessage: ${employeeProvider.errorMessage}');
-              debugPrint(
+              debugdebugPrint(
                   '  - employeeProvider.employees.length: ${employeeProvider.employees.length}');
 
               // Show loading if initialization is incomplete OR provider is loading
@@ -455,7 +456,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                       // Emergency bypass button
                       ElevatedButton.icon(
                         onPressed: () async {
-                          debugPrint('🚨 Emergency bypass activated');
+                          debugdebugPrint('ðŸš¨ Emergency bypass activated');
                           try {
                             await EmployeeManagementHelper
                                 .populateDemoEmployees(context, silent: true);
@@ -466,7 +467,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                               _initError = null;
                             });
                           } catch (e) {
-                            debugPrint('❌ Emergency bypass failed: $e');
+                            debugdebugPrint('âŒ Emergency bypass failed: $e');
                             setState(() {
                               _initError = 'Emergency bypass failed: $e';
                               _loading = false;
@@ -615,7 +616,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         const Text(
-                                          '🚀 Get Started',
+                                          'ðŸš€ Get Started',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -727,8 +728,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             Expanded(
                                               child: OutlinedButton.icon(
                                                 onPressed: () async {
-                                                  debugPrint(
-                                                      '🔄 Force refreshing employee data...');
+                                                  debugdebugPrint(
+                                                      'ðŸ”„ Force refreshing employee data...');
                                                   setState(() {
                                                     _initComplete = false;
                                                     _initError = null;
@@ -786,7 +787,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                                 BorderRadius.circular(8),
                                           ),
                                           child: const Text(
-                                            '💡 Demo data includes:\n• Esther (Owner) with management privileges\n• Rajesh Kumar (Tailor) for customization work\n• Priya Sharma (Designer) for creative tasks\n• Amit Patel (Cutter) for fabric preparation\n• Sneha Gupta (Finisher) for final touches\n• Manual employee addition available',
+                                            'ðŸ’¡ Demo data includes:\nâ€¢ Esther (Owner) with management privileges\nâ€¢ Rajesh Kumar (Tailor) for customization work\nâ€¢ Priya Sharma (Designer) for creative tasks\nâ€¢ Amit Patel (Cutter) for fabric preparation\nâ€¢ Sneha Gupta (Finisher) for final touches\nâ€¢ Manual employee addition available',
                                             style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.black87),
@@ -1300,42 +1301,42 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     final FirebaseService firebaseService = FirebaseService();
 
     try {
-      debugPrint('🎯 Debug Info: Starting database check...');
+      debugdebugPrint('ðŸŽ¯ Debug Info: Starting database check...');
       // Check Firebase auth state
       final currentUser = firebaseService.currentUser;
-      debugPrint('🔐 Auth state: ${currentUser?.email ?? "Not logged in"}');
+      debugdebugPrint('ðŸ” Auth state: ${currentUser?.email ?? "Not logged in"}');
 
       // Try to fetch employees collection
       final querySnapshot = await firebaseService.getCollection('employees');
       final employeeCount = querySnapshot.docs.length;
-      debugPrint('💾 Database: $employeeCount employees in collection');
+      debugdebugPrint('ðŸ’¾ Database: $employeeCount employees in collection');
 
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('🔍 Database Debug Info'),
+            title: const Text('ðŸ” Database Debug Info'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('🔐 Authentication:',
+                  const Text('ðŸ” Authentication:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text('User: ${currentUser?.email ?? "Not logged in"}',
                       style: const TextStyle(fontSize: 12)),
                   Text('UID: ${currentUser?.uid ?? "N/A"}',
                       style: const TextStyle(fontSize: 12)),
                   const SizedBox(height: 16),
-                  const Text('💾 Database Status:',
+                  const Text('ðŸ’¾ Database Status:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text('Employees in database: $employeeCount'),
                   Text('Collection: employees'),
                   if (employeeCount == 0)
-                    const Text('⚠️ No employees found - database is empty',
+                    const Text('âš ï¸ No employees found - database is empty',
                         style: TextStyle(color: Colors.orange, fontSize: 12)),
                   const SizedBox(height: 16),
-                  const Text('🔧 Troubleshooting Options:',
+                  const Text('ðŸ”§ Troubleshooting Options:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
@@ -1399,12 +1400,12 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
         );
       }
     } catch (e) {
-      debugPrint('❌ Debug check failed: $e');
+      debugdebugPrint('âŒ Debug check failed: $e');
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('🤔 Debug Error'),
+            title: const Text('ðŸ¤” Debug Error'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1415,14 +1416,14 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                   const SizedBox(height: 16),
                   const Text('This might indicate:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
-                  const Text('• Firebase connection issues',
+                  const Text('â€¢ Firebase connection issues',
                       style: TextStyle(fontSize: 12)),
-                  const Text('• Internet connectivity problems',
+                  const Text('â€¢ Internet connectivity problems',
                       style: TextStyle(fontSize: 12)),
-                  const Text('• Firebase configuration issues',
+                  const Text('â€¢ Firebase configuration issues',
                       style: TextStyle(fontSize: 12)),
                   const Text(
-                      '• "Cannot send Null" debug service errors interfering',
+                      'â€¢ "Cannot send Null" debug service errors interfering',
                       style: TextStyle(fontSize: 12, color: Colors.orange)),
                   const SizedBox(height: 16),
                   Row(
@@ -1496,3 +1497,5 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     }
   }
 }
+
+

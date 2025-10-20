@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item.dart';
@@ -254,7 +255,7 @@ class CartProvider with ChangeNotifier {
       await prefs.setString('cart_items', json.encode(cartData));
       await prefs.setInt('cart_item_count', _items.length);
     } catch (e) {
-      print('Error saving cart to storage: $e');
+      debugPrint('Error saving cart to storage: $e');
     }
   }
 
@@ -265,7 +266,7 @@ class CartProvider with ChangeNotifier {
       await prefs.remove('cart_items');
       await prefs.setInt('cart_item_count', 0);
     } catch (e) {
-      print('Error clearing cart from storage: $e');
+      debugPrint('Error clearing cart from storage: $e');
     }
   }
 
@@ -296,3 +297,5 @@ class CartProvider with ChangeNotifier {
     }
   }
 }
+
+

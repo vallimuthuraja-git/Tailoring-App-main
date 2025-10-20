@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -56,7 +57,7 @@ class _UserAvatarState extends State<UserAvatar> {
           _customization = AvatarCustomization.fromJson(data);
         }
       } catch (e) {
-        debugPrint('Error loading avatar customization: $e');
+        debugdebugPrint('Error loading avatar customization: $e');
       } finally {
         if (mounted) {
           setState(() => _isLoading = false);
@@ -176,3 +177,5 @@ class _UserAvatarState extends State<UserAvatar> {
     );
   }
 }
+
+

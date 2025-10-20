@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_service.dart';
@@ -9,7 +10,7 @@ class SetupDemoEmployees {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> setupAllDemoEmployees() async {
-    // print('🚀 Setting up demo employees...');
+    // debugPrint('ðŸš€ Setting up demo employees...');
 
     // Setup demo users in Auth
     await _setupAuthUsers();
@@ -17,11 +18,11 @@ class SetupDemoEmployees {
     // Setup employee profiles in Firestore
     await _setupEmployeeProfiles();
 
-    // print('✅ Demo employees setup complete!');
+    // debugPrint('âœ… Demo employees setup complete!');
   }
 
   Future<void> _setupAuthUsers() async {
-    // print('📧 Creating demo auth users...');
+    // debugPrint('ðŸ“§ Creating demo auth users...');
 
     final demoUsers = [
       {
@@ -59,7 +60,7 @@ class SetupDemoEmployees {
             .get();
 
         if (existingUsers.docs.isNotEmpty) {
-          // print('✅ User ${userData['email']} already exists');
+          // debugPrint('âœ… User ${userData['email']} already exists');
           continue;
         }
 
@@ -89,18 +90,18 @@ class SetupDemoEmployees {
             .doc(userCredential.user!.uid)
             .set(userModel.toJson());
 
-        // print('✅ Created user: ${userData['email']}');
+        // debugPrint('âœ… Created user: ${userData['email']}');
 
         // Sign out to avoid conflicts
         await _auth.signOut();
       } catch (e) {
-        // print('❌ Error creating user ${userData['email']}: $e');
+        // debugPrint('âŒ Error creating user ${userData['email']}: $e');
       }
     }
   }
 
   Future<void> _setupEmployeeProfiles() async {
-    // print('👷 Setting up employee profiles...');
+    // debugPrint('ðŸ‘· Setting up employee profiles...');
 
     final employeeProfiles = [
       {
@@ -150,7 +151,7 @@ class SetupDemoEmployees {
             .get();
 
         if (userDoc.docs.isEmpty) {
-          // print('❌ User not found: ${profile['email']}');
+          // debugPrint('âŒ User not found: ${profile['email']}');
           continue;
         }
 
@@ -163,7 +164,7 @@ class SetupDemoEmployees {
             .get();
 
         if (existingEmployee.docs.isNotEmpty) {
-          // print('✅ Employee profile already exists: ${profile['email']}');
+          // debugPrint('âœ… Employee profile already exists: ${profile['email']}');
           continue;
         }
 
@@ -223,16 +224,16 @@ class SetupDemoEmployees {
 
         await _firestore.collection('employees').add(employeeData);
 
-        // print('✅ Created employee profile: ${profile['email']}');
+        // debugPrint('âœ… Created employee profile: ${profile['email']}');
       } catch (e) {
-        // print('❌ Error creating employee profile ${profile['email']}: $e');
+        // debugPrint('âŒ Error creating employee profile ${profile['email']}: $e');
       }
     }
   }
 
   // Method to clean up demo employees (for testing)
   Future<void> cleanupDemoEmployees() async {
-    // print('🧹 Cleaning up demo employees...');
+    // debugPrint('ðŸ§¹ Cleaning up demo employees...');
 
     try {
       // Delete from employees collection
@@ -241,7 +242,7 @@ class SetupDemoEmployees {
         final data = doc.data();
         if (data['additionalInfo']?['demo_account'] == true) {
           await doc.reference.delete();
-          // print('✅ Deleted employee: ${data['email']}');
+          // debugPrint('âœ… Deleted employee: ${data['email']}');
         }
       }
 
@@ -253,13 +254,13 @@ class SetupDemoEmployees {
                 .containsKey(data['role']?.toString().split('.').last) &&
             data['email']?.contains('@demo.com') == true) {
           await doc.reference.delete();
-          // print('✅ Deleted user: ${data['email']}');
+          // debugPrint('âœ… Deleted user: ${data['email']}');
         }
       }
 
-      // print('✅ Demo employees cleanup complete!');
+      // debugPrint('âœ… Demo employees cleanup complete!');
     } catch (e) {
-      // print('❌ Error during cleanup: $e');
+      // debugPrint('âŒ Error during cleanup: $e');
     }
   }
 }
@@ -267,13 +268,15 @@ class SetupDemoEmployees {
 // Helper function to setup demo employees (can be called from main)
 Future<void> setupDemoEmployees() async {
   try {
-    print('🚀 Starting demo employee setup...');
+    debugPrint('ðŸš€ Starting demo employee setup...');
     final setup = SetupDemoEmployees();
     await setup.setupAllDemoEmployees();
-    print('✅ Demo employee setup completed successfully');
+    debugPrint('âœ… Demo employee setup completed successfully');
   } catch (e) {
-    print('❌ Demo employee setup failed: $e');
+    debugPrint('âŒ Demo employee setup failed: $e');
     // Don't throw error to prevent app from crashing
     // The employee screen will handle missing data gracefully
   }
 }
+
+

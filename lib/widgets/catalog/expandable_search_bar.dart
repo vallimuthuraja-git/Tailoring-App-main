@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
@@ -66,14 +66,14 @@ class _ExpandableSearchBarState extends State<ExpandableSearchBar> {
             color: (themeProvider.isDarkMode
                     ? DarkAppColors.onSurface
                     : AppColors.onSurface)
-                .withOpacity(0.6),
+                .withValues(alpha: 0.6),
           ),
           prefixIcon: Icon(
             Icons.search,
             size: ProductScreenConstants.getResponsiveFontSize(screenWidth, 18),
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withOpacity(0.7)
-                : AppColors.onSurface.withOpacity(0.7),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                : AppColors.onSurface.withValues(alpha: 0.7),
           ),
           suffixIcon: _isSearching
               ? Container(
@@ -112,7 +112,7 @@ class _ExpandableSearchBarState extends State<ExpandableSearchBar> {
               color: (themeProvider.isDarkMode
                       ? DarkAppColors.onSurface
                       : AppColors.onSurface)
-                  .withOpacity(0.2),
+                  .withValues(alpha: 0.2),
             ),
           ),
           enabledBorder: OutlineInputBorder(
@@ -122,7 +122,7 @@ class _ExpandableSearchBarState extends State<ExpandableSearchBar> {
               color: (themeProvider.isDarkMode
                       ? DarkAppColors.onSurface
                       : AppColors.onSurface)
-                  .withOpacity(0.2),
+                  .withValues(alpha: 0.2),
             ),
           ),
           focusedBorder: OutlineInputBorder(
@@ -152,3 +152,4 @@ class _ExpandableSearchBarState extends State<ExpandableSearchBar> {
     );
   }
 }
+

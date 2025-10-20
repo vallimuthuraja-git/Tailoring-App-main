@@ -1,4 +1,4 @@
-// Service List Screen with Offline Support
+﻿// Service List Screen with Offline Support
 // Displays all tailoring services with filtering, search, and analytics
 
 import 'package:flutter/material.dart';
@@ -271,7 +271,7 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -383,9 +383,9 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
             vertical: isSmallScreen ? 6 : 8,
           ),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -472,11 +472,11 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                         height: isSmallScreen ? 40 : 50,
                         decoration: BoxDecoration(
                           color: _getServiceColor(service.category)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: _getServiceColor(service.category)
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Icon(
@@ -534,7 +534,7 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: _getServiceColor(service.category)
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -967,3 +967,4 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
     serviceProvider.filterByActiveStatus(null);
   }
 }
+

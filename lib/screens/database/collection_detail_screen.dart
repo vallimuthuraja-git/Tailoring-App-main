@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/firebase_service.dart';
 import 'document_edit_screen.dart';
@@ -183,7 +183,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: widget.color.withOpacity(0.1),
+                      color: widget.color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -458,3 +458,4 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
     );
   }
 }
+

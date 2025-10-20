@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
@@ -84,14 +84,14 @@ class ProductScreenActionBar extends StatelessWidget {
           color: (themeProvider.isDarkMode
                   ? DarkAppColors.onSurface
                   : AppColors.onSurface)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
             color: (themeProvider.isDarkMode
                     ? DarkAppColors.onSurface
                     : AppColors.onSurface)
-                .withOpacity(0.1),
+                .withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -144,14 +144,14 @@ class ProductScreenActionBar extends StatelessWidget {
           color: (themeProvider.isDarkMode
                   ? DarkAppColors.onSurface
                   : AppColors.onSurface)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
             color: (themeProvider.isDarkMode
                     ? DarkAppColors.onSurface
                     : AppColors.onSurface)
-                .withOpacity(0.1),
+                .withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -213,3 +213,4 @@ class ProductScreenActionBar extends StatelessWidget {
     );
   }
 }
+

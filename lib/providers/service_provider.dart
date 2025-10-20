@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 // Service Provider for Managing Tailoring Services
 // Handles CRUD operations, offline sync, and service analytics
 
@@ -82,22 +83,22 @@ class ServiceProvider with ChangeNotifier {
         return Service.fromJson(data);
       }).toList();
 
-      debugPrint('loadServices: Found ${_services.length} existing services');
+      debugdebugPrint('loadServices: Found ${_services.length} existing services');
 
       // Initialize sample services if none exist
       if (_services.isEmpty) {
-        debugPrint(
+        debugdebugPrint(
             'loadServices: No services found, initializing sample services');
         await initializeSampleServices();
       } else {
-        debugPrint('loadServices: Using existing services, calculating stats');
+        debugdebugPrint('loadServices: Using existing services, calculating stats');
         _calculateStats();
         _applyFilters();
         _isLoading = false;
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('loadServices: Error - $e');
+      debugdebugPrint('loadServices: Error - $e');
       _isLoading = false;
       _errorMessage = 'Failed to load services: $e';
       notifyListeners();
@@ -136,31 +137,31 @@ class ServiceProvider with ChangeNotifier {
   // Create new service
   Future<bool> createService(Service service,
       {bool reloadAfterCreate = true}) async {
-    debugPrint(
+    debugdebugPrint(
         'createService called with service: ${service.name}, category: ${service.category}, price: ${service.basePrice}');
     _isLoading = true;
     notifyListeners();
 
     try {
-      debugPrint('createService: converting to json');
+      debugdebugPrint('createService: converting to json');
       final serviceData = service.toJson();
       serviceData.remove('id');
       serviceData['createdAt'] = Timestamp.fromDate(DateTime.now());
       serviceData['updatedAt'] = Timestamp.fromDate(DateTime.now());
 
-      debugPrint('createService: serviceData: $serviceData');
+      debugdebugPrint('createService: serviceData: $serviceData');
       await _firebaseService.addDocument('services', serviceData);
 
       if (reloadAfterCreate) {
-        debugPrint('createService: calling loadServices');
+        debugdebugPrint('createService: calling loadServices');
         await loadServices();
       }
-      debugPrint('createService: success');
+      debugdebugPrint('createService: success');
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('createService: error $e');
+      debugdebugPrint('createService: error $e');
       _isLoading = false;
       _errorMessage = 'Failed to create service: $e';
       notifyListeners();
@@ -171,18 +172,18 @@ class ServiceProvider with ChangeNotifier {
   // Update service
   Future<bool> updateService(
       String serviceId, Map<String, dynamic> updates) async {
-    debugPrint('updateService called for $serviceId with updates: $updates');
+    debugdebugPrint('updateService called for $serviceId with updates: $updates');
     _isLoading = true;
     notifyListeners();
 
     try {
       updates['updatedAt'] = Timestamp.fromDate(DateTime.now());
 
-      debugPrint('updateService: calling firebase update');
+      debugdebugPrint('updateService: calling firebase update');
       await _firebaseService.updateDocument('services', serviceId, updates);
 
       // Update local data
-      debugPrint('updateService: updating local data');
+      debugdebugPrint('updateService: updating local data');
       final index = _services.indexWhere((service) => service.id == serviceId);
       if (index != -1) {
         final updatedService = _services[index].copyWith(
@@ -198,12 +199,12 @@ class ServiceProvider with ChangeNotifier {
         _applyFilters();
       }
 
-      debugPrint('updateService: success');
+      debugdebugPrint('updateService: success');
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('updateService: error $e');
+      debugdebugPrint('updateService: error $e');
       _isLoading = false;
       _errorMessage = 'Failed to update service: $e';
       notifyListeners();
@@ -313,7 +314,7 @@ class ServiceProvider with ChangeNotifier {
 
   // Force reload services (useful for debugging)
   Future<void> forceReloadServices() async {
-    debugPrint('forceReloadServices: Forcing reload of services');
+    debugdebugPrint('forceReloadServices: Forcing reload of services');
     await loadServices();
   }
 
@@ -513,21 +514,21 @@ class ServiceProvider with ChangeNotifier {
   // Initialize with sample data
   Future<void> initializeSampleServices() async {
     if (_services.isEmpty) {
-      debugPrint(
+      debugdebugPrint(
           'initializeSampleServices: Starting initialization of ${ServiceTemplates.allServices.length} sample services');
       int createdCount = 0;
       for (final service in ServiceTemplates.allServices) {
         await createService(service, reloadAfterCreate: false);
         createdCount++;
-        debugPrint(
+        debugdebugPrint(
             'initializeSampleServices: Created service $createdCount/${ServiceTemplates.allServices.length}: ${service.name}');
       }
-      debugPrint(
+      debugdebugPrint(
           'initializeSampleServices: All services created, reloading...');
       // Reload services after all have been created
       await loadServices();
     } else {
-      debugPrint(
+      debugdebugPrint(
           'initializeSampleServices: Services already exist, skipping initialization');
     }
   }
@@ -593,3 +594,5 @@ class ServiceProvider with ChangeNotifier {
     };
   }
 }
+
+

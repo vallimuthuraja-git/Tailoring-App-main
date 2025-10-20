@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -386,8 +386,8 @@ class CartBadgeIcon extends StatelessWidget {
                               ? DarkAppColors.error
                               : AppColors.error,
                           themeProvider.isDarkMode
-                              ? DarkAppColors.error.withOpacity(0.8)
-                              : AppColors.error.withOpacity(0.8),
+                              ? DarkAppColors.error.withValues(alpha: 0.8)
+                              : AppColors.error.withValues(alpha: 0.8),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -398,7 +398,7 @@ class CartBadgeIcon extends StatelessWidget {
                           color: (themeProvider.isDarkMode
                                   ? DarkAppColors.error
                                   : AppColors.error)
-                              .withOpacity(0.4),
+                              .withValues(alpha: 0.4),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -486,3 +486,4 @@ class LogoutIcon extends StatelessWidget {
     );
   }
 }
+

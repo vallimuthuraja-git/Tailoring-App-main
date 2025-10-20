@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +32,7 @@ class OfflineProductRepository implements IProductRepository {
             final product = Product.fromJson(productData);
             _products[product.id] = product;
           } catch (e) {
-            debugPrint('Error parsing offline product: $e');
+            debugdebugPrint('Error parsing offline product: $e');
           }
         }
       }
@@ -46,7 +46,7 @@ class OfflineProductRepository implements IProductRepository {
         });
       }
     } catch (e) {
-      debugPrint('Error loading offline products: $e');
+      debugdebugPrint('Error loading offline products: $e');
     }
   }
 
@@ -59,7 +59,7 @@ class OfflineProductRepository implements IProductRepository {
       // Save analytics
       await _prefs.setString(_analyticsKey, jsonEncode(_analytics));
     } catch (e) {
-      debugPrint('Error saving offline products: $e');
+      debugdebugPrint('Error saving offline products: $e');
     }
   }
 
@@ -224,3 +224,4 @@ class OfflineProductRepository implements IProductRepository {
     return await hasOfflineData();
   }
 }
+

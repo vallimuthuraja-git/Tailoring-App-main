@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
@@ -65,7 +66,7 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        AppColors.primary.withOpacity(0.05),
+                        AppColors.primary.withValues(alpha: 0.05),
                         AppColors.background,
                       ],
                     ),
@@ -87,8 +88,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.primary.withOpacity(0.3)
-                              : AppColors.primary.withOpacity(0.3),
+                              ? DarkAppColors.primary.withValues(alpha: 0.3)
+                              : AppColors.primary.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -117,8 +118,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                                  : AppColors.onSurface.withOpacity(0.7),
+                                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                  : AppColors.onSurface.withValues(alpha: 0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -286,8 +287,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withOpacity(0.3)
-                              : AppColors.onSurface.withOpacity(0.3),
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                              : AppColors.onSurface.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -317,8 +318,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                                  : AppColors.onSurface.withOpacity(0.7),
+                                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                  : AppColors.onSurface.withValues(alpha: 0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -359,8 +360,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withOpacity(0.3)
-                              : AppColors.onSurface.withOpacity(0.3),
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                              : AppColors.onSurface.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -386,8 +387,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                                  : AppColors.onSurface.withOpacity(0.7),
+                                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                  : AppColors.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -414,8 +415,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: themeProvider.isDarkMode
-              ? DarkAppColors.onSurface.withOpacity(0.3)
-              : AppColors.onSurface.withOpacity(0.3),
+              ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+              : AppColors.onSurface.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -424,8 +425,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.primary.withOpacity(0.1)
-                  : AppColors.primary.withOpacity(0.1),
+                  ? DarkAppColors.primary.withValues(alpha: 0.1)
+                  : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -455,8 +456,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     color: themeProvider.isDarkMode
-                        ? DarkAppColors.onSurface.withOpacity(0.7)
-                        : AppColors.onSurface.withOpacity(0.7),
+                        ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                        : AppColors.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 Text(
@@ -464,8 +465,8 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
                   style: TextStyle(
                     fontSize: 12,
                     color: themeProvider.isDarkMode
-                        ? DarkAppColors.onSurface.withOpacity(0.6)
-                        : AppColors.onSurface.withOpacity(0.6),
+                        ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                        : AppColors.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -501,19 +502,19 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
       // For this demo setup, we need to provide providers
       // Since we don't have context in this method, we'll note that orders setup
       // can be done separately or integrated in the main app
-      print(
+      debugPrint(
           'Note: Demo orders can be set up using SetupDemoOrders with ProductProvider and OrderProvider');
 
       setState(() {
         _isLoading = false;
         _setupComplete = true;
         _statusMessage =
-            '✅ Demo setup complete!\n\nEmployees, work assignments, and notes on orders setup.\nYou can now login using the demo employee accounts.\n\nTo setup demo orders, use the order setup functionality separately.';
+            'âœ… Demo setup complete!\n\nEmployees, work assignments, and notes on orders setup.\nYou can now login using the demo employee accounts.\n\nTo setup demo orders, use the order setup functionality separately.';
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _statusMessage = '❌ Error setting up demo: $e';
+        _statusMessage = 'âŒ Error setting up demo: $e';
       });
     }
   }
@@ -534,12 +535,12 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
       setState(() {
         _isLoading = false;
         _setupComplete = false;
-        _statusMessage = '✅ Demo data cleaned up successfully!';
+        _statusMessage = 'âœ… Demo data cleaned up successfully!';
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _statusMessage = '❌ Error cleaning up demo data: $e';
+        _statusMessage = 'âŒ Error cleaning up demo data: $e';
       });
     }
   }
@@ -564,13 +565,16 @@ class _DemoSetupScreenState extends State<DemoSetupScreen> {
       setState(() {
         _isLoading = false;
         _statusMessage =
-            '✅ Demo orders setup complete!\nCustomers and orders have been created.';
+            'âœ… Demo orders setup complete!\nCustomers and orders have been created.';
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _statusMessage = '❌ Error setting up demo orders: $e';
+        _statusMessage = 'âŒ Error setting up demo orders: $e';
       });
     }
   }
 }
+
+
+

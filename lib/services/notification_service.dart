@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/employee.dart' as emp;
@@ -205,7 +206,7 @@ class NotificationService {
       await _firestore.collection('notifications').add(notificationData);
       return true;
     } catch (e) {
-      print('Error sending notification: $e');
+      debugPrint('Error sending notification: $e');
       return false;
     }
   }
@@ -483,7 +484,7 @@ class NotificationService {
         return Notification.fromJson(data);
       }).toList();
     } catch (e) {
-      print('Error getting notifications: $e');
+      debugPrint('Error getting notifications: $e');
       return [];
     }
   }
@@ -499,7 +500,7 @@ class NotificationService {
 
       return querySnapshot.docs.length;
     } catch (e) {
-      print('Error getting unread count: $e');
+      debugPrint('Error getting unread count: $e');
       return 0;
     }
   }
@@ -513,7 +514,7 @@ class NotificationService {
       });
       return true;
     } catch (e) {
-      print('Error marking notification as read: $e');
+      debugPrint('Error marking notification as read: $e');
       return false;
     }
   }
@@ -539,7 +540,7 @@ class NotificationService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error marking all notifications as read: $e');
+      debugPrint('Error marking all notifications as read: $e');
       return false;
     }
   }
@@ -550,7 +551,7 @@ class NotificationService {
       await _firestore.collection('notifications').doc(notificationId).delete();
       return true;
     } catch (e) {
-      print('Error deleting notification: $e');
+      debugPrint('Error deleting notification: $e');
       return false;
     }
   }
@@ -616,7 +617,7 @@ class NotificationService {
         }
       }
     } catch (e) {
-      print('Error scheduling deadline reminders: $e');
+      debugPrint('Error scheduling deadline reminders: $e');
     }
   }
 
@@ -637,7 +638,7 @@ class NotificationService {
 
       await batch.commit();
     } catch (e) {
-      print('Error cleaning up old notifications: $e');
+      debugPrint('Error cleaning up old notifications: $e');
     }
   }
 
@@ -664,7 +665,7 @@ class NotificationService {
         'averageResponseTime': _calculateAverageResponseTime(allNotifications),
       };
     } catch (e) {
-      print('Error getting notification stats: $e');
+      debugPrint('Error getting notification stats: $e');
       return {
         'totalNotifications': 0,
         'unreadCount': 0,
@@ -688,3 +689,5 @@ class NotificationService {
     return totalResponseTime / readNotifications.length;
   }
 }
+
+

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class LoadingSplashScreen extends StatefulWidget {
   final double? progress;
@@ -66,7 +66,7 @@ class _LoadingSplashScreenState extends State<LoadingSplashScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).primaryColor.withOpacity(0.1),
+              Theme.of(context).primaryColor.withValues(alpha: 0.1),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -86,12 +86,12 @@ class _LoadingSplashScreenState extends State<LoadingSplashScreen>
                     gradient: LinearGradient(
                       colors: [
                         Theme.of(context).primaryColor,
-                        Theme.of(context).primaryColor.withOpacity(0.7),
+                        Theme.of(context).primaryColor.withValues(alpha: 0.7),
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                         blurRadius: 20,
                         spreadRadius: 5,
                       ),
@@ -123,7 +123,7 @@ class _LoadingSplashScreenState extends State<LoadingSplashScreen>
                             .textTheme
                             .bodyLarge
                             ?.color
-                            ?.withOpacity(0.7),
+                            ?.withValues(alpha: 0.7),
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -212,7 +212,7 @@ class _LoadingSplashScreenState extends State<LoadingSplashScreen>
                                     strokeWidth: 8,
                                     backgroundColor: Theme.of(context)
                                         .primaryColor
-                                        .withOpacity(0.1),
+                                        .withValues(alpha: 0.1),
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                       Theme.of(context).primaryColor,
                                     ),
@@ -246,7 +246,7 @@ class _LoadingSplashScreenState extends State<LoadingSplashScreen>
                                         .textTheme
                                         .bodyLarge
                                         ?.color
-                                        ?.withOpacity(0.8),
+                                        ?.withValues(alpha: 0.8),
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -280,3 +280,4 @@ class _LoadingSplashScreenState extends State<LoadingSplashScreen>
     );
   }
 }
+

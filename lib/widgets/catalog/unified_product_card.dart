@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/product_models.dart';
@@ -98,27 +99,27 @@ class UnifiedProductCard extends StatelessWidget {
                 size.height > expectedMaxHeight || size.width > screenWidth;
 
             // DEBUG LOGGING: Overflow detection
-            debugPrint(
+            debugdebugPrint(
               '[UnifiedProductCard] Render Size: ${size.width.toInt()}x${size.height.toInt()}px',
             );
-            debugPrint(
+            debugdebugPrint(
               '[UnifiedProductCard] Expected Max: ${screenWidth.toInt()}x${expectedMaxHeight.toInt()}px',
             );
 
             if (hasOverflow) {
-              debugPrint(
-                '🚨 [UnifiedProductCard] OVERFLOW DETECTED! Content exceeds allocated space',
+              debugdebugPrint(
+                'ðŸš¨ [UnifiedProductCard] OVERFLOW DETECTED! Content exceeds allocated space',
               );
-              debugPrint(
-                '🚨 [UnifiedProductCard] Height overflow: ${(size.height - expectedMaxHeight).toInt()}px',
+              debugdebugPrint(
+                'ðŸš¨ [UnifiedProductCard] Height overflow: ${(size.height - expectedMaxHeight).toInt()}px',
               );
             } else {
-              debugPrint('✅ [UnifiedProductCard] No overflow detected');
+              debugdebugPrint('âœ… [UnifiedProductCard] No overflow detected');
             }
           }
         } catch (e) {
           // Safe exception handling for debug logging
-          debugPrint('[UnifiedProductCard] Debug logging error: $e');
+          debugdebugPrint('[UnifiedProductCard] Debug logging error: $e');
         }
       });
     }
@@ -934,7 +935,7 @@ class UnifiedProductCard extends StatelessWidget {
         ),
       );
     } catch (e) {
-      debugPrint('Navigation error: $e');
+      debugdebugPrint('Navigation error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Unable to open product details'),
@@ -1086,14 +1087,14 @@ class UnifiedProductCard extends StatelessWidget {
 
 ContentDisplayConfig _calculateContentDisplayConfig(double availableHeight) {
   // DEBUG LOGGING: Content display configuration
-  debugPrint(
+  debugdebugPrint(
     '[UnifiedProductCard] Content Area Height: ${availableHeight.toInt()}px',
   );
 
   // Dynamic content prioritization based on available height
   if (availableHeight >= 120) {
     // Plenty of space - show everything
-    debugPrint(
+    debugdebugPrint(
       '[UnifiedProductCard] Content Config: Plenty of space (>=120px) - Title:3 lines, Rating:YES, Action:YES',
     );
     return const ContentDisplayConfig(
@@ -1103,7 +1104,7 @@ ContentDisplayConfig _calculateContentDisplayConfig(double availableHeight) {
     );
   } else if (availableHeight >= 90) {
     // Moderate space - show most content
-    debugPrint(
+    debugdebugPrint(
       '[UnifiedProductCard] Content Config: Moderate space (90-119px) - Title:2 lines, Rating:YES, Action:YES',
     );
     return const ContentDisplayConfig(
@@ -1113,7 +1114,7 @@ ContentDisplayConfig _calculateContentDisplayConfig(double availableHeight) {
     );
   } else if (availableHeight >= 70) {
     // Limited space - essential content only
-    debugPrint(
+    debugdebugPrint(
       '[UnifiedProductCard] Content Config: Limited space (70-89px) - Title:2 lines, Rating:NO, Action:YES',
     );
     return const ContentDisplayConfig(
@@ -1123,7 +1124,7 @@ ContentDisplayConfig _calculateContentDisplayConfig(double availableHeight) {
     );
   } else {
     // Very limited space - critical content only
-    debugPrint(
+    debugdebugPrint(
       '[UnifiedProductCard] Content Config: Very limited space (<70px) - Title:1 line, Rating:NO, Action:YES',
     );
     return const ContentDisplayConfig(
@@ -1165,3 +1166,5 @@ class ContentDisplayConfig {
     required this.showActionButton,
   });
 }
+
+

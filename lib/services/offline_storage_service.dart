@@ -1,4 +1,4 @@
-// Offline Storage Service for Cross-Platform Data Persistence
+﻿// Offline Storage Service for Cross-Platform Data Persistence
 // Supports SQLite (Mobile) and IndexedDB (Web) with Firebase Sync
 
 import 'dart:convert';
@@ -66,7 +66,7 @@ class OfflineStorageService {
   Future<void> _initializeWebStorage() async {
     // Web storage will be handled by a separate web-specific implementation
     // For now, we'll use a simple in-memory cache with localStorage backup
-    debugPrint('Web storage initialized');
+    debugdebugPrint('Web storage initialized');
   }
 
   Future<void> _onCreateDatabase(Database db, int version) async {
@@ -162,7 +162,7 @@ class OfflineStorageService {
 
   Future<void> _onUpgradeDatabase(Database db, int oldVersion, int newVersion) async {
     // Handle database migrations here
-    debugPrint('Database upgraded from $oldVersion to $newVersion');
+    debugdebugPrint('Database upgraded from $oldVersion to $newVersion');
   }
 
   void _onConnectivityChanged(List<ConnectivityResult> results) {
@@ -245,7 +245,7 @@ class OfflineStorageService {
     if (kIsWeb) {
       // Use web-specific storage
       // This would be implemented with js interop for IndexedDB
-      debugPrint('Web storage: Saving employee $key');
+      debugdebugPrint('Web storage: Saving employee $key');
     }
 
     await _addToSyncQueue('employees', employee.id, 'create', data);
@@ -277,7 +277,7 @@ class OfflineStorageService {
 
   Future<Employee?> _getEmployeeWeb(String employeeId) async {
     // Web implementation
-    debugPrint('Web storage: Getting employee $employeeId');
+    debugdebugPrint('Web storage: Getting employee $employeeId');
     return null;
   }
 
@@ -299,7 +299,7 @@ class OfflineStorageService {
       try {
         return Employee.fromJson(_convertFromSQLite(map));
       } catch (e) {
-        debugPrint('Error parsing employee: $e');
+        debugdebugPrint('Error parsing employee: $e');
         return null;
       }
     }).whereType<Employee>().toList();
@@ -307,7 +307,7 @@ class OfflineStorageService {
 
   Future<List<Employee>> _getAllEmployeesWeb() async {
     // Web implementation
-    debugPrint('Web storage: Getting all employees');
+    debugdebugPrint('Web storage: Getting all employees');
     return [];
   }
 
@@ -333,7 +333,7 @@ class OfflineStorageService {
   }
 
   Future<void> _deleteEmployeeWeb(String employeeId) async {
-    debugPrint('Web storage: Deleting employee $employeeId');
+    debugdebugPrint('Web storage: Deleting employee $employeeId');
   }
 
   // Work Assignment Operations
@@ -385,7 +385,7 @@ class OfflineStorageService {
   }
 
   Future<void> _saveWorkAssignmentWeb(WorkAssignment assignment) async {
-    debugPrint('Web storage: Saving work assignment ${assignment.id}');
+    debugdebugPrint('Web storage: Saving work assignment ${assignment.id}');
     await _addToSyncQueue('work_assignments', assignment.id, 'create', assignment.toJson());
   }
 
@@ -412,14 +412,14 @@ class OfflineStorageService {
       try {
         return WorkAssignment.fromJson(_convertFromSQLite(map));
       } catch (e) {
-        debugPrint('Error parsing work assignment: $e');
+        debugdebugPrint('Error parsing work assignment: $e');
         return null;
       }
     }).whereType<WorkAssignment>().toList();
   }
 
   Future<List<WorkAssignment>> _getEmployeeAssignmentsWeb(String employeeId) async {
-    debugPrint('Web storage: Getting assignments for employee $employeeId');
+    debugdebugPrint('Web storage: Getting assignments for employee $employeeId');
     return [];
   }
 
@@ -437,7 +437,7 @@ class OfflineStorageService {
 
     if (kIsWeb) {
       // Web implementation
-      debugPrint('Added to sync queue: ${queueItem['id']}');
+      debugdebugPrint('Added to sync queue: ${queueItem['id']}');
     } else {
       final db = _database;
       if (db != null) {
@@ -483,13 +483,13 @@ class OfflineStorageService {
           where: 'id = ?',
           whereArgs: [item['id']],
         );
-        debugPrint('Sync failed for ${item['id']}: $e');
+        debugdebugPrint('Sync failed for ${item['id']}: $e');
       }
     }
   }
 
   Future<void> _syncPendingChangesWeb() async {
-    debugPrint('Syncing pending changes for web platform');
+    debugdebugPrint('Syncing pending changes for web platform');
   }
 
   Future<void> _syncItem(Map<String, dynamic> item) async {
@@ -613,3 +613,4 @@ class OfflineStorageService {
     }
   }
 }
+

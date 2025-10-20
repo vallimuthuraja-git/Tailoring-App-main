@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/employee_provider.dart';
@@ -29,7 +30,7 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
     });
 
     try {
-      debugPrint('🚀 Initializing employee data...');
+      debugdebugPrint('ðŸš€ Initializing employee data...');
 
       // First, ensure Firebase is properly initialized
       final employeeProvider =
@@ -42,18 +43,18 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
       await employeeProvider.loadEmployees().timeout(
         const Duration(seconds: 15),
         onTimeout: () {
-          debugPrint('⚠️ Employee load timed out');
+          debugdebugPrint('âš ï¸ Employee load timed out');
           throw Exception(
               'Loading timed out. Please check your internet connection.');
         },
       );
 
-      debugPrint('✅ Employee data loaded successfully');
+      debugdebugPrint('âœ… Employee data loaded successfully');
       setState(() {
         _isInitializing = false;
       });
     } catch (e) {
-      debugPrint('❌ Failed to initialize employee data: $e');
+      debugdebugPrint('âŒ Failed to initialize employee data: $e');
       setState(() {
         _isInitializing = false;
         _initError = e.toString();
@@ -72,7 +73,7 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
         },
       );
     } catch (e) {
-      debugPrint('❌ Failed to reload employees: $e');
+      debugdebugPrint('âŒ Failed to reload employees: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to refresh: $e')),
@@ -423,7 +424,7 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
                                               size: 16, color: Colors.grey),
                                           const SizedBox(width: 4),
                                           Text(
-                                            '₹${employee.baseRatePerHour}/hr',
+                                            'â‚¹${employee.baseRatePerHour}/hr',
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey[600],
@@ -470,3 +471,5 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
     );
   }
 }
+
+

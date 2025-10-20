@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -47,7 +47,7 @@ class FirebaseService {
     } catch (e) {
       _isConnected = false;
       _connectionError = 'Firebase initialization failed: $e';
-      debugPrint('❌ Firebase initialization failed: $e');
+      debugdebugPrint('âŒ Firebase initialization failed: $e');
       rethrow;
     }
   }
@@ -55,16 +55,16 @@ class FirebaseService {
   // Test Firebase connection
   Future<void> _testConnection() async {
     try {
-      debugPrint('🔍 Testing Firebase connection...');
+      debugdebugPrint('ðŸ” Testing Firebase connection...');
       // Test basic firestore connectivity
       await _firestore.collection('test').limit(1).get();
       _isConnected = true;
       _connectionError = null;
-      debugPrint('✅ Firebase connection successful');
+      debugdebugPrint('âœ… Firebase connection successful');
     } catch (e) {
       _isConnected = false;
       _connectionError = 'Firebase connection failed: $e';
-      debugPrint('❌ Firebase connection failed: $e');
+      debugdebugPrint('âŒ Firebase connection failed: $e');
     }
   }
 
@@ -81,8 +81,8 @@ class FirebaseService {
 
   // Generic CRUD operations with enhanced error handling
   Future<DocumentReference> addDocument(String collection, Map<String, dynamic> data, {int maxRetries = 2}) async {
-    debugPrint('💾 Adding document to collection: $collection');
-    debugPrint('📄 Data keys: ${data.keys.toList()}');
+    debugdebugPrint('ðŸ’¾ Adding document to collection: $collection');
+    debugdebugPrint('ðŸ“„ Data keys: ${data.keys.toList()}');
 
     int retryCount = 0;
     while (retryCount < maxRetries) {
@@ -101,15 +101,15 @@ class FirebaseService {
           throw Exception('Document not created successfully');
         }
 
-        debugPrint('✅ Document added successfully to $collection with ID: ${docRef.id}');
+        debugdebugPrint('âœ… Document added successfully to $collection with ID: ${docRef.id}');
         return docRef;
 
       } catch (e) {
         retryCount++;
-        debugPrint('❌ Failed attempt $retryCount to add document to $collection: $e');
+        debugdebugPrint('âŒ Failed attempt $retryCount to add document to $collection: $e');
 
         if (retryCount == maxRetries) {
-          debugPrint('🚫 Giving up after $maxRetries attempts');
+          debugdebugPrint('ðŸš« Giving up after $maxRetries attempts');
           rethrow;
         }
 
@@ -132,8 +132,8 @@ class FirebaseService {
   }
 
  Future<QuerySnapshot> getCollection(String collection, {int maxRetries = 3}) async {
-   debugPrint('🔍 Fetching collection: $collection');
-   debugPrint('👤 Auth state: ${FirebaseAuth.instance.currentUser?.email ?? 'No authenticated user'}');
+   debugdebugPrint('ðŸ” Fetching collection: $collection');
+   debugdebugPrint('ðŸ‘¤ Auth state: ${FirebaseAuth.instance.currentUser?.email ?? 'No authenticated user'}');
 
    int retryCount = 0;
    while (retryCount < maxRetries) {
@@ -141,14 +141,14 @@ class FirebaseService {
        final result = await _firestore.collection(collection).get().timeout(
          const Duration(seconds: 15),
        );
-       debugPrint('✅ Successfully fetched ${result.docs.length} documents from $collection');
+       debugdebugPrint('âœ… Successfully fetched ${result.docs.length} documents from $collection');
        return result;
      } catch (e) {
        retryCount++;
-       debugPrint('❌ Failed attempt $retryCount to fetch $collection: $e');
+       debugdebugPrint('âŒ Failed attempt $retryCount to fetch $collection: $e');
 
        if (retryCount == maxRetries) {
-         debugPrint('🚫 Giving up after $maxRetries attempts for collection: $collection');
+         debugdebugPrint('ðŸš« Giving up after $maxRetries attempts for collection: $collection');
          rethrow;
        }
 
@@ -268,3 +268,4 @@ class FirebaseService {
     return 'An unexpected error occurred.';
   }
 }
+

@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,7 +7,7 @@ import 'firebase_options.dart';
 /// Script to reset demo accounts that have wrong passwords
 /// Run this script to delete existing demo accounts and let the app recreate them fresh
 Future<void> resetDemoAccounts() async {
-  print('🔄 Starting demo account reset process...');
+  debugPrint('ðŸ”„ Starting demo account reset process...');
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -32,7 +33,7 @@ Future<void> resetDemoAccounts() async {
     final password = account.value;
 
     try {
-      print('🔍 Processing account: $email');
+      debugPrint('ðŸ” Processing account: $email');
 
       // First try to sign in to get the user
       UserCredential? userCredential;
@@ -41,16 +42,16 @@ Future<void> resetDemoAccounts() async {
           email: email,
           password: password,
         );
-        print('✅ Successfully signed in as $email');
+        debugPrint('âœ… Successfully signed in as $email');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'invalid-credential') {
           // Password is wrong, try to find if account exists another way
           // Since we can't check without knowing the correct password,
           // we'll assume it exists and proceed to try deleting the profile
-          print('⚠️ Password incorrect for $email, skipping auth access');
+          debugPrint('âš ï¸ Password incorrect for $email, skipping auth access');
         } else {
-          print(
-              'ℹ️ Account $email does not exist or other error: ${e.message}');
+          debugPrint(
+              'â„¹ï¸ Account $email does not exist or other error: ${e.message}');
           continue;
         }
       }
@@ -61,9 +62,9 @@ Future<void> resetDemoAccounts() async {
         // Delete user profile from Firestore
         try {
           await firestore.collection('users').doc(user.uid).delete();
-          print('🗑️ Deleted Firestore profile for $email');
+          debugPrint('ðŸ—‘ï¸ Deleted Firestore profile for $email');
         } catch (e) {
-          print('⚠️ Could not delete Firestore profile for $email: $e');
+          debugPrint('âš ï¸ Could not delete Firestore profile for $email: $e');
         }
 
         // Delete user profile from employees collection if exists
@@ -74,10 +75,10 @@ Future<void> resetDemoAccounts() async {
               .get();
           for (final doc in employeeQuery.docs) {
             await doc.reference.delete();
-            print('🗑️ Deleted employee profile for $email');
+            debugPrint('ðŸ—‘ï¸ Deleted employee profile for $email');
           }
         } catch (e) {
-          print('⚠️ Could not delete employee profile for $email: $e');
+          debugPrint('âš ï¸ Could not delete employee profile for $email: $e');
         }
 
         // Sign out
@@ -86,9 +87,9 @@ Future<void> resetDemoAccounts() async {
         // Try to delete the auth account (this works better when signed in)
         try {
           await user.delete();
-          print('🗑️ Deleted auth account for $email');
+          debugPrint('ðŸ—‘ï¸ Deleted auth account for $email');
         } catch (e) {
-          print('⚠️ Could not fully delete auth account for $email: $e');
+          debugPrint('âš ï¸ Could not fully delete auth account for $email: $e');
           // This is common if requires-recent-login
         }
       } else {
@@ -102,11 +103,11 @@ Future<void> resetDemoAccounts() async {
 
           for (final doc in userQuery.docs) {
             await doc.reference.delete();
-            print(
-                '🗑️ Deleted Firestore profile for $email using email search');
+            debugPrint(
+                'ðŸ—‘ï¸ Deleted Firestore profile for $email using email search');
           }
         } catch (e) {
-          print('⚠️ Could not delete Firestore profile for $email: $e');
+          debugPrint('âš ï¸ Could not delete Firestore profile for $email: $e');
         }
 
         try {
@@ -116,30 +117,32 @@ Future<void> resetDemoAccounts() async {
               .get();
           for (final doc in employeeQuery.docs) {
             await doc.reference.delete();
-            print('🗑️ Deleted employee profile for $email using email search');
+            debugPrint('ðŸ—‘ï¸ Deleted employee profile for $email using email search');
           }
         } catch (e) {
-          print('⚠️ Could not delete employee profile for $email: $e');
+          debugPrint('âš ï¸ Could not delete employee profile for $email: $e');
         }
       }
     } catch (e) {
-      print('❌ Error processing account $email: $e');
+      debugPrint('âŒ Error processing account $email: $e');
     }
   }
 
-  print('✅ Demo account reset process completed!');
-  print('');
-  print('📋 Next steps:');
-  print('1. Restart your Flutter app');
-  print(
+  debugPrint('âœ… Demo account reset process completed!');
+  debugPrint('');
+  debugPrint('ðŸ“‹ Next steps:');
+  debugPrint('1. Restart your Flutter app');
+  debugPrint(
       '2. The app will automatically recreate the demo accounts with correct passwords');
-  print('3. Demo login should now work properly');
+  debugPrint('3. Demo login should now work properly');
 }
 
 void main() async {
   try {
     await resetDemoAccounts();
   } catch (e) {
-    print('❌ Script failed: $e');
+    debugPrint('âŒ Script failed: $e');
   }
 }
+
+

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/product_provider.dart';
@@ -82,7 +82,7 @@ class ProductScreenFiltersBar extends StatelessWidget {
       final range = provider.priceRange!;
       if (range.start > 0 || range.end < 10000) {
         filters.add(_FilterChipData(
-          label: '₹${range.start.toInt()} - ₹${range.end.toInt()}',
+          label: 'â‚¹${range.start.toInt()} - â‚¹${range.end.toInt()}',
           type: 'price',
           value: range,
         ));
@@ -128,12 +128,12 @@ class ProductScreenFiltersBar extends StatelessWidget {
         ),
         onDeleted: () => _removeFilter(context, filter),
         backgroundColor: themeProvider.isDarkMode
-            ? DarkAppColors.surface.withOpacity(0.8)
-            : AppColors.surface.withOpacity(0.8),
+            ? DarkAppColors.surface.withValues(alpha: 0.8)
+            : AppColors.surface.withValues(alpha: 0.8),
         side: BorderSide(
           color: themeProvider.isDarkMode
-              ? DarkAppColors.onSurface.withOpacity(0.2)
-              : AppColors.onSurface.withOpacity(0.2),
+              ? DarkAppColors.onSurface.withValues(alpha: 0.2)
+              : AppColors.onSurface.withValues(alpha: 0.2),
         ),
         padding: EdgeInsets.symmetric(
           horizontal: ProductScreenConstants.smallSpacing,
@@ -228,7 +228,7 @@ class ProductScreenFiltersBar extends StatelessWidget {
           color: (themeProvider.isDarkMode
                   ? DarkAppColors.primary
                   : AppColors.primary)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
           borderRadius:
               BorderRadius.circular(ProductScreenConstants.borderRadiusSmall),
         ),
@@ -277,7 +277,7 @@ class ProductScreenFiltersBar extends StatelessWidget {
           color: (themeProvider.isDarkMode
                   ? DarkAppColors.primary
                   : AppColors.primary)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
           borderRadius:
               BorderRadius.circular(ProductScreenConstants.borderRadiusSmall),
         ),
@@ -347,14 +347,14 @@ class ProductScreenFiltersBar extends StatelessWidget {
           color: (themeProvider.isDarkMode
                   ? DarkAppColors.onSurface
                   : AppColors.onSurface)
-              .withOpacity(0.1),
+              .withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
             color: (themeProvider.isDarkMode
                     ? DarkAppColors.onSurface
                     : AppColors.onSurface)
-                .withOpacity(0.1),
+                .withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -424,3 +424,4 @@ class _FilterChipData {
     required this.value,
   });
 }
+

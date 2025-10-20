@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,12 +61,12 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
   }
 
   Future<void> _loadServices() async {
-    debugPrint('🔄 ServiceCatalogScreen loading services');
+    debugdebugPrint('ðŸ”„ ServiceCatalogScreen loading services');
     final serviceProvider =
         Provider.of<ServiceProvider>(context, listen: false);
     await serviceProvider.loadServices();
-    debugPrint(
-        '✅ ServiceCatalogScreen services loaded successfully: ${serviceProvider.services.length}');
+    debugdebugPrint(
+        'âœ… ServiceCatalogScreen services loaded successfully: ${serviceProvider.services.length}');
   }
 
   Future<void> _loadViewModePreference() async {
@@ -75,7 +76,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
         _isGridView = prefs.getBool('service_view_mode_grid') ?? true;
       });
     } catch (e) {
-      debugPrint('Error loading view mode preference: $e');
+      debugdebugPrint('Error loading view mode preference: $e');
     }
   }
 
@@ -84,7 +85,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('service_view_mode_grid', isGrid);
     } catch (e) {
-      debugPrint('Error saving view mode preference: $e');
+      debugdebugPrint('Error saving view mode preference: $e');
     }
   }
 
@@ -244,12 +245,12 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                 final services = serviceProvider.services
                     .where((service) => service.isActive)
                     .toList();
-                debugPrint(
-                    '📊 ServiceCatalogScreen entered, services: ${services.length}');
+                debugdebugPrint(
+                    'ðŸ“Š ServiceCatalogScreen entered, services: ${services.length}');
 
                 if (services.isEmpty) {
-                  debugPrint(
-                      '⚠️ No services available after filtering - total services: ${serviceProvider.services.length}');
+                  debugdebugPrint(
+                      'âš ï¸ No services available after filtering - total services: ${serviceProvider.services.length}');
                   return const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -300,14 +301,14 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
           hintText: 'Search services...',
           prefixIcon: Icon(Icons.search,
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                  : AppColors.onSurface.withOpacity(0.7)),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                  : AppColors.onSurface.withValues(alpha: 0.7)),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(Icons.clear,
                       color: themeProvider.isDarkMode
-                          ? DarkAppColors.onSurface.withOpacity(0.7)
-                          : AppColors.onSurface.withOpacity(0.7)),
+                          ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                          : AppColors.onSurface.withValues(alpha: 0.7)),
                   onPressed: () {
                     _searchController.clear();
                     Provider.of<ServiceProvider>(context, listen: false)
@@ -371,7 +372,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
           themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
       selectedColor:
           (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
-              .withOpacity(0.2),
+              .withValues(alpha: 0.2),
       checkmarkColor:
           themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
     );
@@ -434,7 +435,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                           height: 60,
                           decoration: BoxDecoration(
                             color: _getServiceColor(service.category)
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Icon(
@@ -582,7 +583,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                     height: 50,
                     decoration: BoxDecoration(
                       color:
-                          _getServiceColor(service.category).withOpacity(0.1),
+                          _getServiceColor(service.category).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -613,8 +614,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                         service.shortDescription,
                         style: TextStyle(
                           color: themeProvider.isDarkMode
-                              ? DarkAppColors.onSurface.withOpacity(0.7)
-                              : AppColors.onSurface.withOpacity(0.7),
+                              ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                              : AppColors.onSurface.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                         maxLines: 2,
@@ -630,8 +631,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                             style: TextStyle(
                               fontSize: 12,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withOpacity(0.6)
-                                  : AppColors.onSurface.withOpacity(0.6),
+                                  ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                                  : AppColors.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -641,11 +642,11 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                             decoration: BoxDecoration(
                               color: service.category ==
                                       ServiceCategory.consultation
-                                  ? Colors.blue.withOpacity(0.1)
+                                  ? Colors.blue.withValues(alpha: 0.1)
                                   : service.category ==
                                           ServiceCategory.customDesign
-                                      ? Colors.purple.withOpacity(0.1)
-                                      : Colors.green.withOpacity(0.1),
+                                      ? Colors.purple.withValues(alpha: 0.1)
+                                      : Colors.green.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -722,7 +723,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                           color: (themeProvider.isDarkMode
                                   ? DarkAppColors.surface
                                   : AppColors.surface)
-                              .withOpacity(0.8),
+                              .withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -897,3 +898,6 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
     }
   }
 }
+
+
+

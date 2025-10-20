@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
@@ -102,7 +103,7 @@ Future<void> addToCart(BuildContext context, Product product) async {
     }
   } catch (e) {
     if (context.mounted) {
-      debugPrint('Error adding to cart: $e');
+      debugdebugPrint('Error adding to cart: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('An error occurred while adding to cart'),
@@ -164,7 +165,7 @@ double getResponsiveIconSize(double baseSize, BuildContext context) {
 
 // Format price with currency
 String formatPrice(double price) {
-  return '₹${price.toStringAsFixed(0)}';
+  return 'â‚¹${price.toStringAsFixed(0)}';
 }
 
 // Get availability text based on stock
@@ -258,9 +259,9 @@ class ProductStatsOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 100),
@@ -355,11 +356,11 @@ class CatalogHeroBanner extends StatelessWidget {
                 (themeProvider.isDarkMode
                         ? DarkAppColors.primary
                         : AppColors.primary)
-                    .withOpacity(0.8),
+                    .withValues(alpha: 0.8),
                 (themeProvider.isDarkMode
                         ? DarkAppColors.primary
                         : AppColors.primary)
-                    .withOpacity(0.6),
+                    .withValues(alpha: 0.6),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -370,7 +371,7 @@ class CatalogHeroBanner extends StatelessWidget {
                 color: (themeProvider.isDarkMode
                         ? DarkAppColors.onSurface
                         : AppColors.onSurface)
-                    .withOpacity(0.1),
+                    .withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -418,7 +419,7 @@ class CatalogHeroBanner extends StatelessWidget {
                     Text(
                       'Up to 70% off on premium fashion',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 14,
                       ),
                     ),
@@ -546,7 +547,7 @@ class CatalogQuickActions extends StatelessWidget {
               color: (themeProvider.isDarkMode
                       ? DarkAppColors.onSurface
                       : AppColors.onSurface)
-                  .withOpacity(0.1),
+                  .withValues(alpha: 0.1),
             ),
           ),
           child: Column(
@@ -602,11 +603,11 @@ class CatalogEmptyState extends StatelessWidget {
                         (themeProvider.isDarkMode
                                 ? DarkAppColors.primary
                                 : AppColors.primary)
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         (themeProvider.isDarkMode
                                 ? DarkAppColors.primary
                                 : AppColors.primary)
-                            .withOpacity(0.05),
+                            .withValues(alpha: 0.05),
                       ],
                     ),
                     shape: BoxShape.circle,
@@ -617,7 +618,7 @@ class CatalogEmptyState extends StatelessWidget {
                     color: (themeProvider.isDarkMode
                             ? DarkAppColors.primary
                             : AppColors.primary)
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -639,7 +640,7 @@ class CatalogEmptyState extends StatelessWidget {
                     color: (themeProvider.isDarkMode
                             ? DarkAppColors.onSurface
                             : AppColors.onSurface)
-                        .withOpacity(0.6),
+                        .withValues(alpha: 0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -711,11 +712,11 @@ class ActionButton extends StatelessWidget {
             : null,
         borderRadius: BorderRadius.circular(8),
         splashColor: themeProvider.isDarkMode
-            ? DarkAppColors.primary.withOpacity(0.2)
-            : AppColors.primary.withOpacity(0.2),
+            ? DarkAppColors.primary.withValues(alpha: 0.2)
+            : AppColors.primary.withValues(alpha: 0.2),
         highlightColor: themeProvider.isDarkMode
-            ? DarkAppColors.primary.withOpacity(0.1)
-            : AppColors.primary.withOpacity(0.1),
+            ? DarkAppColors.primary.withValues(alpha: 0.1)
+            : AppColors.primary.withValues(alpha: 0.1),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           curve: Curves.easeInOut,
@@ -731,7 +732,7 @@ class ActionButton extends StatelessWidget {
             boxShadow: isInCart
                 ? [
                     BoxShadow(
-                      color: Colors.green.withOpacity(0.3),
+                      color: Colors.green.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     )
@@ -743,7 +744,7 @@ class ActionButton extends StatelessWidget {
                           color: (themeProvider.isDarkMode
                                   ? DarkAppColors.primary
                                   : AppColors.primary)
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         )
@@ -752,7 +753,7 @@ class ActionButton extends StatelessWidget {
           child: Center(
             child: Text(
               isInCart
-                  ? '✓ Added'
+                  ? 'âœ“ Added'
                   : product.stockCount <= 0
                       ? 'Out of Stock'
                       : 'Add to Cart',
@@ -769,3 +770,6 @@ class ActionButton extends StatelessWidget {
     );
   }
 }
+
+
+

@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,37 +26,37 @@ const Map<String, double> defaultFemaleMeasurements = {
 };
 
 void main() async {
-  print('🚀 Starting update_existing_users script...');
+  debugPrint('ðŸš€ Starting update_existing_users script...');
 
   try {
     // Initialize Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('✅ Firebase initialized successfully');
+    debugPrint('âœ… Firebase initialized successfully');
 
     // Authenticate as admin to get permissions
     final auth = FirebaseAuth.instance;
-    print('🔐 Authenticating as admin...');
+    debugPrint('ðŸ” Authenticating as admin...');
     await auth.signInWithEmailAndPassword(
       email: DemoConstants.adminEmail,
       password: DemoConstants.demoPassword,
     );
-    print('✅ Authenticated as admin successfully');
+    debugPrint('âœ… Authenticated as admin successfully');
 
     final firestore = FirebaseFirestore.instance;
     final usersCollection = firestore.collection('users');
 
     // Fetch all users
-    print('🔍 Fetching all users from Firestore...');
+    debugPrint('ðŸ” Fetching all users from Firestore...');
     final usersSnapshot = await usersCollection.get();
 
     if (usersSnapshot.docs.isEmpty) {
-      print('ℹ️ No users found in the database');
+      debugPrint('â„¹ï¸ No users found in the database');
       return;
     }
 
-    print('📊 Found ${usersSnapshot.docs.length} users');
+    debugPrint('ðŸ“Š Found ${usersSnapshot.docs.length} users');
     int updatedUsers = 0;
     int skippedUsers = 0;
 
@@ -64,8 +65,8 @@ void main() async {
       final userId = userDoc.id;
       final userData = userDoc.data();
 
-      print(
-          '\n👤 Processing user: $userId (${userData['email'] ?? 'no email'})');
+      debugPrint(
+          '\nðŸ‘¤ Processing user: $userId (${userData['email'] ?? 'no email'})');
 
       bool needsUpdate = false;
       final Map<String, dynamic> updates = {};
@@ -74,9 +75,9 @@ void main() async {
       if (userData['gender'] == null || userData['gender'].toString().isEmpty) {
         updates['gender'] = 'male'; // Default gender
         needsUpdate = true;
-        print('  📝 Missing gender - will set to "male"');
+        debugPrint('  ðŸ“ Missing gender - will set to "male"');
       } else {
-        print('  ✅ Gender already exists: ${userData['gender']}');
+        debugPrint('  âœ… Gender already exists: ${userData['gender']}');
       }
 
       // Check if dateOfBirth is missing
@@ -85,23 +86,23 @@ void main() async {
             DateTime.now().subtract(Duration(days: 365 * 25));
         updates['dateOfBirth'] = twentyFiveYearsAgo.toIso8601String();
         needsUpdate = true;
-        print('  📅 Missing dateOfBirth - will set to 25 years ago');
+        debugPrint('  ðŸ“… Missing dateOfBirth - will set to 25 years ago');
       } else {
-        print('  ✅ DateOfBirth already exists');
+        debugPrint('  âœ… DateOfBirth already exists');
       }
 
       // Update user document if needed
       if (needsUpdate) {
         try {
           await usersCollection.doc(userId).update(updates);
-          print('  ✅ User document updated successfully');
+          debugPrint('  âœ… User document updated successfully');
           updatedUsers++;
         } catch (e) {
-          print('  ❌ Failed to update user document: $e');
+          debugPrint('  âŒ Failed to update user document: $e');
           continue; // Skip to next user
         }
       } else {
-        print('  ⏭️ No updates needed for user document');
+        debugPrint('  â­ï¸ No updates needed for user document');
       }
 
       // Check if measurements already exist
@@ -110,8 +111,8 @@ void main() async {
       final existingMeasurements = await measurementsCollection.get();
 
       if (existingMeasurements.docs.isNotEmpty) {
-        print(
-            '  ✅ Measurements already exist (${existingMeasurements.docs.length} measurements)');
+        debugPrint(
+            '  âœ… Measurements already exist (${existingMeasurements.docs.length} measurements)');
         skippedUsers++;
         continue;
       }
@@ -122,7 +123,7 @@ void main() async {
           ? defaultFemaleMeasurements
           : defaultMaleMeasurements;
 
-      print('  📏 Adding default measurements for $gender...');
+      debugPrint('  ðŸ“ Adding default measurements for $gender...');
 
       int addedMeasurements = 0;
       for (final entry in defaultMeasurements.entries) {
@@ -134,24 +135,24 @@ void main() async {
           });
           addedMeasurements++;
         } catch (e) {
-          print('  ❌ Failed to add measurement ${entry.key}: $e');
+          debugPrint('  âŒ Failed to add measurement ${entry.key}: $e');
         }
       }
 
-      print('  ✅ Added $addedMeasurements measurements');
+      debugPrint('  âœ… Added $addedMeasurements measurements');
       updatedUsers++;
     }
-    print('\n🎉 Script completed successfully!');
-    print('📈 Summary:');
-    print('  - Total users processed: ${usersSnapshot.docs.length}');
-    print('  - Users updated: $updatedUsers');
-    print('  - Users skipped (already had measurements): $skippedUsers');
+    debugPrint('\nðŸŽ‰ Script completed successfully!');
+    debugPrint('ðŸ“ˆ Summary:');
+    debugPrint('  - Total users processed: ${usersSnapshot.docs.length}');
+    debugPrint('  - Users updated: $updatedUsers');
+    debugPrint('  - Users skipped (already had measurements): $skippedUsers');
 
 // Sign out
     await auth.signOut();
-    print('👋 Signed out admin user');
+    debugPrint('ðŸ‘‹ Signed out admin user');
   } catch (e) {
-    print('❌ Script failed with error: $e');
+    debugPrint('âŒ Script failed with error: $e');
 // Try to sign out even on error
     try {
       await FirebaseAuth.instance.signOut();
@@ -159,3 +160,5 @@ void main() async {
     rethrow;
   }
 }
+
+

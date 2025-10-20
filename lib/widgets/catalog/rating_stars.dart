@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/product_models.dart';
 import '../../providers/theme_provider.dart';
@@ -41,8 +41,8 @@ class RatingStars extends StatelessWidget {
           style: TextStyle(
             fontSize: 8,
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withOpacity(0.7)
-                : AppColors.onSurface.withOpacity(0.7),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                : AppColors.onSurface.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -50,3 +50,4 @@ class RatingStars extends StatelessWidget {
     );
   }
 }
+

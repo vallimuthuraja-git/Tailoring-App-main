@@ -1,3 +1,4 @@
+﻿import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,7 @@ class _ProductScreenState extends State<ProductScreen>
       try {
         Provider.of<ProductProvider>(context, listen: false).loadProducts();
       } catch (e) {
-        debugPrint('Error loading products: $e');
+        debugdebugPrint('Error loading products: $e');
       }
     });
   }
@@ -455,3 +456,5 @@ extension on CartProvider {
     return items.fold(0, (sum, item) => sum + item.quantity);
   }
 }
+
+

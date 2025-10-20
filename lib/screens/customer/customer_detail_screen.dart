@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -127,13 +127,13 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                           color: (isDark
                                   ? DarkAppColors.primary
                                   : AppColors.primary)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: (isDark
                                     ? DarkAppColors.primary
                                     : AppColors.primary)
-                                .withOpacity(0.2),
+                                .withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
@@ -172,8 +172,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? DarkAppColors.onSurface.withOpacity(0.1)
-              : AppColors.onSurface.withOpacity(0.1),
+              ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+              : AppColors.onSurface.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -198,8 +198,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: customer.isActive
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.red.withOpacity(0.1),
+                  ? Colors.green.withValues(alpha: 0.1)
+                  : Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
@@ -221,7 +221,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     final stats = [
       {
         'label': 'Total Spent',
-        'value': '₹${customer.totalSpent.toStringAsFixed(0)}'
+        'value': 'â‚¹${customer.totalSpent.toStringAsFixed(0)}'
       },
       {
         'label': 'Loyalty Tier',
@@ -241,8 +241,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? DarkAppColors.onSurface.withOpacity(0.1)
-              : AppColors.onSurface.withOpacity(0.1),
+              ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+              : AppColors.onSurface.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -287,8 +287,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
           style: TextStyle(
             fontSize: 12,
             color: isDark
-                ? DarkAppColors.onSurface.withOpacity(0.7)
-                : AppColors.onSurface.withOpacity(0.7),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                : AppColors.onSurface.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -309,8 +309,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? DarkAppColors.onSurface.withOpacity(0.1)
-              : AppColors.onSurface.withOpacity(0.1),
+              ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+              : AppColors.onSurface.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -366,7 +366,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: defaultColor.withOpacity(0.7),
+                color: defaultColor.withValues(alpha: 0.7),
               ),
             ),
           ),
@@ -417,7 +417,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: (isDark ? DarkAppColors.primary : AppColors.primary)
-                    .withOpacity(0.1),
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -659,3 +659,4 @@ extension StringExtensions on String {
     return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
+

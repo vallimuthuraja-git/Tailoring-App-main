@@ -111,12 +111,12 @@ class EmployeeProvider with ChangeNotifier {
   Future<void> loadEmployees() async {
     _isLoading = true;
     _errorMessage = null;
-    debugdebugPrint('ðŸ‘¥ Loading employees from Firebase...');
+    debugPrint('ðŸ‘¥ Loading employees from Firebase...');
     notifyListeners();
 
     try {
       // Skip connection check for first attempt - just try to fetch data
-      debugdebugPrint('ðŸ“‹ Fetching employees collection from Firebase...');
+      debugPrint('ðŸ“‹ Fetching employees collection from Firebase...');
       final querySnapshot = await _firebaseService.getCollection('employees');
 
       _employees = querySnapshot.docs.map((doc) {
@@ -127,15 +127,15 @@ class EmployeeProvider with ChangeNotifier {
         try {
           employee = Employee.fromJson(data);
         } catch (parseError) {
-          debugdebugPrint('âš ï¸ Failed to parse employee ${doc.id}: $parseError');
-          debugdebugPrint('ðŸ“„ Raw data: $data');
+          debugPrint('âš ï¸ Failed to parse employee ${doc.id}: $parseError');
+          debugPrint('ðŸ“„ Raw data: $data');
           employee = null;
         }
 
         return employee;
       }).whereType<Employee>().toList();
 
-      debugdebugPrint('âœ… Successfully loaded ${_employees.length} employees from database');
+      debugPrint('âœ… Successfully loaded ${_employees.length} employees from database');
 
       _applyFilters();
       _isLoading = false;
@@ -143,11 +143,11 @@ class EmployeeProvider with ChangeNotifier {
       notifyListeners();
 
     } catch (e) {
-      debugdebugPrint('âŒ Failed to load employees from database: $e');
+      debugPrint('âŒ Failed to load employees from database: $e');
 
       // Try one more time with connection check
       try {
-        debugdebugPrint('ðŸ”„ Retrying with connection check...');
+        debugPrint('ðŸ”„ Retrying with connection check...');
         final connectionStatus = await _firebaseService.getConnectionStatus();
 
         if (!connectionStatus['connected']) {
@@ -157,7 +157,7 @@ class EmployeeProvider with ChangeNotifier {
         // If connection is OK, rethrow original error
         rethrow;
       } catch (retryError) {
-        debugdebugPrint('âŒ Retry also failed: $retryError');
+        debugPrint('âŒ Retry also failed: $retryError');
         _isLoading = false;
         _errorMessage = _getUserFriendlyErrorMessage(e);
         _employees = []; // Clear local data on error to force fresh load
@@ -169,7 +169,7 @@ class EmployeeProvider with ChangeNotifier {
 
   // Force reload from database (bypassing any potential caching)
   Future<void> forceReloadEmployees() async {
-    debugdebugPrint('ðŸ”„ Force reloading employees...');
+    debugPrint('ðŸ”„ Force reloading employees...');
     await loadEmployees();
   }
 
@@ -235,7 +235,7 @@ class EmployeeProvider with ChangeNotifier {
     required double performanceBonusRate,
     required String paymentTerms,
   }) async {
-    debugdebugPrint('ðŸ‘¤ Creating new employee: $displayName');
+    debugPrint('ðŸ‘¤ Creating new employee: $displayName');
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -287,10 +287,10 @@ class EmployeeProvider with ChangeNotifier {
       final employeeData = employee.toJson();
       employeeData.remove('id');
 
-      debugdebugPrint('ðŸ’¾ Saving employee data to Firebase...');
+      debugPrint('ðŸ’¾ Saving employee data to Firebase...');
       final docRef = await _firebaseService.addDocument('employees', employeeData);
 
-      debugdebugPrint('âœ… Employee created successfully with ID: ${docRef.id}');
+      debugPrint('âœ… Employee created successfully with ID: ${docRef.id}');
 
       // Immediate reload to reflect changes in UI
       await loadEmployees();
@@ -301,7 +301,7 @@ class EmployeeProvider with ChangeNotifier {
       return true;
 
     } catch (e) {
-      debugdebugPrint('âŒ Failed to create employee $displayName: $e');
+      debugPrint('âŒ Failed to create employee $displayName: $e');
       _isLoading = false;
       _errorMessage = 'Failed to create employee: $e';
       notifyListeners();
@@ -675,5 +675,6 @@ class EmployeeProvider with ChangeNotifier {
     }
   }
 }
+
 
 

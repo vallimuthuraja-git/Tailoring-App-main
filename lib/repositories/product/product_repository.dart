@@ -23,11 +23,11 @@ class ProductRepository implements IProductRepository {
   Future<bool> _isOnline() async {
     try {
       final results = await _connectivity.checkConnectivity();
-      debugdebugPrint(
+      debugPrint(
           'Repository connectivity result: $results, type: ${results.runtimeType}');
       return results.isNotEmpty && results.first != ConnectivityResult.none;
     } catch (e) {
-      debugdebugPrint('Error checking connectivity: $e');
+      debugPrint('Error checking connectivity: $e');
       return false;
     }
   }
@@ -48,26 +48,26 @@ class ProductRepository implements IProductRepository {
       if (repo == _onlineRepo && products.isNotEmpty) {
         try {
           await _offlineRepo.syncFromOnline(products);
-          debugdebugPrint('âœ… Synced ${products.length} products to offline storage');
+          debugPrint('âœ… Synced ${products.length} products to offline storage');
         } catch (e) {
-          debugdebugPrint('âš ï¸ Failed to sync products to offline: $e');
+          debugPrint('âš ï¸ Failed to sync products to offline: $e');
         }
       }
 
       return products;
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to get products from primary repository, trying fallback...');
 
       // Try fallback repository
       try {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         final products = await fallbackRepo.getProducts();
-        debugdebugPrint(
+        debugPrint(
             'âœ… Retrieved ${products.length} products from fallback repository');
         return products;
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception(
             'Failed to load products from both online and offline storage');
       }
@@ -80,7 +80,7 @@ class ProductRepository implements IProductRepository {
       final repo = await _getRepository();
       return await repo.getProductById(id);
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to get product from primary repository, trying fallback...');
 
       // Try fallback repository
@@ -88,7 +88,7 @@ class ProductRepository implements IProductRepository {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         return await fallbackRepo.getProductById(id);
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception('Failed to load product from both repositories');
       }
     }
@@ -106,20 +106,20 @@ class ProductRepository implements IProductRepository {
         // Sync to offline storage
         try {
           await _offlineRepo.addProduct(addedProduct);
-          debugdebugPrint('âœ… Synced new product to offline storage');
+          debugPrint('âœ… Synced new product to offline storage');
         } catch (e) {
-          debugdebugPrint('âš ï¸ Failed to sync product to offline: $e');
+          debugPrint('âš ï¸ Failed to sync product to offline: $e');
         }
 
         return addedProduct;
       } catch (e) {
-        debugdebugPrint('âŒ Failed to add product online, storing offline only...');
+        debugPrint('âŒ Failed to add product online, storing offline only...');
         // Fall back to offline storage
         return await _offlineRepo.addProduct(product);
       }
     } else {
       // Store offline only
-      debugdebugPrint('ðŸ“± Device offline, storing product locally');
+      debugPrint('ðŸ“± Device offline, storing product locally');
       return await _offlineRepo.addProduct(product);
     }
   }
@@ -135,21 +135,21 @@ class ProductRepository implements IProductRepository {
         // Sync to offline storage
         try {
           await _offlineRepo.updateProduct(updatedProduct);
-          debugdebugPrint('âœ… Synced updated product to offline storage');
+          debugPrint('âœ… Synced updated product to offline storage');
         } catch (e) {
-          debugdebugPrint('âš ï¸ Failed to sync updated product to offline: $e');
+          debugPrint('âš ï¸ Failed to sync updated product to offline: $e');
         }
 
         return updatedProduct;
       } catch (e) {
-        debugdebugPrint(
+        debugPrint(
             'âŒ Failed to update product online, updating offline only...');
         // Fall back to offline storage
         return await _offlineRepo.updateProduct(product);
       }
     } else {
       // Update offline only
-      debugdebugPrint('ðŸ“± Device offline, updating product locally');
+      debugPrint('ðŸ“± Device offline, updating product locally');
       return await _offlineRepo.updateProduct(product);
     }
   }
@@ -165,18 +165,18 @@ class ProductRepository implements IProductRepository {
         // Sync to offline storage
         try {
           await _offlineRepo.deleteProduct(id);
-          debugdebugPrint('âœ… Synced product deletion to offline storage');
+          debugPrint('âœ… Synced product deletion to offline storage');
         } catch (e) {
-          debugdebugPrint('âš ï¸ Failed to sync product deletion to offline: $e');
+          debugPrint('âš ï¸ Failed to sync product deletion to offline: $e');
         }
       } catch (e) {
-        debugdebugPrint(
+        debugPrint(
             'âŒ Failed to delete product online, deleting offline only...');
         await _offlineRepo.deleteProduct(id);
       }
     } else {
       // Delete offline only
-      debugdebugPrint('ðŸ“± Device offline, deleting product locally');
+      debugPrint('ðŸ“± Device offline, deleting product locally');
       await _offlineRepo.deleteProduct(id);
     }
   }
@@ -187,14 +187,14 @@ class ProductRepository implements IProductRepository {
       final repo = await _getRepository();
       return await repo.searchProducts(query);
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to search products in primary repository, trying fallback...');
 
       try {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         return await fallbackRepo.searchProducts(query);
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception('Failed to search products in both repositories');
       }
     }
@@ -206,14 +206,14 @@ class ProductRepository implements IProductRepository {
       final repo = await _getRepository();
       return await repo.getProductsByCategory(category);
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to get products by category from primary repository, trying fallback...');
 
       try {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         return await fallbackRepo.getProductsByCategory(category);
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception(
             'Failed to get products by category from both repositories');
       }
@@ -226,14 +226,14 @@ class ProductRepository implements IProductRepository {
       final repo = await _getRepository();
       return await repo.getFeaturedProducts();
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to get featured products from primary repository, trying fallback...');
 
       try {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         return await fallbackRepo.getFeaturedProducts();
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception(
             'Failed to get featured products from both repositories');
       }
@@ -263,16 +263,16 @@ class ProductRepository implements IProductRepository {
         // Sync to offline storage
         try {
           await _offlineRepo.bulkUpdateProducts(products);
-          debugdebugPrint('âœ… Synced bulk update to offline storage');
+          debugPrint('âœ… Synced bulk update to offline storage');
         } catch (e) {
-          debugdebugPrint('âš ï¸ Failed to sync bulk update to offline: $e');
+          debugPrint('âš ï¸ Failed to sync bulk update to offline: $e');
         }
       } catch (e) {
-        debugdebugPrint('âŒ Failed to bulk update online, updating offline only...');
+        debugPrint('âŒ Failed to bulk update online, updating offline only...');
         await _offlineRepo.bulkUpdateProducts(products);
       }
     } else {
-      debugdebugPrint('ðŸ“± Device offline, bulk updating locally');
+      debugPrint('ðŸ“± Device offline, bulk updating locally');
       await _offlineRepo.bulkUpdateProducts(products);
     }
   }
@@ -288,16 +288,16 @@ class ProductRepository implements IProductRepository {
         // Sync to offline storage
         try {
           await _offlineRepo.bulkDeleteProducts(ids);
-          debugdebugPrint('âœ… Synced bulk deletion to offline storage');
+          debugPrint('âœ… Synced bulk deletion to offline storage');
         } catch (e) {
-          debugdebugPrint('âš ï¸ Failed to sync bulk deletion to offline: $e');
+          debugPrint('âš ï¸ Failed to sync bulk deletion to offline: $e');
         }
       } catch (e) {
-        debugdebugPrint('âŒ Failed to bulk delete online, deleting offline only...');
+        debugPrint('âŒ Failed to bulk delete online, deleting offline only...');
         await _offlineRepo.bulkDeleteProducts(ids);
       }
     } else {
-      debugdebugPrint('ðŸ“± Device offline, bulk deleting locally');
+      debugPrint('ðŸ“± Device offline, bulk deleting locally');
       await _offlineRepo.bulkDeleteProducts(ids);
     }
   }
@@ -308,14 +308,14 @@ class ProductRepository implements IProductRepository {
       final repo = await _getRepository();
       return await repo.getProductAnalytics();
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to get analytics from primary repository, trying fallback...');
 
       try {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         return await fallbackRepo.getProductAnalytics();
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception('Failed to get analytics from both repositories');
       }
     }
@@ -327,14 +327,14 @@ class ProductRepository implements IProductRepository {
       final repo = await _getRepository();
       return await repo.getTopSellingProducts(limit);
     } catch (e) {
-      debugdebugPrint(
+      debugPrint(
           'âŒ Failed to get top selling products from primary repository, trying fallback...');
 
       try {
         final fallbackRepo = await _isOnline() ? _offlineRepo : _onlineRepo;
         return await fallbackRepo.getTopSellingProducts(limit);
       } catch (fallbackError) {
-        debugdebugPrint('âŒ Both repositories failed: $fallbackError');
+        debugPrint('âŒ Both repositories failed: $fallbackError');
         throw Exception(
             'Failed to get top selling products from both repositories');
       }
@@ -345,49 +345,49 @@ class ProductRepository implements IProductRepository {
   Future<void> syncOfflineDataToOnline() async {
     final isOnline = await _isOnline();
     if (!isOnline) {
-      debugdebugPrint('âš ï¸ Cannot sync: device is offline');
+      debugPrint('âš ï¸ Cannot sync: device is offline');
       return;
     }
 
     try {
-      debugdebugPrint('ðŸ”„ Syncing offline data to online...');
+      debugPrint('ðŸ”„ Syncing offline data to online...');
 
       // Check if there's offline data to sync
       final hasOfflineData = await _offlineRepo.hasOfflineData();
       if (!hasOfflineData) {
-        debugdebugPrint('â„¹ï¸ No offline data to sync');
+        debugPrint('â„¹ï¸ No offline data to sync');
         return;
       }
 
       final offlineProducts = await _offlineRepo.getProducts();
-      debugdebugPrint('ðŸ“¤ Syncing ${offlineProducts.length} products to online...');
+      debugPrint('ðŸ“¤ Syncing ${offlineProducts.length} products to online...');
 
       // Sync each product
       for (final product in offlineProducts) {
         try {
           await _onlineRepo.addProduct(product);
-          debugdebugPrint('âœ… Synced product: ${product.name}');
+          debugPrint('âœ… Synced product: ${product.name}');
         } catch (e) {
           if (e.toString().contains('already exists')) {
             // Product already exists online, update it instead
             try {
               await _onlineRepo.updateProduct(product);
-              debugdebugPrint('âœ… Updated existing product: ${product.name}');
+              debugPrint('âœ… Updated existing product: ${product.name}');
             } catch (updateError) {
-              debugdebugPrint(
+              debugPrint(
                   'âŒ Failed to update product ${product.name}: $updateError');
             }
           } else {
-            debugdebugPrint('âŒ Failed to sync product ${product.name}: $e');
+            debugPrint('âŒ Failed to sync product ${product.name}: $e');
           }
         }
       }
 
       // Clear offline data after successful sync
       await _offlineRepo.clearOfflineData();
-      debugdebugPrint('âœ… Successfully synced all offline data to online');
+      debugPrint('âœ… Successfully synced all offline data to online');
     } catch (e) {
-      debugdebugPrint('âŒ Failed to sync offline data to online: $e');
+      debugPrint('âŒ Failed to sync offline data to online: $e');
       throw Exception('Failed to sync offline data to online: $e');
     }
   }
@@ -406,4 +406,5 @@ class ProductRepository implements IProductRepository {
     };
   }
 }
+
 

@@ -235,7 +235,7 @@ class _MyAppState extends State<MyApp> {
               // Handle dynamic routes
               if (settings.name?.startsWith('/product/') == true) {
                 final productId = settings.name!.split('/').last;
-                debugdebugPrint(
+                debugPrint(
                     '[DEBUG] Main: Navigating to product detail for ID: $productId');
                 return MaterialPageRoute(
                   builder: (context) => Scaffold(
@@ -248,7 +248,7 @@ class _MyAppState extends State<MyApp> {
               }
               if (settings.name?.startsWith('/service/') == true) {
                 final serviceId = settings.name!.split('/').last;
-                debugdebugPrint(
+                debugPrint(
                     '[DEBUG] Main: Navigating to service detail for ID: $serviceId');
                 return MaterialPageRoute(
                   builder: (context) => Scaffold(
@@ -720,5 +720,6 @@ class _ActionButton extends StatelessWidget {
     );
   }
 }
+
 
 

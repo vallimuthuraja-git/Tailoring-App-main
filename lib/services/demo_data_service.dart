@@ -23,7 +23,7 @@ class ComprehensiveDemoDataService {
 
   /// Main method to populate all demo data
   static Future<void> populateAllDemoData() async {
-    debugdebugPrint('ðŸš€ Starting comprehensive demo data population...');
+    debugPrint('ðŸš€ Starting comprehensive demo data population...');
 
     try {
       // Generate and populate data in order of dependencies
@@ -34,17 +34,17 @@ class ComprehensiveDemoDataService {
       await _populateWorkAssignments();
       await _populateChatConversations();
 
-      debugdebugPrint('âœ… Comprehensive demo data population completed!');
-      debugdebugPrint('ðŸ“Š Generated:');
-      debugdebugPrint('   - $_customerCount customers');
-      debugdebugPrint('   - $_productCount products');
-      debugdebugPrint('   - $_employeeCount employees');
-      debugdebugPrint('   - $_serviceCount services');
-      debugdebugPrint('   - $_workAssignmentCount work assignments');
-      debugdebugPrint('   - $_chatConversationCount chat conversations');
-      debugdebugPrint('   - Ready for full system testing!');
+      debugPrint('âœ… Comprehensive demo data population completed!');
+      debugPrint('ðŸ“Š Generated:');
+      debugPrint('   - $_customerCount customers');
+      debugPrint('   - $_productCount products');
+      debugPrint('   - $_employeeCount employees');
+      debugPrint('   - $_serviceCount services');
+      debugPrint('   - $_workAssignmentCount work assignments');
+      debugPrint('   - $_chatConversationCount chat conversations');
+      debugPrint('   - Ready for full system testing!');
     } catch (e) {
-      debugdebugPrint('âŒ Error during demo data population: $e');
+      debugPrint('âŒ Error during demo data population: $e');
       rethrow;
     }
   }
@@ -57,7 +57,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate customers with all loyalty tiers and diverse profiles
   static Future<void> _populateCustomers() async {
-    debugdebugPrint('ðŸ‘¥ Generating customers...');
+    debugPrint('ðŸ‘¥ Generating customers...');
 
     final customers = _generateCustomers();
     final batch = _firestore.batch();
@@ -68,12 +68,12 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugdebugPrint('âœ… Generated ${customers.length} customers');
+    debugPrint('âœ… Generated ${customers.length} customers');
   }
 
   /// Generate products across all categories
   static Future<void> _populateProducts() async {
-    debugdebugPrint('ðŸ“¦ Generating products...');
+    debugPrint('ðŸ“¦ Generating products...');
 
     final products = _generateProducts();
     final batch = _firestore.batch();
@@ -84,7 +84,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugdebugPrint('âœ… Generated ${products.length} products');
+    debugPrint('âœ… Generated ${products.length} products');
   }
 
   /// Generate diverse customer profiles with all loyalty tiers
@@ -370,7 +370,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate employees with all skill combinations and diverse profiles
   static Future<void> _populateEmployees() async {
-    debugdebugPrint('ðŸ‘· Generating employees...');
+    debugPrint('ðŸ‘· Generating employees...');
 
     final employees = _generateEmployees();
     final batch = _firestore.batch();
@@ -381,7 +381,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugdebugPrint('âœ… Generated ${employees.length} employees');
+    debugPrint('âœ… Generated ${employees.length} employees');
   }
 
   /// Generate diverse employee profiles with all skill combinations
@@ -754,7 +754,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate services with all types and complexities
   static Future<void> _populateServices() async {
-    debugdebugPrint('ðŸ·ï¸ Generating services...');
+    debugPrint('ðŸ·ï¸ Generating services...');
 
     final services = _generateServices();
     final batch = _firestore.batch();
@@ -765,7 +765,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    debugdebugPrint('âœ… Generated ${services.length} services');
+    debugPrint('âœ… Generated ${services.length} services');
   }
 
   /// Generate diverse services across all categories and types
@@ -1882,4 +1882,5 @@ class ComprehensiveDemoDataService {
     };
   }
 }
+
 

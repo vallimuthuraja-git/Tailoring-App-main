@@ -552,9 +552,9 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     };
 
     try {
-      debugdebugPrint('ðŸ§ª Creating quick test customer...');
+      debugPrint('ðŸ§ª Creating quick test customer...');
       await firebaseService.addDocument('customers', customerData);
-      debugdebugPrint('âœ… Quick customer created successfully');
+      debugPrint('âœ… Quick customer created successfully');
 
       // Refresh the list
       customerProvider.loadAllCustomers();
@@ -562,7 +562,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Quick customer added successfully!')));
     } catch (e) {
-      debugdebugPrint('âŒ Quick customer creation failed: $e');
+      debugPrint('âŒ Quick customer creation failed: $e');
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to add customer: $e')));
     }
@@ -1447,14 +1447,14 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         'isActive': true,
       };
 
-      debugdebugPrint('ðŸ”¥ Attempting Firebase write...');
+      debugPrint('ðŸ”¥ Attempting Firebase write...');
       await firebaseService.addDocument('customers', testCustomer);
-      debugdebugPrint('âœ… Firebase write successful!');
+      debugPrint('âœ… Firebase write successful!');
 
       Navigator.of(context).pop(); // Close loading dialog
 
       // Force refresh
-      debugdebugPrint('ðŸ”„ Forcing customer list refresh...');
+      debugPrint('ðŸ”„ Forcing customer list refresh...');
       customerProvider.loadAllCustomers();
 
       showDialog(
@@ -1472,7 +1472,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
         ),
       );
     } catch (e) {
-      debugdebugPrint('âŒ Test customer creation failed: $e');
+      debugPrint('âŒ Test customer creation failed: $e');
       Navigator.of(context).pop(); // Close loading dialog
 
       showDialog(
@@ -1694,7 +1694,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
           successCount++;
         } catch (e) {
-          debugdebugPrint('Failed to prepare customer ${demoCustomers[i].name}: $e');
+          debugPrint('Failed to prepare customer ${demoCustomers[i].name}: $e');
         }
       }
 
@@ -1752,5 +1752,6 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
     }
   }
 }
+
 
 

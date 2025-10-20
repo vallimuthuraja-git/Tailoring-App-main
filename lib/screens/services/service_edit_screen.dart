@@ -487,14 +487,14 @@ class _ServiceEditScreenState extends State<ServiceEditScreen> {
   }
 
   void _submitForm() async {
-    debugdebugPrint('_submitForm called for service ${widget.service.id}');
+    debugPrint('_submitForm called for service ${widget.service.id}');
     if (!_formKey.currentState!.validate()) {
-      debugdebugPrint('_submitForm: validation failed');
+      debugPrint('_submitForm: validation failed');
       return;
     }
 
     if (_features.isEmpty) {
-      debugdebugPrint('_submitForm: no features, showing snackbar');
+      debugPrint('_submitForm: no features, showing snackbar');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please add at least one feature')),
       );
@@ -504,7 +504,7 @@ class _ServiceEditScreenState extends State<ServiceEditScreen> {
     setState(() => _isLoading = true);
 
     try {
-      debugdebugPrint('_submitForm: preparing updates');
+      debugPrint('_submitForm: preparing updates');
       final updates = {
         'name': _nameController.text,
         'description': _descriptionController.text,
@@ -524,23 +524,23 @@ class _ServiceEditScreenState extends State<ServiceEditScreen> {
         'requiresFitting': _requiresFitting,
       };
 
-      debugdebugPrint('_submitForm: updates: $updates');
+      debugPrint('_submitForm: updates: $updates');
       final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
       final success = await serviceProvider.updateService(widget.service.id, updates);
-      debugdebugPrint('_submitForm: updateService result: $success');
+      debugPrint('_submitForm: updateService result: $success');
 
       if (success && mounted) {
-        debugdebugPrint('_submitForm: service updated successfully, navigating back');
+        debugPrint('_submitForm: service updated successfully, navigating back');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Service updated successfully!')),
         );
         Navigator.pop(context);
       } else {
-        debugdebugPrint('_submitForm: updateService failed');
+        debugPrint('_submitForm: updateService failed');
         throw Exception('Failed to update service');
       }
     } catch (e) {
-      debugdebugPrint('_submitForm: error updating service: $e');
+      debugPrint('_submitForm: error updating service: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
@@ -553,5 +553,6 @@ class _ServiceEditScreenState extends State<ServiceEditScreen> {
     }
   }
 }
+
 
 

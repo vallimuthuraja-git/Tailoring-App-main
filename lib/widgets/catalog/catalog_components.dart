@@ -103,7 +103,7 @@ Future<void> addToCart(BuildContext context, Product product) async {
     }
   } catch (e) {
     if (context.mounted) {
-      debugdebugPrint('Error adding to cart: $e');
+      debugPrint('Error adding to cart: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('An error occurred while adding to cart'),
@@ -770,6 +770,7 @@ class ActionButton extends StatelessWidget {
     );
   }
 }
+
 
 
 

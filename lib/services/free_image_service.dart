@@ -59,7 +59,7 @@ class FreeImageService {
 
       return null;
     } catch (e) {
-      debugdebugPrint('Error uploading to Imgur: $e');
+      debugPrint('Error uploading to Imgur: $e');
       return null;
     }
   }
@@ -81,7 +81,7 @@ class FreeImageService {
       // For demo, return a placeholder URL since we can't serve local files
       return getDemoImageUrl('default');
     } catch (e) {
-      debugdebugPrint('Error saving locally: $e');
+      debugPrint('Error saving locally: $e');
       return null;
     }
   }
@@ -92,7 +92,7 @@ class FreeImageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('image_$imageId', imageUrl);
     } catch (e) {
-      debugdebugPrint('Error storing image mapping: $e');
+      debugPrint('Error storing image mapping: $e');
     }
   }
 
@@ -102,7 +102,7 @@ class FreeImageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString('image_$imageId');
     } catch (e) {
-      debugdebugPrint('Error getting stored image: $e');
+      debugPrint('Error getting stored image: $e');
       return null;
     }
   }
@@ -113,7 +113,7 @@ class FreeImageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('image_$imageId');
     } catch (e) {
-      debugdebugPrint('Error deleting image mapping: $e');
+      debugPrint('Error deleting image mapping: $e');
     }
   }
 
@@ -136,7 +136,7 @@ class FreeImageService {
 
       return imageMappings;
     } catch (e) {
-      debugdebugPrint('Error getting all image mappings: $e');
+      debugPrint('Error getting all image mappings: $e');
       return {};
     }
   }
@@ -156,7 +156,7 @@ class FreeImageService {
         }
       }
     } catch (e) {
-      debugdebugPrint('Error cleaning up images: $e');
+      debugPrint('Error cleaning up images: $e');
     }
   }
 
@@ -238,7 +238,7 @@ class FreeImageService {
 
       return false;
     } catch (e) {
-      debugdebugPrint('Error deleting image: $e');
+      debugPrint('Error deleting image: $e');
       return false;
     }
   }
@@ -256,7 +256,7 @@ class FreeImageService {
         'imageMappings': mappings,
       };
     } catch (e) {
-      debugdebugPrint('Error getting storage stats: $e');
+      debugPrint('Error getting storage stats: $e');
       return {
         'totalImages': 0,
         'usingDemoImages': 0,
@@ -267,4 +267,5 @@ class FreeImageService {
     }
   }
 }
+
 

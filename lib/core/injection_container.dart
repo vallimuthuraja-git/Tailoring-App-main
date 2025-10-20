@@ -66,7 +66,7 @@ class InjectionContainer {
       connectivity: _connectivity,
     );
 
-    debugdebugPrint('âœ… All dependencies initialized');
+    debugPrint('âœ… All dependencies initialized');
   }
 
   // Getters for accessing dependencies
@@ -103,7 +103,7 @@ class InjectionContainer {
   /// Dispose of all resources
   Future<void> dispose() async {
     await _productBloc.close();
-    debugdebugPrint('âœ… Dependencies disposed');
+    debugPrint('âœ… Dependencies disposed');
   }
 
   /// Reset all dependencies (useful for testing)
@@ -115,5 +115,6 @@ class InjectionContainer {
 
 /// Global instance for easy access
 final injectionContainer = InjectionContainer();
+
 
 

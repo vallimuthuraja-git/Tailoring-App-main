@@ -42,7 +42,7 @@ class FirebaseStorageService {
       uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
         final progress = snapshot.bytesTransferred / snapshot.totalBytes;
         onProgress?.call(progress);
-        debugdebugPrint('Upload progress: ${(progress * 100).toStringAsFixed(1)}%');
+        debugPrint('Upload progress: ${(progress * 100).toStringAsFixed(1)}%');
       });
 
       // Wait for upload to complete
@@ -50,11 +50,11 @@ class FirebaseStorageService {
 
       // Get download URL
       final downloadUrl = await snapshot.ref.getDownloadURL();
-      debugdebugPrint('Image uploaded successfully: $downloadUrl');
+      debugPrint('Image uploaded successfully: $downloadUrl');
 
       return downloadUrl;
     } catch (e) {
-      debugdebugPrint('Error uploading image to Firebase Storage: $e');
+      debugPrint('Error uploading image to Firebase Storage: $e');
       return null;
     }
   }
@@ -116,11 +116,11 @@ class FirebaseStorageService {
       final decodedPath = Uri.decodeFull(storagePath);
 
       await _storage.ref().child(decodedPath).delete();
-      debugdebugPrint('Image deleted successfully: $decodedPath');
+      debugPrint('Image deleted successfully: $decodedPath');
 
       return true;
     } catch (e) {
-      debugdebugPrint('Error deleting image: $e');
+      debugPrint('Error deleting image: $e');
       return false;
     }
   }
@@ -163,7 +163,7 @@ class FirebaseStorageService {
 
       return downloadUrl;
     } catch (e) {
-      debugdebugPrint('Error creating optimized URL: $e');
+      debugPrint('Error creating optimized URL: $e');
       return downloadUrl;
     }
   }
@@ -194,7 +194,7 @@ class FirebaseStorageService {
         'metageneration': metadata.metageneration,
       };
     } catch (e) {
-      debugdebugPrint('Error getting image metadata: $e');
+      debugPrint('Error getting image metadata: $e');
       return null;
     }
   }
@@ -204,7 +204,7 @@ class FirebaseStorageService {
     try {
       return _storage.refFromURL(url);
     } catch (e) {
-      debugdebugPrint('Error creating reference from URL: $e');
+      debugPrint('Error creating reference from URL: $e');
       return null;
     }
   }
@@ -215,7 +215,7 @@ class FirebaseStorageService {
       final result = await _storage.ref().child(folderPath).listAll();
       return result.items;
     } catch (e) {
-      debugdebugPrint('Error listing files in folder: $e');
+      debugPrint('Error listing files in folder: $e');
       return [];
     }
   }
@@ -239,7 +239,7 @@ class FirebaseStorageService {
       final newUrl = await destinationRef.getDownloadURL();
       return newUrl;
     } catch (e) {
-      debugdebugPrint('Error moving image: $e');
+      debugPrint('Error moving image: $e');
       return null;
     }
   }
@@ -288,4 +288,5 @@ class FirebaseStorageService {
     return uploadedUrls;
   }
 }
+
 

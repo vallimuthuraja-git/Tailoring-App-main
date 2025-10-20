@@ -47,7 +47,7 @@ class FirebaseService {
     } catch (e) {
       _isConnected = false;
       _connectionError = 'Firebase initialization failed: $e';
-      debugdebugPrint('âŒ Firebase initialization failed: $e');
+      debugPrint('âŒ Firebase initialization failed: $e');
       rethrow;
     }
   }
@@ -55,16 +55,16 @@ class FirebaseService {
   // Test Firebase connection
   Future<void> _testConnection() async {
     try {
-      debugdebugPrint('ðŸ” Testing Firebase connection...');
+      debugPrint('ðŸ” Testing Firebase connection...');
       // Test basic firestore connectivity
       await _firestore.collection('test').limit(1).get();
       _isConnected = true;
       _connectionError = null;
-      debugdebugPrint('âœ… Firebase connection successful');
+      debugPrint('âœ… Firebase connection successful');
     } catch (e) {
       _isConnected = false;
       _connectionError = 'Firebase connection failed: $e';
-      debugdebugPrint('âŒ Firebase connection failed: $e');
+      debugPrint('âŒ Firebase connection failed: $e');
     }
   }
 
@@ -81,8 +81,8 @@ class FirebaseService {
 
   // Generic CRUD operations with enhanced error handling
   Future<DocumentReference> addDocument(String collection, Map<String, dynamic> data, {int maxRetries = 2}) async {
-    debugdebugPrint('ðŸ’¾ Adding document to collection: $collection');
-    debugdebugPrint('ðŸ“„ Data keys: ${data.keys.toList()}');
+    debugPrint('ðŸ’¾ Adding document to collection: $collection');
+    debugPrint('ðŸ“„ Data keys: ${data.keys.toList()}');
 
     int retryCount = 0;
     while (retryCount < maxRetries) {
@@ -101,15 +101,15 @@ class FirebaseService {
           throw Exception('Document not created successfully');
         }
 
-        debugdebugPrint('âœ… Document added successfully to $collection with ID: ${docRef.id}');
+        debugPrint('âœ… Document added successfully to $collection with ID: ${docRef.id}');
         return docRef;
 
       } catch (e) {
         retryCount++;
-        debugdebugPrint('âŒ Failed attempt $retryCount to add document to $collection: $e');
+        debugPrint('âŒ Failed attempt $retryCount to add document to $collection: $e');
 
         if (retryCount == maxRetries) {
-          debugdebugPrint('ðŸš« Giving up after $maxRetries attempts');
+          debugPrint('ðŸš« Giving up after $maxRetries attempts');
           rethrow;
         }
 
@@ -132,8 +132,8 @@ class FirebaseService {
   }
 
  Future<QuerySnapshot> getCollection(String collection, {int maxRetries = 3}) async {
-   debugdebugPrint('ðŸ” Fetching collection: $collection');
-   debugdebugPrint('ðŸ‘¤ Auth state: ${FirebaseAuth.instance.currentUser?.email ?? 'No authenticated user'}');
+   debugPrint('ðŸ” Fetching collection: $collection');
+   debugPrint('ðŸ‘¤ Auth state: ${FirebaseAuth.instance.currentUser?.email ?? 'No authenticated user'}');
 
    int retryCount = 0;
    while (retryCount < maxRetries) {
@@ -141,14 +141,14 @@ class FirebaseService {
        final result = await _firestore.collection(collection).get().timeout(
          const Duration(seconds: 15),
        );
-       debugdebugPrint('âœ… Successfully fetched ${result.docs.length} documents from $collection');
+       debugPrint('âœ… Successfully fetched ${result.docs.length} documents from $collection');
        return result;
      } catch (e) {
        retryCount++;
-       debugdebugPrint('âŒ Failed attempt $retryCount to fetch $collection: $e');
+       debugPrint('âŒ Failed attempt $retryCount to fetch $collection: $e');
 
        if (retryCount == maxRetries) {
-         debugdebugPrint('ðŸš« Giving up after $maxRetries attempts for collection: $collection');
+         debugPrint('ðŸš« Giving up after $maxRetries attempts for collection: $collection');
          rethrow;
        }
 
@@ -268,4 +268,5 @@ class FirebaseService {
     return 'An unexpected error occurred.';
   }
 }
+
 

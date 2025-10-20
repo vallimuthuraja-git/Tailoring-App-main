@@ -29,7 +29,7 @@ class ImageUploadService {
       );
       return image;
     } catch (e) {
-      debugdebugPrint('Error picking image: $e');
+      debugPrint('Error picking image: $e');
       return null;
     }
   }
@@ -51,7 +51,7 @@ class ImageUploadService {
 
       return images;
     } catch (e) {
-      debugdebugPrint('Error picking multiple images: $e');
+      debugPrint('Error picking multiple images: $e');
       return null;
     }
   }
@@ -66,7 +66,7 @@ class ImageUploadService {
         return await _uploadToMobileService(imageFile);
       }
     } catch (e) {
-      debugdebugPrint('Error uploading image: $e');
+      debugPrint('Error uploading image: $e');
       return getDemoImageUrl('default');
     }
   }
@@ -102,7 +102,7 @@ class ImageUploadService {
       // Fallback to demo images
       return getDemoImageUrl('default');
     } catch (e) {
-      debugdebugPrint('Error uploading to web service: $e');
+      debugPrint('Error uploading to web service: $e');
       return getDemoImageUrl('default');
     }
   }
@@ -121,7 +121,7 @@ class ImageUploadService {
       // Fallback to demo images
       return getDemoImageUrl('default');
     } catch (e) {
-      debugdebugPrint('Error uploading to mobile service: $e');
+      debugPrint('Error uploading to mobile service: $e');
       return getDemoImageUrl('default');
     }
   }
@@ -152,7 +152,7 @@ class ImageUploadService {
 
       return null;
     } catch (e) {
-      debugdebugPrint('Error uploading to Imgur web: $e');
+      debugPrint('Error uploading to Imgur web: $e');
       return null;
     }
   }
@@ -183,7 +183,7 @@ class ImageUploadService {
 
       return null;
     } catch (e) {
-      debugdebugPrint('Error uploading to Imgur mobile: $e');
+      debugPrint('Error uploading to Imgur mobile: $e');
       return null;
     }
   }
@@ -261,4 +261,5 @@ class ImageUploadService {
     }
   }
 }
+
 

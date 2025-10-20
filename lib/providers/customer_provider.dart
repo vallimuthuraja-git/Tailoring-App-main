@@ -86,7 +86,7 @@ class CustomerProvider with ChangeNotifier {
       _isLoading = false;
       _errorMessage = 'Failed to load customers: $e';
       notifyListeners();
-      debugdebugPrint('ERROR: Failed to load customers: $e');
+      debugPrint('ERROR: Failed to load customers: $e');
     }
   }
 
@@ -475,5 +475,6 @@ extension CustomerExtensions on Customer {
     return name;
   }
 }
+
 
 

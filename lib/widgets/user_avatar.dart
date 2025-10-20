@@ -57,7 +57,7 @@ class _UserAvatarState extends State<UserAvatar> {
           _customization = AvatarCustomization.fromJson(data);
         }
       } catch (e) {
-        debugdebugPrint('Error loading avatar customization: $e');
+        debugPrint('Error loading avatar customization: $e');
       } finally {
         if (mounted) {
           setState(() => _isLoading = false);
@@ -177,5 +177,6 @@ class _UserAvatarState extends State<UserAvatar> {
     );
   }
 }
+
 
 

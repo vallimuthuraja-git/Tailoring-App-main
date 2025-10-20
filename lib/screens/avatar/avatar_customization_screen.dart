@@ -183,7 +183,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
           _customization = AvatarCustomization.fromJson(data);
         }
       } catch (e) {
-        debugdebugPrint('Error loading avatar customization: $e');
+        debugPrint('Error loading avatar customization: $e');
       } finally {
         setState(() => _isLoading = false);
       }
@@ -203,7 +203,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
             .doc('customization')
             .set(_customization.toJson());
       } catch (e) {
-        debugdebugPrint('Error saving avatar customization: $e');
+        debugPrint('Error saving avatar customization: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save avatar: $e')),
         );
@@ -762,7 +762,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
       setState(() {
         _modelError = 'Failed to load 3D model: $e';
       });
-      debugdebugPrint('Error loading avatar model: $e');
+      debugPrint('Error loading avatar model: $e');
     }
   }
 
@@ -778,7 +778,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
   void _updateModelMaterials() {
     // Placeholder for material/texture updates
     // In a real implementation, this would change colors, textures, etc.
-    debugdebugPrint(
+    debugPrint(
         'Updating avatar with customization: ${_customization.toJson()}');
   }
 
@@ -815,5 +815,6 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
     });
   }
 }
+
 
 

@@ -81,7 +81,7 @@ class EmployeeManagementHelper {
         );
       } else {
         // Log error silently
-        debugdebugPrint('Failed to silently populate demo employees: $e');
+        debugPrint('Failed to silently populate demo employees: $e');
       }
     }
   }
@@ -91,13 +91,13 @@ class EmployeeManagementHelper {
     try {
       final querySnapshot = await _firebaseService.getCollection('employees');
       if (querySnapshot.docs.isEmpty) {
-        debugdebugPrint('No employees found. Auto-populating demo data...');
+        debugPrint('No employees found. Auto-populating demo data...');
         await populateDemoEmployees(context, silent: true);
         return true; // Data was populated
       }
       return false; // Data already exists
     } catch (e) {
-      debugdebugPrint('Error checking for employees: $e');
+      debugPrint('Error checking for employees: $e');
       return false;
     }
   }
@@ -304,32 +304,32 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
   @override
   void initState() {
     super.initState();
-    debugdebugPrint('ðŸ—ï¸ EmployeeListSimple initState - starting initialization');
+    debugPrint('ðŸ—ï¸ EmployeeListSimple initState - starting initialization');
     // Start with a simple loading state
     _loading = true;
     _initComplete = false;
 
     // Use a simple delayed initialization to avoid complex async issues
     Future.delayed(const Duration(milliseconds: 500), () {
-      debugdebugPrint('â° EmployeeListSimple delayed initialization triggered');
+      debugPrint('â° EmployeeListSimple delayed initialization triggered');
       if (mounted) {
         _initializeSimple();
       } else {
-        debugdebugPrint(
+        debugPrint(
             'âš ï¸ EmployeeListSimple not mounted during delayed initialization');
       }
     });
   }
 
   void _initializeSimple() {
-    debugdebugPrint(
+    debugPrint(
         'ðŸš€ EmployeeListSimple _initializeSimple - starting simple initialization');
     // Simple synchronous initialization first
     setState(() {
       _loading = false;
       _initComplete = true;
     });
-    debugdebugPrint(
+    debugPrint(
         'âœ… EmployeeListSimple simple initialization complete, now loading data');
 
     // Then try to load data asynchronously
@@ -338,43 +338,43 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
   Future<void> _loadEmployeeData() async {
     try {
-      debugdebugPrint(
+      debugPrint(
           'ðŸš€ EmployeeListSimple _loadEmployeeData - starting data load');
-      debugdebugPrint('ðŸ“¦ Checking EmployeeProvider availability');
+      debugPrint('ðŸ“¦ Checking EmployeeProvider availability');
       final employeeProvider =
           Provider.of<EmployeeProvider>(context, listen: false);
-      debugdebugPrint('âœ… EmployeeProvider obtained successfully');
+      debugPrint('âœ… EmployeeProvider obtained successfully');
 
       // Simple load with timeout
       await employeeProvider.loadEmployees().timeout(
         const Duration(seconds: 10),
         onTimeout: () {
-          debugdebugPrint('âš ï¸ Employee load timed out');
+          debugPrint('âš ï¸ Employee load timed out');
           throw Exception('Loading timed out - please check your connection');
         },
       );
 
-      debugdebugPrint('âœ… EmployeeListSimple data loaded successfully');
-      debugdebugPrint('ðŸ“ˆ Found ${employeeProvider.employees.length} employees');
+      debugPrint('âœ… EmployeeListSimple data loaded successfully');
+      debugPrint('ðŸ“ˆ Found ${employeeProvider.employees.length} employees');
 
       if (mounted) {
-        debugdebugPrint('ðŸ”„ EmployeeListSimple - clearing error and updating state');
+        debugPrint('ðŸ”„ EmployeeListSimple - clearing error and updating state');
         setState(() {
           _initError = null;
         });
       } else {
-        debugdebugPrint(
+        debugPrint(
             'âš ï¸ EmployeeListSimple not mounted when setting success state');
       }
     } catch (e) {
-      debugdebugPrint('âŒ EmployeeListSimple failed to load employee data: $e');
+      debugPrint('âŒ EmployeeListSimple failed to load employee data: $e');
       if (mounted) {
-        debugdebugPrint('ðŸ”„ EmployeeListSimple - setting error state');
+        debugPrint('ðŸ”„ EmployeeListSimple - setting error state');
         setState(() {
           _initError = 'Failed to load employees: $e';
         });
       } else {
-        debugdebugPrint(
+        debugPrint(
             'âš ï¸ EmployeeListSimple not mounted when setting error state');
       }
     }
@@ -382,15 +382,15 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
 
   @override
   Widget build(BuildContext context) {
-    debugdebugPrint('ðŸ”„ EmployeeListSimple build - rebuilding widget');
+    debugPrint('ðŸ”„ EmployeeListSimple build - rebuilding widget');
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        debugdebugPrint(
+        debugPrint(
             'ðŸ” EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
-        debugdebugPrint('ðŸ‘‘ isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
+        debugPrint('ðŸ‘‘ isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
         // Check if user has permission to view employee list
         if (!authProvider.isShopOwnerOrAdmin) {
-          debugdebugPrint(
+          debugPrint(
               'âŒ EmployeeListSimple access denied - user is not shop owner or admin');
           return Center(
             child: Column(
@@ -417,19 +417,19 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
           );
         }
 
-        debugdebugPrint(
+        debugPrint(
             'âœ… EmployeeListSimple access granted - building main content');
         return Expanded(
           child: Consumer<EmployeeProvider>(
             builder: (context, employeeProvider, child) {
-              debugdebugPrint('ðŸ“Š EmployeeListSimple building with provider state:');
-              debugdebugPrint('  - _initComplete: $_initComplete');
-              debugdebugPrint(
+              debugPrint('ðŸ“Š EmployeeListSimple building with provider state:');
+              debugPrint('  - _initComplete: $_initComplete');
+              debugPrint(
                   '  - employeeProvider.isLoading: ${employeeProvider.isLoading}');
-              debugdebugPrint('  - _initError: $_initError');
-              debugdebugPrint(
+              debugPrint('  - _initError: $_initError');
+              debugPrint(
                   '  - employeeProvider.errorMessage: ${employeeProvider.errorMessage}');
-              debugdebugPrint(
+              debugPrint(
                   '  - employeeProvider.employees.length: ${employeeProvider.employees.length}');
 
               // Show loading if initialization is incomplete OR provider is loading
@@ -456,7 +456,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                       // Emergency bypass button
                       ElevatedButton.icon(
                         onPressed: () async {
-                          debugdebugPrint('ðŸš¨ Emergency bypass activated');
+                          debugPrint('ðŸš¨ Emergency bypass activated');
                           try {
                             await EmployeeManagementHelper
                                 .populateDemoEmployees(context, silent: true);
@@ -467,7 +467,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                               _initError = null;
                             });
                           } catch (e) {
-                            debugdebugPrint('âŒ Emergency bypass failed: $e');
+                            debugPrint('âŒ Emergency bypass failed: $e');
                             setState(() {
                               _initError = 'Emergency bypass failed: $e';
                               _loading = false;
@@ -728,7 +728,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                             Expanded(
                                               child: OutlinedButton.icon(
                                                 onPressed: () async {
-                                                  debugdebugPrint(
+                                                  debugPrint(
                                                       'ðŸ”„ Force refreshing employee data...');
                                                   setState(() {
                                                     _initComplete = false;
@@ -1301,15 +1301,15 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     final FirebaseService firebaseService = FirebaseService();
 
     try {
-      debugdebugPrint('ðŸŽ¯ Debug Info: Starting database check...');
+      debugPrint('ðŸŽ¯ Debug Info: Starting database check...');
       // Check Firebase auth state
       final currentUser = firebaseService.currentUser;
-      debugdebugPrint('ðŸ” Auth state: ${currentUser?.email ?? "Not logged in"}');
+      debugPrint('ðŸ” Auth state: ${currentUser?.email ?? "Not logged in"}');
 
       // Try to fetch employees collection
       final querySnapshot = await firebaseService.getCollection('employees');
       final employeeCount = querySnapshot.docs.length;
-      debugdebugPrint('ðŸ’¾ Database: $employeeCount employees in collection');
+      debugPrint('ðŸ’¾ Database: $employeeCount employees in collection');
 
       if (mounted) {
         showDialog(
@@ -1400,7 +1400,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
         );
       }
     } catch (e) {
-      debugdebugPrint('âŒ Debug check failed: $e');
+      debugPrint('âŒ Debug check failed: $e');
       if (mounted) {
         showDialog(
           context: context,
@@ -1497,5 +1497,6 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     }
   }
 }
+
 
 

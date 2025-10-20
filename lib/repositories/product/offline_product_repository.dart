@@ -32,7 +32,7 @@ class OfflineProductRepository implements IProductRepository {
             final product = Product.fromJson(productData);
             _products[product.id] = product;
           } catch (e) {
-            debugdebugPrint('Error parsing offline product: $e');
+            debugPrint('Error parsing offline product: $e');
           }
         }
       }
@@ -46,7 +46,7 @@ class OfflineProductRepository implements IProductRepository {
         });
       }
     } catch (e) {
-      debugdebugPrint('Error loading offline products: $e');
+      debugPrint('Error loading offline products: $e');
     }
   }
 
@@ -59,7 +59,7 @@ class OfflineProductRepository implements IProductRepository {
       // Save analytics
       await _prefs.setString(_analyticsKey, jsonEncode(_analytics));
     } catch (e) {
-      debugdebugPrint('Error saving offline products: $e');
+      debugPrint('Error saving offline products: $e');
     }
   }
 
@@ -224,4 +224,5 @@ class OfflineProductRepository implements IProductRepository {
     return await hasOfflineData();
   }
 }
+
 

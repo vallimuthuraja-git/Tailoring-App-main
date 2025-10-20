@@ -64,11 +64,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   Future<bool> _isOnline() async {
     try {
       final results = await _connectivity.checkConnectivity();
-      debugdebugPrint(
+      debugPrint(
           'Bloc connectivity result: $results, type: ${results.runtimeType}');
       return results.isNotEmpty && results.first != ConnectivityResult.none;
     } catch (e) {
-      debugdebugPrint('Error checking connectivity: $e');
+      debugPrint('Error checking connectivity: $e');
       return false;
     }
   }
@@ -97,7 +97,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         _setupProductsSubscription();
       }
     } catch (e) {
-      debugdebugPrint('Error loading products: $e');
+      debugPrint('Error loading products: $e');
       emit(ProductError(message: 'Failed to load products: $e'));
     }
   }
@@ -114,7 +114,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(const ProductError(message: 'Product not found'));
       }
     } catch (e) {
-      debugdebugPrint('Error loading product: $e');
+      debugPrint('Error loading product: $e');
       emit(ProductError(message: 'Failed to load product: $e'));
     }
   }
@@ -133,7 +133,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       // Reload products to refresh the list
       add(const LoadProducts());
     } catch (e) {
-      debugdebugPrint('Error adding product: $e');
+      debugPrint('Error adding product: $e');
       emit(ProductError(message: 'Failed to add product: $e'));
     }
   }
@@ -158,7 +158,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       // Reload products to refresh the list
       add(const LoadProducts());
     } catch (e) {
-      debugdebugPrint('Error updating product: $e');
+      debugPrint('Error updating product: $e');
       emit(ProductError(message: 'Failed to update product: $e'));
     }
   }
@@ -175,7 +175,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       // Reload products to refresh the list
       add(const LoadProducts());
     } catch (e) {
-      debugdebugPrint('Error deleting product: $e');
+      debugPrint('Error deleting product: $e');
       emit(ProductError(message: 'Failed to delete product: $e'));
     }
   }
@@ -194,7 +194,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         query: event.query,
       ));
     } catch (e) {
-      debugdebugPrint('Error searching products: $e');
+      debugPrint('Error searching products: $e');
       emit(ProductError(message: 'Failed to search products: $e'));
     }
   }
@@ -216,7 +216,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final featuredProducts = await _productRepository.getFeaturedProducts();
       emit(FeaturedProductsLoaded(featuredProducts));
     } catch (e) {
-      debugdebugPrint('Error loading featured products: $e');
+      debugPrint('Error loading featured products: $e');
       emit(ProductError(message: 'Failed to load featured products: $e'));
     }
   }
@@ -253,7 +253,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
       add(UpdateProduct(updatedProduct));
     } catch (e) {
-      debugdebugPrint('Error toggling product status: $e');
+      debugPrint('Error toggling product status: $e');
       emit(ProductError(message: 'Failed to toggle product status: $e'));
     }
   }
@@ -268,7 +268,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       // Reload products to refresh the list
       add(const LoadProducts());
     } catch (e) {
-      debugdebugPrint('Error bulk updating products: $e');
+      debugPrint('Error bulk updating products: $e');
       emit(ProductError(message: 'Failed to bulk update products: $e'));
     }
   }
@@ -283,7 +283,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       // Reload products to refresh the list
       add(const LoadProducts());
     } catch (e) {
-      debugdebugPrint('Error bulk deleting products: $e');
+      debugPrint('Error bulk deleting products: $e');
       emit(ProductError(message: 'Failed to bulk delete products: $e'));
     }
   }
@@ -294,7 +294,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final analytics = await _productRepository.getProductAnalytics();
       emit(ProductAnalyticsLoaded(analytics));
     } catch (e) {
-      debugdebugPrint('Error loading product analytics: $e');
+      debugPrint('Error loading product analytics: $e');
       emit(ProductError(message: 'Failed to load product analytics: $e'));
     }
   }
@@ -306,7 +306,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           await _productRepository.getTopSellingProducts(event.limit);
       emit(TopSellingProductsLoaded(topSellingProducts));
     } catch (e) {
-      debugdebugPrint('Error loading top selling products: $e');
+      debugPrint('Error loading top selling products: $e');
       emit(ProductError(message: 'Failed to load top selling products: $e'));
     }
   }
@@ -335,7 +335,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
       emit(OfflineDataSynced(syncedCount));
     } catch (e) {
-      debugdebugPrint('Error syncing offline data: $e');
+      debugPrint('Error syncing offline data: $e');
       emit(ProductError(message: 'Failed to sync offline data: $e'));
     }
   }
@@ -384,7 +384,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         add(const LoadProducts());
       },
       onError: (error) {
-        debugdebugPrint('Error in products stream: $error');
+        debugPrint('Error in products stream: $error');
       },
     );
   }
@@ -396,4 +396,5 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     return super.close();
   }
 }
+
 

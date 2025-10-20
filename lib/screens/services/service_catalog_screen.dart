@@ -61,11 +61,11 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
   }
 
   Future<void> _loadServices() async {
-    debugdebugPrint('ðŸ”„ ServiceCatalogScreen loading services');
+    debugPrint('ðŸ”„ ServiceCatalogScreen loading services');
     final serviceProvider =
         Provider.of<ServiceProvider>(context, listen: false);
     await serviceProvider.loadServices();
-    debugdebugPrint(
+    debugPrint(
         'âœ… ServiceCatalogScreen services loaded successfully: ${serviceProvider.services.length}');
   }
 
@@ -76,7 +76,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
         _isGridView = prefs.getBool('service_view_mode_grid') ?? true;
       });
     } catch (e) {
-      debugdebugPrint('Error loading view mode preference: $e');
+      debugPrint('Error loading view mode preference: $e');
     }
   }
 
@@ -85,7 +85,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('service_view_mode_grid', isGrid);
     } catch (e) {
-      debugdebugPrint('Error saving view mode preference: $e');
+      debugPrint('Error saving view mode preference: $e');
     }
   }
 
@@ -245,11 +245,11 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                 final services = serviceProvider.services
                     .where((service) => service.isActive)
                     .toList();
-                debugdebugPrint(
+                debugPrint(
                     'ðŸ“Š ServiceCatalogScreen entered, services: ${services.length}');
 
                 if (services.isEmpty) {
-                  debugdebugPrint(
+                  debugPrint(
                       'âš ï¸ No services available after filtering - total services: ${serviceProvider.services.length}');
                   return const Center(
                     child: Column(
@@ -898,6 +898,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
     }
   }
 }
+
 
 
 

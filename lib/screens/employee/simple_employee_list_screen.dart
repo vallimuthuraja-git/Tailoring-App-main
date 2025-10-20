@@ -30,7 +30,7 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
     });
 
     try {
-      debugdebugPrint('ðŸš€ Initializing employee data...');
+      debugPrint('ðŸš€ Initializing employee data...');
 
       // First, ensure Firebase is properly initialized
       final employeeProvider =
@@ -43,18 +43,18 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
       await employeeProvider.loadEmployees().timeout(
         const Duration(seconds: 15),
         onTimeout: () {
-          debugdebugPrint('âš ï¸ Employee load timed out');
+          debugPrint('âš ï¸ Employee load timed out');
           throw Exception(
               'Loading timed out. Please check your internet connection.');
         },
       );
 
-      debugdebugPrint('âœ… Employee data loaded successfully');
+      debugPrint('âœ… Employee data loaded successfully');
       setState(() {
         _isInitializing = false;
       });
     } catch (e) {
-      debugdebugPrint('âŒ Failed to initialize employee data: $e');
+      debugPrint('âŒ Failed to initialize employee data: $e');
       setState(() {
         _isInitializing = false;
         _initError = e.toString();
@@ -73,7 +73,7 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
         },
       );
     } catch (e) {
-      debugdebugPrint('âŒ Failed to reload employees: $e');
+      debugPrint('âŒ Failed to reload employees: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to refresh: $e')),
@@ -471,5 +471,6 @@ class _SimpleEmployeeListScreenState extends State<SimpleEmployeeListScreen> {
     );
   }
 }
+
 
 

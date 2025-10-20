@@ -48,7 +48,7 @@ class _ComprehensiveProductsScreenState
       try {
         Provider.of<ProductProvider>(context, listen: false).loadProducts();
       } catch (e) {
-        debugdebugPrint('Error loading products: $e');
+        debugPrint('Error loading products: $e');
       }
     });
   }
@@ -463,5 +463,6 @@ extension ThemeProviderExtension on ThemeProvider {
   void
       toggleViewMode() {} // Placeholder - implement based on your ThemeProvider
 }
+
 
 

@@ -44,7 +44,7 @@ class _ProductScreenState extends State<ProductScreen>
       try {
         Provider.of<ProductProvider>(context, listen: false).loadProducts();
       } catch (e) {
-        debugdebugPrint('Error loading products: $e');
+        debugPrint('Error loading products: $e');
       }
     });
   }
@@ -456,5 +456,6 @@ extension on CartProvider {
     return items.fold(0, (sum, item) => sum + item.quantity);
   }
 }
+
 
 

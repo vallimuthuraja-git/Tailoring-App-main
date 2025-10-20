@@ -6,7 +6,7 @@ import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/product_provider.dart';
 import '../utils/responsive_utils.dart';
-import '../utils/theme_constants.dart';
+
 import '../widgets/catalog/expandable_search_bar.dart';
 import '../widgets/catalog/product_grid_view.dart';
 import '../widgets/catalog/product_screen_filters_bar.dart';
@@ -134,8 +134,8 @@ class _ComprehensiveProductsScreenState
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _addNewProduct,
-          child: const Icon(Icons.add),
           tooltip: 'Add New Product',
+          child: const Icon(Icons.add),
         ),
       ),
     );

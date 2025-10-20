@@ -153,7 +153,7 @@ class ProductManager {
       // Track analytics
       await _analyticsService.trackEvent(
         productId: product.id,
-        eventType: data_access.EVENT_PURCHASE,
+        eventType: data_access.eventPurchase,
         metadata: {'action': 'product_added'},
       );
 
@@ -291,7 +291,7 @@ class ProductManager {
   }
 
   Future<Map<String, dynamic>> getCacheStats() async {
-    return await _cacheService.getCacheStats();
+    return _cacheService.getCacheStats();
   }
 
   // Search service integration

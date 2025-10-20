@@ -57,7 +57,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate customers with all loyalty tiers and diverse profiles
   static Future<void> _populateCustomers() async {
-    print('👥 Generating customers...');
+    debugPrint('👥 Generating customers...');
 
     final customers = _generateCustomers();
     final batch = _firestore.batch();
@@ -68,12 +68,12 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated ${customers.length} customers');
+    debugPrint('✅ Generated ${customers.length} customers');
   }
 
   /// Generate products across all categories
   static Future<void> _populateProducts() async {
-    print('📦 Generating products...');
+    debugPrint('📦 Generating products...');
 
     final products = _generateProducts();
     final batch = _firestore.batch();
@@ -84,7 +84,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated ${products.length} products');
+    debugPrint('✅ Generated ${products.length} products');
   }
 
   /// Generate diverse customer profiles with all loyalty tiers
@@ -370,7 +370,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate employees with all skill combinations and diverse profiles
   static Future<void> _populateEmployees() async {
-    print('👷 Generating employees...');
+    debugPrint('👷 Generating employees...');
 
     final employees = _generateEmployees();
     final batch = _firestore.batch();
@@ -381,7 +381,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated ${employees.length} employees');
+    debugPrint('✅ Generated ${employees.length} employees');
   }
 
   /// Generate diverse employee profiles with all skill combinations
@@ -754,7 +754,7 @@ class ComprehensiveDemoDataService {
 
   /// Generate services with all types and complexities
   static Future<void> _populateServices() async {
-    print('🏷️ Generating services...');
+    debugPrint('🏷️ Generating services...');
 
     final services = _generateServices();
     final batch = _firestore.batch();
@@ -765,7 +765,7 @@ class ComprehensiveDemoDataService {
     }
 
     await batch.commit();
-    print('✅ Generated ${services.length} services');
+    debugPrint('✅ Generated ${services.length} services');
   }
 
   /// Generate diverse services across all categories and types
@@ -1741,7 +1741,7 @@ class ComprehensiveDemoDataService {
         ));
       }
 
-      final totalAmount = items.fold(0.0, (sum, item) => sum + item.price);
+      final totalAmount = items.fold(0.0, (total, item) => total + item.price);
 
       orders.add(Order(
         id: 'work_order_${i + 1}',

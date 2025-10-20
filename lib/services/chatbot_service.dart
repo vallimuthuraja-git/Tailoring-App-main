@@ -1,7 +1,6 @@
 import '../models/chat.dart';
 import '../providers/order_provider.dart';
 import '../providers/product_provider.dart';
-import '../product_data_access.dart';
 
 class ChatbotService {
   final List<ChatbotIntent> _intents = tailoringChatbotIntents;

@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../utils/error_handler.dart';
 
@@ -23,9 +22,38 @@ class AuthProvider with ChangeNotifier {
   AuthService get authService => _authService;
   User? get currentUser => _user; // For compatibility with existing code
 
+  // Check if user is shop owner
+  bool get isShopOwner {
+    return _userProfile?.role == UserRole.shopOwner;
+  }
+
+  // Check if user is shop owner (legacy alias)
+  bool get isShopOwnerOrAdmin {
+    return isShopOwner;
+  }
+
+  // Get user display name
+  String get displayName {
+    return _userProfile?.displayName ?? _user?.displayName ?? 'User';
+  }
+
+  // Get user email
+  String? get email {
+    return _userProfile?.email ?? _user?.email;
+  }
+
+  // Get user phone number
+  String? get phoneNumber {
+    return _userProfile?.phoneNumber ?? _user?.phoneNumber;
+  }
+
+  // Get user photo URL
+  String? get photoUrl {
+    return _userProfile?.photoUrl ?? _user?.photoURL;
+  }
+
   // Constructor
   AuthProvider() {
-    initLogging();
     _initializeAuth();
   }
 
@@ -479,36 +507,6 @@ class AuthProvider with ChangeNotifier {
     return _userProfile?.role == requiredRole;
   }
 
-  // Check if user is shop owner
-  bool get isShopOwner {
-    return _userProfile?.role == UserRole.shopOwner;
-  }
-
-  // Check if user is shop owner (legacy alias)
-  bool get isShopOwnerOrAdmin {
-    return isShopOwner;
-  }
-
-  // Get user display name
-  String get displayName {
-    return _userProfile?.displayName ?? _user?.displayName ?? 'User';
-  }
-
-  // Get user email
-  String? get email {
-    return _userProfile?.email ?? _user?.email;
-  }
-
-  // Get user phone number
-  String? get phoneNumber {
-    return _userProfile?.phoneNumber ?? _user?.phoneNumber;
-  }
-
-  // Get user photo URL
-  String? get photoUrl {
-    return _userProfile?.photoUrl ?? _user?.photoURL;
-  }
-
   // Demo login methods with fallback to create account if it doesn't exist
   Future<bool> demoLoginAsCustomer() async {
     return await _demoLogin('customer', UserRole.customer);
@@ -551,8 +549,7 @@ class AuthProvider with ChangeNotifier {
 
     print('🔑 DEMO LOGIN START FOR: $accountKey');
     print('📧 Email: $email');
-    print(
-        '🔒 Password: ${password.replaceAll(RegExp(r'.'), '*')}'); // Hide actual password
+    print('🔒 Password: ***********'); // Hide actual password
     print('👤 Display Name: $displayName');
     print('⚡ Role: $role');
 
@@ -598,36 +595,122 @@ class AuthProvider with ChangeNotifier {
               '🔍 AUTH PROVIDER: Admin demo login - assigned role: ${_userProfile?.role.name}');
         }
       } catch (e) {
-        // If sign-in fails (e.g., account doesn't exist), try to create the account
-        debugPrint(
-            '🚫 DEMO LOGIN: Sign in failed ($e), attempting to create new demo account');
-
-        try {
-          debugPrint('🔧 DEMO LOGIN: Creating account via AuthService signup');
-          UserCredential userCredential =
-              await _authService.signUpWithEmailAndPassword(
-            email: email,
-            password: password,
-            displayName: displayName,
-            role: role,
-          );
-
-          _user = userCredential.user;
-
+        // If sign-in fails due to wrong password for existing account, try to reset the account
+        if (e is FirebaseAuthException && e.code == 'invalid-credential') {
           debugPrint(
-              '✅ DEMO LOGIN: Account created successfully, loading profile');
-          await _loadUserProfile();
+              '🚫 DEMO LOGIN: Sign in failed due to invalid credentials, attempting to reset demo account');
 
-          if (_userProfile == null) {
-            debugPrint('❌ DEMO LOGIN: Profile creation/loading failed');
-            throw Exception('Failed to create/load user profile in Firestore');
+          try {
+            // Try to delete the existing auth account and recreate it
+            // First, try to sign in with whatever password allows access to delete the account
+            await _resetAndRecreateDemoAccount(
+                email, password, displayName, role);
+          } catch (resetError) {
+            debugPrint(
+                '❌ DEMO LOGIN: Account reset failed ($resetError), trying normal signup fallback');
+            // Fall back to trying signup anyway
+            try {
+              debugPrint(
+                  '🔧 DEMO LOGIN: Creating account via AuthService signup');
+              UserCredential userCredential =
+                  await _authService.signUpWithEmailAndPassword(
+                email: email,
+                password: password,
+                displayName: displayName,
+                role: role,
+              );
+
+              _user = userCredential.user;
+
+              debugPrint(
+                  '✅ DEMO LOGIN: Account created successfully, loading profile');
+              await _loadUserProfile();
+
+              if (_userProfile == null) {
+                debugPrint('❌ DEMO LOGIN: Profile creation/loading failed');
+                throw Exception(
+                    'Failed to create/load user profile in Firestore');
+              }
+
+              debugPrint(
+                  '✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
+            } catch (createError) {
+              debugPrint(
+                  '❌ DEMO LOGIN: Fallback account creation failed: $createError');
+              throw Exception(
+                  'Demo account exists but cannot be accessed. Please contact administrator to reset demo account password. Error: $createError');
+            }
           }
-
+        } else {
+          // For other types of errors, try to create the account normally
           debugPrint(
-              '✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
-        } catch (createError) {
-          debugPrint('❌ DEMO LOGIN: Account creation failed: $createError');
-          rethrow;
+              '🚫 DEMO LOGIN: Sign in failed with different error ($e), attempting to create new demo account');
+
+          try {
+            debugPrint(
+                '🔧 DEMO LOGIN: Creating account via AuthService signup');
+            UserCredential userCredential =
+                await _authService.signUpWithEmailAndPassword(
+              email: email,
+              password: password,
+              displayName: displayName,
+              role: role,
+            );
+
+            _user = userCredential.user;
+
+            debugPrint(
+                '✅ DEMO LOGIN: Account created successfully, loading profile');
+            await _loadUserProfile();
+
+            if (_userProfile == null) {
+              debugPrint('❌ DEMO LOGIN: Profile creation/loading failed');
+              throw Exception(
+                  'Failed to create/load user profile in Firestore');
+            }
+
+            debugPrint(
+                '✅ DEMO LOGIN: Profile created. User: ${_user?.email}, Role: ${_userProfile?.role}, DisplayName: ${_userProfile?.displayName}');
+          } catch (createError) {
+            if (createError.toString().contains('An account already exists')) {
+              debugPrint(
+                  '💡 DEMO LOGIN: Account exists with different credentials - trying manual login fallback');
+
+              // Try direct manual login as final fallback
+              try {
+                debugPrint('🔑 DEMO LOGIN: Attempting manual login fallback');
+                UserCredential userCredential =
+                    await _authService.signInWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+
+                _user = userCredential.user;
+
+                debugPrint('✅ DEMO LOGIN: Manual login fallback successful');
+                await _loadUserProfile();
+
+                if (_userProfile != null) {
+                  debugPrint(
+                      '✅ DEMO LOGIN: Profile loaded successfully via manual login');
+                  // Success! Don't throw error
+                } else {
+                  debugPrint(
+                      '⚠️ DEMO LOGIN: Manual login succeeded but no profile found');
+                  // Still consider it a success but log the issue
+                }
+              } catch (manualLoginError) {
+                debugPrint(
+                    '❌ DEMO LOGIN: Manual login fallback also failed: $manualLoginError');
+                // Only throw error after all attempts fail
+                throw Exception(
+                    'Demo account exists but all login attempts failed. Please contact administrator to reset demo account password. Manual login: email: $email, password: $password.');
+              }
+            } else {
+              debugPrint('❌ DEMO LOGIN: Account creation failed: $createError');
+              rethrow;
+            }
+          }
         }
       }
 
@@ -647,6 +730,75 @@ class AuthProvider with ChangeNotifier {
       _errorMessage = 'Demo login failed: $e';
       notifyListeners();
       return false;
+    }
+  }
+
+  // Helper method to reset and recreate demo account
+  Future<void> _resetAndRecreateDemoAccount(
+      String email, String password, String displayName, UserRole role) async {
+    debugPrint('🔄 Attempting to reset demo account: $email');
+
+    // Try to delete the existing profile from Firestore first (we can do this without auth)
+    try {
+      final firestore = _authService.firestore;
+      final query = await firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      for (final doc in query.docs) {
+        await doc.reference.delete();
+        debugPrint('🗑️ Deleted old Firestore profile for $email');
+      }
+
+      // Also delete any employee profiles
+      final employeeQuery = await firestore
+          .collection('employees')
+          .where('email', isEqualTo: email)
+          .get();
+
+      for (final doc in employeeQuery.docs) {
+        await doc.reference.delete();
+        debugPrint('🗑️ Deleted old employee profile for $email');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Could not delete old profiles: $e');
+      // Continue anyway
+    }
+
+    // Since we can't delete Firebase Auth accounts without proper authentication,
+    // we'll try to create a new account. If it fails with "email-already-in-use",
+    // it means we need to handle this differently - perhaps the account has a different password
+    // that we don't know. In that case, this method should throw an error to fall back to
+    // manual signup or alternative approaches.
+
+    debugPrint('🔧 Attempting to recreate demo account for $email');
+
+    try {
+      UserCredential userCredential =
+          await _authService.signUpWithEmailAndPassword(
+        email: email,
+        password: password,
+        displayName: displayName,
+        role: role,
+      );
+
+      _user = userCredential.user;
+
+      debugPrint('✅ Demo account recreated successfully for $email');
+
+      // Load the profile
+      await _loadUserProfile();
+
+      if (_userProfile == null) {
+        throw Exception('Failed to create user profile after recreation');
+      }
+
+      debugPrint('✅ Profile created for recreated account: $email');
+    } catch (e) {
+      debugPrint('❌ Failed to recreate demo account: $e');
+      // Re-throw so the caller can handle the fallback
+      rethrow;
     }
   }
 }

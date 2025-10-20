@@ -243,7 +243,6 @@ class DemoStatisticsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final stats = ComprehensiveDemoDataService.getOrderStatistics();
 
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode

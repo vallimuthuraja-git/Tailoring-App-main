@@ -61,7 +61,7 @@ class CatalogAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       centerTitle: true,
       title: showSearchBar
-          ? Container(
+          ? SizedBox(
               width: isLargeScreen
                   ? ProductScreenConstants.screenPadding * 25
                   : ProductScreenConstants.screenPadding * 18.75,
@@ -316,11 +316,11 @@ class CartBadgeIcon extends StatelessWidget {
                     colors: cartProvider.itemCount > 0
                         ? [
                             themeProvider.isDarkMode
-                                ? DarkAppColors.primary.withOpacity(0.8)
-                                : AppColors.primary.withOpacity(0.8),
+                                ? DarkAppColors.primary.withValues(alpha: 0.8)
+                                : AppColors.primary.withValues(alpha: 0.8),
                             themeProvider.isDarkMode
-                                ? DarkAppColors.secondary.withOpacity(0.8)
-                                : AppColors.secondary.withOpacity(0.8),
+                                ? DarkAppColors.secondary.withValues(alpha: 0.8)
+                                : AppColors.secondary.withValues(alpha: 0.8),
                           ]
                         : [
                             Colors.transparent,
@@ -335,7 +335,7 @@ class CartBadgeIcon extends StatelessWidget {
                             color: (themeProvider.isDarkMode
                                     ? DarkAppColors.primary
                                     : AppColors.primary)
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),

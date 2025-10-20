@@ -143,18 +143,18 @@ class UnifiedProductCard extends StatelessWidget {
             onTap: onTap ?? () => _safeNavigateToDetail(context),
             borderRadius: BorderRadius.circular(layoutConfig.borderRadius),
             splashColor: themeProvider.isDarkMode
-                ? DarkAppColors.primary.withOpacity(0.1)
-                : AppColors.primary.withOpacity(0.1),
+                ? DarkAppColors.primary.withValues(alpha: 0.1)
+                : AppColors.primary.withValues(alpha: 0.1),
             highlightColor: themeProvider.isDarkMode
-                ? DarkAppColors.primary.withOpacity(0.05)
-                : AppColors.primary.withOpacity(0.05),
+                ? DarkAppColors.primary.withValues(alpha: 0.05)
+                : AppColors.primary.withValues(alpha: 0.05),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(layoutConfig.borderRadius),
                 border: Border.all(
                   color: themeProvider.isDarkMode
-                      ? DarkAppColors.outline.withOpacity(0.08)
-                      : AppColors.outline.withOpacity(0.06),
+                      ? DarkAppColors.outline.withValues(alpha: 0.08)
+                      : AppColors.outline.withValues(alpha: 0.06),
                   width: 0.5,
                 ),
                 gradient: LinearGradient(
@@ -165,7 +165,8 @@ class UnifiedProductCard extends StatelessWidget {
                         ? DarkAppColors.surface
                         : AppColors.surface,
                     themeProvider.isDarkMode
-                        ? DarkAppColors.surfaceContainerHighest.withOpacity(0.3)
+                        ? DarkAppColors.surfaceContainerHighest
+                            .withValues(alpha: 0.3)
                         : AppColors.surfaceContainerHighest
                             .withValues(alpha: 0.1),
                   ],
@@ -302,8 +303,8 @@ class UnifiedProductCard extends StatelessWidget {
             Icons.image_not_supported_outlined,
             size: 48,
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withOpacity(0.5)
-                : AppColors.onSurface.withOpacity(0.5),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                : AppColors.onSurface.withValues(alpha: 0.6),
           ),
           const SizedBox(height: 8),
           Text(
@@ -312,8 +313,8 @@ class UnifiedProductCard extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.6)
-                  : AppColors.onSurface.withOpacity(0.6),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                  : AppColors.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -340,13 +341,13 @@ class UnifiedProductCard extends StatelessWidget {
       height: 44, // Minimum touch target for accessibility
       decoration: BoxDecoration(
         color: themeProvider.isDarkMode
-            ? DarkAppColors.surface.withOpacity(0.9)
-            : AppColors.surface.withOpacity(0.9),
+            ? DarkAppColors.surface.withValues(alpha: 0.9)
+            : AppColors.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: themeProvider.isDarkMode
-              ? DarkAppColors.outline.withOpacity(0.3)
-              : AppColors.outline.withOpacity(0.3),
+              ? DarkAppColors.outline.withValues(alpha: 0.3)
+              : AppColors.outline.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -358,8 +359,8 @@ class UnifiedProductCard extends StatelessWidget {
           color: isInWishlist
               ? Colors.red.shade500
               : themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                  : AppColors.onSurface.withOpacity(0.7),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                  : AppColors.onSurface.withValues(alpha: 0.7),
         ),
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(),
@@ -515,8 +516,8 @@ class UnifiedProductCard extends StatelessWidget {
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withOpacity(0.5)
-                : AppColors.onSurface.withOpacity(0.5),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                : AppColors.onSurface.withValues(alpha: 0.5),
             decoration: TextDecoration.lineThrough,
           ),
         ),
@@ -846,8 +847,8 @@ class UnifiedProductCard extends StatelessWidget {
             Icons.local_shipping_outlined,
             size: 12.0,
             color: themeProvider.isDarkMode
-                ? DarkAppColors.onSurface.withOpacity(0.6)
-                : AppColors.onSurface.withOpacity(0.6),
+                ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                : AppColors.onSurface.withValues(alpha: 0.6),
           ),
           const SizedBox(width: 3.0),
           Text(
@@ -856,8 +857,8 @@ class UnifiedProductCard extends StatelessWidget {
               fontSize: 10.0,
               fontWeight: FontWeight.w500,
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.7)
-                  : AppColors.onSurface.withOpacity(0.7),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                  : AppColors.onSurface.withValues(alpha: 0.7),
               letterSpacing: 0.1,
             ),
           ),

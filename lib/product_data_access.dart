@@ -9,10 +9,10 @@ export 'services/product/product_cache_service.dart';
 export 'services/product/product_search_service.dart';
 
 // Constants
-const String EVENT_PURCHASE = 'product_purchase';
-const String EVENT_VIEW = 'product_view';
-const String EVENT_ADD_TO_CART = 'add_to_cart';
-const String EVENT_WISHLIST = 'add_to_wishlist';
+const String eventPurchase = 'product_purchase';
+const String eventView = 'product_view';
+const String eventAddToCart = 'add_to_cart';
+const String eventWishlist = 'add_to_wishlist';
 
 // Note: ProductCacheService and ProductSearchService are referenced but not implemented yet
 // They would need to be created if required by the application

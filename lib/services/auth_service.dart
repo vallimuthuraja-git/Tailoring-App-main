@@ -87,6 +87,9 @@ class AuthService {
   // Current user
   User? get currentUser => _auth.currentUser;
 
+  // Public firestore access for internal operations
+  FirebaseFirestore get firestore => _firestore;
+
   // Sign up with email and password
   Future<UserCredential> signUpWithEmailAndPassword({
     required String email,

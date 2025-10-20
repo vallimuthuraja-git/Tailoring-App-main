@@ -5,7 +5,6 @@ import '../../../product_data_access.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../utils/theme_constants.dart';
-import '../../utils/responsive_utils.dart';
 import '../../utils/product_screen_constants.dart';
 
 // Base mixin for common bottom sheet functionality
@@ -131,13 +130,13 @@ class _CatalogFilterBottomSheetState extends State<CatalogFilterBottomSheet>
                   horizontal: getResponsivePadding(16, context)),
               decoration: BoxDecoration(
                 color: themeProvider.isDarkMode
-                    ? DarkAppColors.surface.withOpacity(0.5)
-                    : AppColors.surface.withOpacity(0.5),
+                    ? DarkAppColors.surface.withValues(alpha: 0.5)
+                    : AppColors.surface.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: themeProvider.isDarkMode
-                      ? DarkAppColors.onSurface.withOpacity(0.2)
-                      : AppColors.onSurface.withOpacity(0.2),
+                      ? DarkAppColors.onSurface.withValues(alpha: 0.2)
+                      : AppColors.onSurface.withValues(alpha: 0.2),
                 ),
               ),
               child: RangeSlider(
@@ -153,8 +152,8 @@ class _CatalogFilterBottomSheetState extends State<CatalogFilterBottomSheet>
                     ? DarkAppColors.primary
                     : AppColors.primary,
                 inactiveColor: themeProvider.isDarkMode
-                    ? DarkAppColors.onSurface.withOpacity(0.3)
-                    : AppColors.onSurface.withOpacity(0.3),
+                    ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                    : AppColors.onSurface.withValues(alpha: 0.3),
                 onChanged: (values) {
                   setState(() {
                     _priceRange = values;
@@ -249,8 +248,8 @@ class _CatalogFilterBottomSheetState extends State<CatalogFilterBottomSheet>
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.onSurface.withOpacity(0.3)
-                            : AppColors.onSurface.withOpacity(0.3),
+                            ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                            : AppColors.onSurface.withValues(alpha: 0.3),
                       ),
                       padding: EdgeInsets.symmetric(
                           vertical: getResponsivePadding(14, context)),
@@ -419,8 +418,8 @@ class CatalogSortBottomSheet extends StatelessWidget with BottomSheetBase {
           border: Border(
             bottom: BorderSide(
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.1)
-                  : AppColors.onSurface.withOpacity(0.1),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.1)
+                  : AppColors.onSurface.withValues(alpha: 0.1),
             ),
           ),
         ),
@@ -441,8 +440,8 @@ class CatalogSortBottomSheet extends StatelessWidget with BottomSheetBase {
               Icons.arrow_forward_ios,
               size: 16,
               color: themeProvider.isDarkMode
-                  ? DarkAppColors.onSurface.withOpacity(0.5)
-                  : AppColors.onSurface.withOpacity(0.5),
+                  ? DarkAppColors.onSurface.withValues(alpha: 0.5)
+                  : AppColors.onSurface.withValues(alpha: 0.5),
             ),
           ],
         ),

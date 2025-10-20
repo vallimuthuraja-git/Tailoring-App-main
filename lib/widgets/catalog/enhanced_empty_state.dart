@@ -58,11 +58,11 @@ class EnhancedEmptyState extends StatelessWidget {
                   (themeProvider.isDarkMode
                           ? DarkAppColors.primary
                           : AppColors.primary)
-                      .withOpacity(0.1),
+                      .withValues(alpha: 26),
                   (themeProvider.isDarkMode
                           ? DarkAppColors.primary
                           : AppColors.primary)
-                      .withOpacity(0.05),
+                      .withValues(alpha: 13),
                 ],
               ),
               shape: BoxShape.circle,
@@ -74,7 +74,7 @@ class EnhancedEmptyState extends StatelessWidget {
               color: (themeProvider.isDarkMode
                       ? DarkAppColors.primary
                       : AppColors.primary)
-                  .withOpacity(0.7),
+                  .withValues(alpha: 179),
             ),
           ),
 
@@ -105,7 +105,7 @@ class EnhancedEmptyState extends StatelessWidget {
               color: (themeProvider.isDarkMode
                       ? DarkAppColors.onSurface
                       : AppColors.onSurface)
-                  .withOpacity(0.7),
+                  .withValues(alpha: 179),
             ),
             textAlign: TextAlign.center,
           ),
@@ -257,7 +257,7 @@ class EnhancedEmptyState extends StatelessWidget {
                   color: (themeProvider.isDarkMode
                           ? DarkAppColors.primary
                           : AppColors.primary)
-                      .withOpacity(0.3),
+                      .withValues(alpha: 77),
                 ),
           padding: EdgeInsets.symmetric(
             vertical: ProductScreenConstants.getResponsivePadding(screenWidth),

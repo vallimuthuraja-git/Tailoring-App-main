@@ -1,9 +1,135 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write for authenticated users on all collections
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isShopOwner() {
+      return isAuthenticated() &&
+            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'shopOwner';
+    }
+
+    function isEmployee() {
+      return isAuthenticated() &&
+            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employee';
+    }
+
+    function isCustomer() {
+      return isAuthenticated() &&
+            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'customer';
+    }
+
+    function hasAnyRole() {
+      return isAdmin() || isShopOwner() || isEmployee() || isCustomer();
+    }
+
+    // Users collection - allow read/write for authenticated users
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+      allow read: if isAdmin() || isShopOwner();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Allow create operation for demo accounts during setup
+    match /users/{userId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+    }
+
+    // Customers collection
+    match /customers/{customerId} {
+      allow read, write: if hasAnyRole();
+      allow read, write: if isAuthenticated() && isOwner(customerId);
+    }
+
+    // Orders collection
+    match /orders/{orderId} {
+      allow read, write: if hasAnyRole();
+      allow read, write: if isAuthenticated() && isOwner(resource.data.customerId);
+    }
+
+    // Products collection
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin() || isShopOwner();
+    }
+
+    // Measurements collection
+    match /measurements/{measurementId} {
+      allow read, write: if hasAnyRole();
+      allow read, write: if isAuthenticated() && isOwner(resource.data.customerId);
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read, write: if hasAnyRole();
+      allow read, write: if isAuthenticated() && isOwner(notificationId);
+    }
+
+    // Chat collection
+    match /chat/{conversationId}/{document=**} {
+      allow read, write: if isAuthenticated();
+      allow read, write: if hasAnyRole();
+    }
+
+    // Services collection
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin() || isShopOwner();
+    }
+
+    // Employees collection
+    match /employees/{employeeId} {
+      allow read, write: if hasAnyRole();
+      allow read, write: if isAuthenticated() && isOwner(employeeId);
+    }
+
+    // Work assignments collection
+    match /work_assignments/{assignmentId} {
+      allow read, write: if hasAnyRole();
+    }
+
+    // Categories collection
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin() || isShopOwner();
+    }
+
+    // Reviews collection
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isOwner(resource.data.customerId);
+      allow write: if hasAnyRole();
+    }
+
+    // Wishlist collection
+    match /wishlists/{wishlistId} {
+      allow read, write: if isAuthenticated() && isOwner(wishlistId);
+    }
+
+    // Cart collection
+    match /cart/{cartId} {
+      allow read, write: if isAuthenticated() && isOwner(cartId);
+    }
+
+    // Allow all operations for test collection during development
+    match /test/{document=**} {
+      allow read, write: if true;
     }
   }
 }

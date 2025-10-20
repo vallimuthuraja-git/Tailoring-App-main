@@ -22,6 +22,7 @@ class HomeController with ChangeNotifier {
     scrollController.dispose();
     searchController.dispose();
     searchFocusNode.dispose();
+    super.dispose();
   }
 
   void handleSearch(String query, BuildContext context) {

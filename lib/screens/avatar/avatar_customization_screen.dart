@@ -32,15 +32,15 @@ class AvatarCustomization {
 
   Map<String, dynamic> toJson() {
     return {
-      'skinTone': skinTone.value,
-      'hairColor': hairColor.value,
-      'eyeColor': eyeColor.value,
+      'skinTone': skinTone.toARGB32(),
+      'hairColor': hairColor.toARGB32(),
+      'eyeColor': eyeColor.toARGB32(),
       'hairStyle': hairStyle,
       'topClothing': topClothing,
       'bottomClothing': bottomClothing,
       'shoes': shoes,
       'accessories':
-          accessories.map((key, value) => MapEntry(key, value.value)),
+          accessories.map((key, value) => MapEntry(key, value.toARGB32())),
     };
   }
 
@@ -133,19 +133,15 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
   bool _isLoading = false;
   cube.Object? _avatarObject;
   cube.Scene? _scene;
-  bool _isModelLoading = false;
   String? _modelError;
 
   // Camera controls
-  double _rotationY = 0.0;
-  double _rotationX = 0.0;
   double _zoom = 3.0;
   static const double _minZoom = 1.5;
   static const double _maxZoom = 8.0;
 
   // Animation
   AnimationController? _animationController;
-  Animation<double>? _rotationAnimation;
 
   // Selected category for customization
   String _selectedCategory = 'appearance';
@@ -158,8 +154,6 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _rotationAnimation =
-        Tween<double>(begin: 0, end: 2 * pi).animate(_animationController!);
     _loadAvatarCustomization();
   }
 
@@ -746,8 +740,6 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
 
   Future<void> _loadAvatarModel() async {
     try {
-      setState(() => _isModelLoading = true);
-
       // Use the custom_centered_body.obj as base model
       final modelPath = 'assets/models/custom_centered_body.obj';
       _avatarObject = cube.Object(fileName: modelPath);
@@ -763,12 +755,10 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
       _applyCustomizationToModel();
 
       setState(() {
-        _isModelLoading = false;
         _modelError = null;
       });
     } catch (e) {
       setState(() {
-        _isModelLoading = false;
         _modelError = 'Failed to load 3D model: $e';
       });
       debugPrint('Error loading avatar model: $e');
@@ -819,8 +809,6 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen>
   void _resetCustomization() {
     setState(() {
       _customization = AvatarCustomization();
-      _rotationY = 0.0;
-      _rotationX = 0.0;
       _zoom = 3.0;
       _applyCustomizationToModel();
     });

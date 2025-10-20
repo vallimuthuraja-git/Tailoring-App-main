@@ -7,7 +7,6 @@ import '../../services/chatbot_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/product_provider.dart';
-import '../../../product_data_access.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
 
@@ -41,28 +40,28 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
   }
 
   void _initializeChat() {
-    if (!_isInitialized) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final userName = authProvider.userProfile?.displayName ?? 'User';
+    if (!mounted || _isInitialized) return;
 
-      final greetingMessage = _chatbotService.generateResponse(
-        'hello',
-        userId: authProvider.userProfile?.id ?? 'guest',
-        userName: userName,
-      );
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userName = authProvider.userProfile?.displayName ?? 'User';
 
-      final botMessage = _chatbotService.createBotMessage(
-        conversationId: _conversationId,
-        response: greetingMessage,
-      );
+    final greetingMessage = _chatbotService.generateResponse(
+      'hello',
+      userId: authProvider.userProfile?.id ?? 'guest',
+      userName: userName,
+    );
 
-      setState(() {
-        _messages.add(botMessage);
-        _isInitialized = true;
-      });
+    final botMessage = _chatbotService.createBotMessage(
+      conversationId: _conversationId,
+      response: greetingMessage,
+    );
 
-      _scrollToBottom();
-    }
+    setState(() {
+      _messages.add(botMessage);
+      _isInitialized = true;
+    });
+
+    _scrollToBottom();
   }
 
   @override

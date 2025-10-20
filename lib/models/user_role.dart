@@ -150,8 +150,6 @@ class RolePermissions {
       case UserRole.customer:
         return 1;
     }
-    // This should never be reached since we've covered all enum values
-    return 0;
   }
 
   /// Check if one role can access resources of another role

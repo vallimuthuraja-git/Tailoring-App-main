@@ -26,7 +26,6 @@ class _ProductScreenState extends State<ProductScreen>
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   ProductCategory? _selectedCategory = ProductCategory.mensWear;
-  Timer? _searchDebounceTimer;
 
   @override
   bool get wantKeepAlive => true; // Keep alive to prevent unnecessary rebuilds
@@ -68,55 +67,56 @@ class _ProductScreenState extends State<ProductScreen>
         ],
         child: Scaffold(
           appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: const Text(
-            'Products',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(_isSearchExpanded ? Icons.close : Icons.search),
-              onPressed: () =>
-                  setState(() => _isSearchExpanded = !_isSearchExpanded),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            title: const Text(
+              'Products',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
-            IconButton(
-              icon: Icon(_isGridView ? Icons.list : Icons.grid_view),
-              onPressed: () => setState(() => _isGridView = !_isGridView),
-            ),
-          ],
-          bottom: _buildTabBar(),
-        ),
-        body: Column(
-          children: [
-            if (_isSearchExpanded) _buildSearchBar(),
-            _buildCategoryFilters(),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildProductGrid(), // All Products
-                  _buildProductGrid(
-                      category: ProductCategory.womensWear), // Women's
-                  _buildProductGrid(productType: 'new'), // New Arrivals
-                ],
+            actions: [
+              IconButton(
+                icon: Icon(_isSearchExpanded ? Icons.close : Icons.search),
+                onPressed: () =>
+                    setState(() => _isSearchExpanded = !_isSearchExpanded),
               ),
-            ),
-          ],
-        ),
-        floatingActionButton: Consumer<CartProvider>(
-          builder: (context, cartProvider, child) {
-            if (cartProvider.totalQuantity > 0) {
-              return FloatingActionButton(
-                onPressed: () => _showCartBottomSheet(context),
-                child: Badge(
-                  label: Text('${cartProvider.totalQuantity}'),
-                  child: const Icon(Icons.shopping_cart),
+              IconButton(
+                icon: Icon(_isGridView ? Icons.list : Icons.grid_view),
+                onPressed: () => setState(() => _isGridView = !_isGridView),
+              ),
+            ],
+            bottom: _buildTabBar(),
+          ),
+          body: Column(
+            children: [
+              if (_isSearchExpanded) _buildSearchBar(),
+              _buildCategoryFilters(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildProductGrid(), // All Products
+                    _buildProductGrid(
+                        category: ProductCategory.womensWear), // Women's
+                    _buildProductGrid(productType: 'new'), // New Arrivals
+                  ],
                 ),
-              );
-            }
-            return const SizedBox.shrink();
-          },
+              ),
+            ],
+          ),
+          floatingActionButton: Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              if (cartProvider.totalQuantity > 0) {
+                return FloatingActionButton(
+                  onPressed: () => _showCartBottomSheet(context),
+                  child: Badge(
+                    label: Text('${cartProvider.totalQuantity}'),
+                    child: const Icon(Icons.shopping_cart),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );

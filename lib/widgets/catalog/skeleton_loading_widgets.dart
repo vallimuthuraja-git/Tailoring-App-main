@@ -143,8 +143,8 @@ class ProductCardSkeleton extends StatelessWidget {
                       width: screenWidth * 0.6,
                       decoration: BoxDecoration(
                         color: themeProvider.isDarkMode
-                            ? DarkAppColors.surface.withOpacity(0.3)
-                            : AppColors.surface.withOpacity(0.3),
+                            ? DarkAppColors.surface.withValues(alpha: 77)
+                            : AppColors.surface.withValues(alpha: 77),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: _SkeletonAnimation(

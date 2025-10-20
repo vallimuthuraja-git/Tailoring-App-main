@@ -1431,7 +1431,9 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
 
-      if (success && mounted) {
+      if (!mounted) return;
+
+      if (success) {
         // Save credentials if Remember Me is checked
         await _saveCredentials();
 

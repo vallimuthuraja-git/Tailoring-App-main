@@ -97,7 +97,8 @@ class SetupDemoUsers {
         return;
       } catch (e) {
         if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
-          debugPrint('âš ï¸ User $email already exists in Auth, checking profile...');
+          debugPrint(
+              'âš ï¸ User $email already exists in Auth, checking profile...');
           await _ensureUserProfileExists(email, displayName, role);
           return;
         } else {
@@ -175,9 +176,11 @@ class SetupDemoUsers {
       if (adminExists) {
         final adminInfo = await getDemoUserInfo(DemoConstants.adminEmail);
         if (adminInfo != null) {
-          debugPrint('ðŸ” ADMIN EXISTENCE: Role in Firestore: ${adminInfo['role']}');
+          debugPrint(
+              'ðŸ” ADMIN EXISTENCE: Role in Firestore: ${adminInfo['role']}');
         } else {
-          debugPrint('âŒ ADMIN EXISTENCE: No Firestore profile found for admin');
+          debugPrint(
+              'âŒ ADMIN EXISTENCE: No Firestore profile found for admin');
         }
       }
 
@@ -262,5 +265,3 @@ Future<void> setupDemoUsers() async {
   final setup = SetupDemoUsers();
   await setup.initializeDemoDataIfNeeded();
 }
-
-

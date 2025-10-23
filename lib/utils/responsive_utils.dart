@@ -1,18 +1,10 @@
 ﻿import 'dart:io';
 
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
 import '../models/product_models.dart';
-import '../providers/theme_provider.dart';
-import '../providers/cart_provider.dart';
 import '../product_data_access.dart';
-import '../screens/catalog/product_detail_screen.dart';
-import '../utils/theme_constants.dart';
-import '../widgets/catalog/optimized_product_image.dart';
 import '../widgets/catalog/unified_product_card.dart';
-import 'product_screen_constants.dart';
 
 /// Enum representing different device types
 enum DeviceType { mobile, tablet, desktop }
@@ -1012,4 +1004,3 @@ class UnifiedProductGridItem extends StatelessWidget {
     );
   }
 }
-

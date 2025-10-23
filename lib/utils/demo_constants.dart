@@ -1,7 +1,7 @@
 class DemoConstants {
   // Demo passwords - In production, use environment variables or secure storage
   static const String demoPassword =
-      'CHANGE_THIS_IN_PRODUCTION'; // Replace with actual password or use .env
+      'password123'; // Replace with actual password or use .env
   static const String tempPassword =
       'TEMP_CHANGE_THIS_TOO'; // For temporary checks
 

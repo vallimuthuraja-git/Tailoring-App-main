@@ -1,12 +1,10 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../models/customer.dart';
 import '../../utils/theme_constants.dart';
-import '../../services/demo_data_service.dart';
 import '../../services/firebase_service.dart';
 import '../../widgets/user_avatar.dart';
 import 'customer_create_screen.dart';
@@ -860,8 +858,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
                   'Status', customer.isActive ? 'Active' : 'Inactive'),
               _buildDetailRow(
                   'Loyalty Tier', customer.loyaltyTier.name.toUpperCase()),
-              _buildDetailRow(
-                  'Total Spent', 'â‚¹${customer.totalSpent.toStringAsFixed(0)}'),
+              _buildDetailRow('Total Spent',
+                  'â‚¹${customer.totalSpent.toStringAsFixed(0)}'),
               _buildDetailRow('Member Since',
                   '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}'),
               const SizedBox(height: 16),
@@ -1617,138 +1615,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
   }
 
   void _populateDemoCustomers(BuildContext context) async {
-    // Show confirmation dialog first
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Demo Customers'),
-        content: const Text(
-            'This will add 35 demo customers with sample data to your database.\n\n'
-            'Features included:\n'
-            'â€¢ Diverse customer profiles\n'
-            'â€¢ Multiple loyalty tiers\n'
-            'â€¢ Body measurements\n'
-            'â€¢ Purchase history\n\n'
-            'Proceed with adding demo data?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Add Demo Data'),
-          ),
-        ],
-      ),
+    // Demo functionality removed - this was using missing ComprehensiveDemoDataService
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content: Text('Demo data functionality is currently unavailable')),
     );
-
-    if (confirmed != true) return;
-
-    setState(() => _searchQuery = 'Loading...');
-
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const AlertDialog(
-          title: Text('Adding Demo Customers'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text(
-                  'Please wait while we populate the database with 35 demo customers...'),
-            ],
-          ),
-        ),
-      );
-
-      // Generate all 35 demo customers with complete sample data using the service's full generation method
-      final demoCustomers = ComprehensiveDemoDataService.getAllDemoCustomers();
-
-      // Prepare batch operations for better performance
-      final batchOperations = <Map<String, dynamic>>[];
-      int successCount = 0;
-
-      for (int i = 0; i < demoCustomers.length; i++) {
-        try {
-          final customer = demoCustomers[i];
-          // Create customer with complete demo data (including totalSpent, loyaltyTier, measurements, etc.)
-          final customerData = {
-            ...customer.toJson(),
-            'id': 'demo_customer_${i + 1}', // Unique demo ID to avoid conflicts
-          };
-
-          batchOperations.add({
-            'type': 'set',
-            'collection': 'customers',
-            'docId': customerData['id'],
-            'data': customerData,
-          });
-
-          successCount++;
-        } catch (e) {
-          debugPrint('Failed to prepare customer ${demoCustomers[i].name}: $e');
-        }
-      }
-
-      // Commit all customers in a single batch operation
-      await _firebaseService.batchWrite(batchOperations);
-
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-
-        setState(() => _searchQuery = ''); // Clear loading state
-        _loadCustomers(); // Refresh the customer list
-
-        // Show success dialog
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('âœ… Demo Data Added Successfully!'),
-            content: Text(
-                'Successfully added $successCount demo customers to your database!\n\n'
-                'Demo customers include:\n'
-                'â€¢ Diverse loyalty tiers (Bronze, Silver, Gold, Platinum)\n'
-                'â€¢ Realistic contact information\n'
-                'â€¢ Body measurements and preferences\n'
-                'â€¢ Purchase history and spending patterns\n\n'
-                'These customers are now visible in your customer management system!'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-
-        setState(() => _searchQuery = ''); // Clear loading state
-
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('âŒ Error'),
-            content: Text('Failed to add demo customers: $e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
-    }
   }
 }

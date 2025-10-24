@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/user_role.dart';
 import 'auth_provider.dart';
+import 'package:tailoring_app/services/auth_service.dart';
 import '../screens/comprehensive_products_screen.dart';
 import '../screens/services/service_catalog_screen.dart';
 import '../screens/orders/order_history_screen.dart';
@@ -23,7 +23,7 @@ class GlobalNavigationProvider with ChangeNotifier {
   /// Initialize navigation based on user role
   void initializeNavigation(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userRole = authProvider.userRole;
+    final UserRole userRole = authProvider.userRole;
 
     if (userRole == UserRole.employee) {
       _setupEmployeeNavigation();

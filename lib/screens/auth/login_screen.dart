@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
-import '../../services/auth_service.dart';
+import '../../services/dev_setup_service.dart';
 import '../../utils/theme_constants.dart';
 import '../../utils/responsive_utils.dart';
 import '../home/home_screen.dart';
@@ -872,377 +872,93 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   ],
                                                 ),
 
-                                                const SizedBox(height: 24),
-
-                                                // Demo Login Buttons
-                                                Column(
-                                                  children: [
-                                                    if (isMobile) ...[
-                                                      // Mobile: Stack all buttons vertically
-                                                      _buildDemoButton(
-                                                          context,
-                                                          authProvider,
-                                                          'Demo Customer',
-                                                          Icons.person,
-                                                          UserRole.customer,
-                                                          themeProvider
-                                                                  .isDarkMode
-                                                              ? DarkAppColors
-                                                                  .secondary
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : AppColors
-                                                                  .secondary
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          deviceType),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  12.0,
-                                                                  deviceType)),
-                                                      _buildDemoButton(
-                                                          context,
-                                                          authProvider,
-                                                          'Demo Shop',
-                                                          Icons.store,
-                                                          UserRole.shopOwner,
-                                                          themeProvider
-                                                                  .isDarkMode
-                                                              ? Colors.orange
-                                                                  .shade700
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : Colors.orange
-                                                                  .shade600
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          deviceType),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  16.0,
-                                                                  deviceType)),
-                                                      Text(
-                                                        'Demo Partners',
-                                                        style: TextStyle(
-                                                          fontSize: ResponsiveUtils
-                                                              .responsiveFontSize(
-                                                                  16.0,
-                                                                  deviceType),
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: themeProvider
-                                                                  .isDarkMode
-                                                              ? DarkAppColors
-                                                                  .onSurface
-                                                              : AppColors
-                                                                  .onSurface,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  12.0,
-                                                                  deviceType)),
-                                                      _buildDemoButton(
-                                                          context,
-                                                          authProvider,
-                                                          'General Employee',
-                                                          Icons.work,
-                                                          UserRole.employee,
-                                                          themeProvider
-                                                                  .isDarkMode
-                                                              ? Colors.green
-                                                                  .shade700
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : Colors.green
-                                                                  .shade600
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          deviceType),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  12.0,
-                                                                  deviceType)),
-                                                      _buildDemoButton(
-                                                          context,
-                                                          authProvider,
-                                                          'Tailor',
-                                                          Icons.content_cut,
-                                                          UserRole.tailor,
-                                                          themeProvider
-                                                                  .isDarkMode
-                                                              ? Colors.green
-                                                                  .shade500
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : Colors.green
-                                                                  .shade400
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          deviceType),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  12.0,
-                                                                  deviceType)),
-                                                      _buildDemoButton(
-                                                          context,
-                                                          authProvider,
-                                                          'Cutter',
-                                                          Icons.cut_sharp,
-                                                          UserRole.cutter,
-                                                          themeProvider
-                                                                  .isDarkMode
-                                                              ? Colors.green
-                                                                  .shade600
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : Colors.green
-                                                                  .shade500
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          deviceType),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  12.0,
-                                                                  deviceType)),
-                                                      _buildDemoButton(
-                                                          context,
-                                                          authProvider,
-                                                          'Finisher',
-                                                          Icons.check_circle,
-                                                          UserRole.finisher,
-                                                          themeProvider
-                                                                  .isDarkMode
-                                                              ? Colors.green
-                                                                  .shade800
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : Colors.green
-                                                                  .shade300
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          deviceType),
-                                                    ] else ...[
-                                                      // Desktop/Tablet: Use rows
-                                                      Row(
-                                                        children: [
-                                                          Expanded(
-                                                              child: _buildDemoButton(
-                                                                  context,
-                                                                  authProvider,
-                                                                  'Demo Customer',
-                                                                  Icons.person,
-                                                                  UserRole
-                                                                      .customer,
-                                                                  themeProvider
-                                                                          .isDarkMode
-                                                                      ? DarkAppColors
-                                                                          .secondary
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8)
-                                                                      : AppColors
-                                                                          .secondary
-                                                                          .withValues(
-                                                                              alpha: 0.8),
-                                                                  deviceType)),
-                                                          SizedBox(
-                                                              width: ResponsiveUtils
-                                                                  .responsiveSpacing(
-                                                                      12.0,
-                                                                      deviceType)),
-                                                          Expanded(
-                                                              child: _buildDemoButton(
-                                                                  context,
-                                                                  authProvider,
-                                                                  'Demo Shop',
-                                                                  Icons.store,
-                                                                  UserRole
-                                                                      .shopOwner,
-                                                                  themeProvider
-                                                                          .isDarkMode
-                                                                      ? Colors
-                                                                          .orange
-                                                                          .shade700
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8)
-                                                                      : Colors
-                                                                          .orange
-                                                                          .shade600
-                                                                          .withValues(
-                                                                              alpha: 0.8),
-                                                                  deviceType)),
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  16.0,
-                                                                  deviceType)),
-                                                      Text(
-                                                        'Demo Partners',
-                                                        style: TextStyle(
-                                                          fontSize: ResponsiveUtils
-                                                              .responsiveFontSize(
-                                                                  16.0,
-                                                                  deviceType),
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: themeProvider
-                                                                  .isDarkMode
-                                                              ? DarkAppColors
-                                                                  .onSurface
-                                                              : AppColors
-                                                                  .onSurface,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  12.0,
-                                                                  deviceType)),
-                                                      Row(
-                                                        children: [
-                                                          Expanded(
-                                                              child: _buildDemoButton(
-                                                                  context,
-                                                                  authProvider,
-                                                                  'General Employee',
-                                                                  Icons.work,
-                                                                  UserRole
-                                                                      .employee,
-                                                                  themeProvider
-                                                                          .isDarkMode
-                                                                      ? Colors
-                                                                          .green
-                                                                          .shade700
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8)
-                                                                      : Colors
-                                                                          .green
-                                                                          .shade600
-                                                                          .withValues(
-                                                                              alpha: 0.8),
-                                                                  deviceType)),
-                                                          SizedBox(
-                                                              width: ResponsiveUtils
-                                                                  .responsiveSpacing(
-                                                                      12.0,
-                                                                      deviceType)),
-                                                          Expanded(
-                                                              child: _buildDemoButton(
-                                                                  context,
-                                                                  authProvider,
-                                                                  'Tailor',
-                                                                  Icons
-                                                                      .content_cut,
-                                                                  UserRole
-                                                                      .tailor,
-                                                                  themeProvider
-                                                                          .isDarkMode
-                                                                      ? Colors
-                                                                          .green
-                                                                          .shade500
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8)
-                                                                      : Colors
-                                                                          .green
-                                                                          .shade400
-                                                                          .withValues(
-                                                                              alpha: 0.8),
-                                                                  deviceType)),
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                          height: ResponsiveUtils
-                                                              .responsiveSpacing(
-                                                                  16.0,
-                                                                  deviceType)),
-                                                      Row(
-                                                        children: [
-                                                          Expanded(
-                                                              child: _buildDemoButton(
-                                                                  context,
-                                                                  authProvider,
-                                                                  'Cutter',
-                                                                  Icons
-                                                                      .cut_sharp,
-                                                                  UserRole
-                                                                      .cutter,
-                                                                  themeProvider
-                                                                          .isDarkMode
-                                                                      ? Colors
-                                                                          .green
-                                                                          .shade600
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8)
-                                                                      : Colors
-                                                                          .green
-                                                                          .shade500
-                                                                          .withValues(
-                                                                              alpha: 0.8),
-                                                                  deviceType)),
-                                                          SizedBox(
-                                                              width: ResponsiveUtils
-                                                                  .responsiveSpacing(
-                                                                      12.0,
-                                                                      deviceType)),
-                                                          Expanded(
-                                                              child: _buildDemoButton(
-                                                                  context,
-                                                                  authProvider,
-                                                                  'Finisher',
-                                                                  Icons
-                                                                      .check_circle,
-                                                                  UserRole
-                                                                      .finisher,
-                                                                  themeProvider
-                                                                          .isDarkMode
-                                                                      ? Colors
-                                                                          .green
-                                                                          .shade800
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8)
-                                                                      : Colors
-                                                                          .green
-                                                                          .shade300
-                                                                          .withValues(
-                                                                              alpha: 0.8),
-                                                                  deviceType)),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ],
-                                                ),
-
                                                 const SizedBox(height: 32),
+
+                                                // Development Login Buttons (only in development)
+                                                if (const bool.fromEnvironment(
+                                                        'dart.vm.product') ==
+                                                    false) ...[
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.orange.shade50,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      border: Border.all(
+                                                          color: Colors
+                                                              .orange.shade200),
+                                                    ),
+                                                    child: Column(
+                                                      children: [
+                                                        const Text(
+                                                          '🚀 Quick Login (Development Only)',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Colors.orange,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 12),
+                                                        const Text(
+                                                          'Password: dev123456',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 12),
+                                                        Wrap(
+                                                          spacing: 8,
+                                                          runSpacing: 8,
+                                                          children: DevSetupService
+                                                                  .getDevCredentials()
+                                                              .map((cred) {
+                                                            return ElevatedButton
+                                                                .icon(
+                                                              onPressed: () =>
+                                                                  _handleDevLogin(
+                                                                      cred[
+                                                                          'email']!,
+                                                                      cred[
+                                                                          'password']!),
+                                                              icon: Icon(
+                                                                  _getRoleIcon(cred[
+                                                                      'role']!)),
+                                                              label: Text(cred[
+                                                                  'displayName']!),
+                                                              style:
+                                                                  ElevatedButton
+                                                                      .styleFrom(
+                                                                backgroundColor:
+                                                                    _getRoleColor(
+                                                                        cred[
+                                                                            'role']!),
+                                                                foregroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        16,
+                                                                    vertical:
+                                                                        8),
+                                                              ),
+                                                            );
+                                                          }).toList(),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                ],
 
                                                 // Sign Up Link
                                                 Row(
@@ -1349,18 +1065,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Clear saved credentials
-  Future<void> _clearSavedCredentials() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('saved_email');
-      await prefs.remove('saved_password');
-      await prefs.setBool('remember_me', false);
-    } catch (e) {
-      debugPrint('Error clearing credentials: $e');
-    }
-  }
-
   void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -1379,41 +1083,6 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
-    }
-  }
-
-  void _demoLogin(BuildContext context, UserRole role) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    bool success;
-
-    switch (role) {
-      case UserRole.customer:
-        success = await authProvider.demoLoginAsCustomer();
-        break;
-      case UserRole.shopOwner:
-        success = await authProvider.demoLoginAsShopOwner();
-        break;
-
-      case UserRole.employee:
-        success = await authProvider.demoLoginAsEmployee();
-        break;
-      case UserRole.tailor:
-        success = await authProvider.demoLoginAsTailor();
-        break;
-      case UserRole.cutter:
-        success = await authProvider.demoLoginAsCutter();
-        break;
-      case UserRole.finisher:
-        success = await authProvider.demoLoginAsFinisher();
-        break;
-      default:
-        success = false;
-    }
-
-    if (success && context.mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
     }
   }
 
@@ -1451,32 +1120,41 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Widget _buildDemoButton(
-      BuildContext context,
-      AuthProvider authProvider,
-      String label,
-      IconData icon,
-      UserRole role,
-      Color backgroundColor,
-      DeviceType deviceType) {
-    return ElevatedButton.icon(
-      onPressed:
-          authProvider.isLoading ? null : () => _demoLogin(context, role),
-      icon: Icon(icon,
-          size: ResponsiveUtils.responsiveFontSize(18.0, deviceType)),
-      label: Text(label,
-          style: TextStyle(
-              fontSize: ResponsiveUtils.responsiveFontSize(16.0, deviceType))),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-        minimumSize: Size.fromHeight(
-            ResponsiveUtils.responsiveSpacing(48.0, deviceType)),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 0,
-      ),
-    );
+  // Development login handlers
+  void _handleDevLogin(String email, String password) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.signIn(email: email, password: password);
+
+    if (success && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
+  }
+
+  IconData _getRoleIcon(String role) {
+    switch (role.toLowerCase()) {
+      case 'shop owner':
+        return Icons.business;
+      case 'employee':
+        return Icons.work;
+      case 'customer':
+        return Icons.person;
+      default:
+        return Icons.account_circle;
+    }
+  }
+
+  Color _getRoleColor(String role) {
+    switch (role.toLowerCase()) {
+      case 'shop owner':
+        return Colors.purple;
+      case 'employee':
+        return Colors.blue;
+      case 'customer':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 }

@@ -7,14 +7,12 @@ import '../../providers/global_navigation_provider.dart';
 import '../../utils/theme_constants.dart';
 import '../../widgets/user_avatar.dart';
 import '../orders/order_management_dashboard.dart';
-import '../demo_setup_screen.dart';
 import '../employee/employee_management_home.dart';
 import '../database/database_management_home.dart';
 import '../customer/customer_management_screen.dart';
 import '../cart/cart_screen.dart';
 import '../workflow/tailoring_workflow_screen.dart';
 import '../ai/ai_assistance_screen.dart';
-import '../demo_overview_screen.dart';
 import '../employee/simple_employee_list_screen.dart';
 import '../dashboard/analytics_dashboard_screen.dart';
 import '../../utils/responsive_utils.dart';
@@ -176,16 +174,6 @@ class DashboardTab extends StatelessWidget {
                   // Open AI chatbot
                   _showChatbot(context);
                 },
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.play_arrow,
-                  color: themeProvider.isDarkMode
-                      ? DarkAppColors.onSurface
-                      : AppColors.onSurface,
-                ),
-                tooltip: 'View Demo',
-                onPressed: () => _showDemoOverview(context),
               ),
             ],
           ),
@@ -362,15 +350,6 @@ class DashboardTab extends StatelessWidget {
     );
   }
 
-  void _showDemoOverview(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DemoOverviewScreen(),
-      ),
-    );
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -487,19 +466,6 @@ class DashboardTab extends StatelessWidget {
           color: Colors.cyan,
           onTap: () {
             // Navigate to reports
-          },
-        ),
-        _QuickActionCard(
-          icon: Icons.build,
-          title: 'Demo Setup',
-          color: Colors.teal,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const DemoSetupScreen(),
-              ),
-            );
           },
         ),
         _QuickActionCard(

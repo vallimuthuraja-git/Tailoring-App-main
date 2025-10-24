@@ -537,7 +537,7 @@ class ServiceProvider with ChangeNotifier {
   Future<List<DateTime>> getAvailableDates(String serviceId,
       {DateTime? startDate, int daysAhead = 30}) async {
     final start = startDate ?? DateTime.now();
-    final end = start.add(Duration(days: daysAhead));
+    // final end = start.add(Duration(days: daysAhead)); // Not used in this implementation
     final availableDates = <DateTime>[];
 
     // Mock availability logic - can be replaced with real API call
@@ -594,6 +594,3 @@ class ServiceProvider with ChangeNotifier {
     };
   }
 }
-
-
-

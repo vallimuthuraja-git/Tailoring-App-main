@@ -2112,10 +2112,22 @@ class _SignupScreenState extends State<SignupScreen>
     switch (role) {
       case user_role.UserRole.customer:
         return auth_service.UserRole.customer;
-      case user_role.UserRole.employee:
-        return auth_service.UserRole.employee;
       case user_role.UserRole.shopOwner:
         return auth_service.UserRole.shopOwner;
+      case user_role.UserRole.admin:
+        return auth_service.UserRole.admin;
+      case user_role.UserRole.employee:
+        return auth_service.UserRole.employee;
+      case user_role.UserRole.tailor:
+        return auth_service.UserRole.tailor;
+      case user_role.UserRole.cutter:
+        return auth_service.UserRole.cutter;
+      case user_role.UserRole.finisher:
+        return auth_service.UserRole.finisher;
+      case user_role.UserRole.supervisor:
+        return auth_service.UserRole.supervisor;
+      case user_role.UserRole.apprentice:
+        return auth_service.UserRole.apprentice;
     }
   }
 

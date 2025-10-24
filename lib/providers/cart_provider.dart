@@ -1,5 +1,4 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item.dart';
 import '../models/product_models.dart';
@@ -214,7 +213,8 @@ class CartProvider with ChangeNotifier {
         // For now, we'll store basic product info in the cart persistence
 
         // This is a simplified version - you'd need proper product fetching
-        for (final itemData in decodedData) {
+        for (final _itemData in decodedData) {
+          // TODO: Implement cart item restoration
           // Skip items without valid product data for now
           // In a full implementation, you'd fetch the product from the database
         }

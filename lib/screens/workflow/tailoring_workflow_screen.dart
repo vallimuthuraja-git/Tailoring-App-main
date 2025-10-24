@@ -4,7 +4,7 @@ import '../../models/order.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/employee_provider.dart';
-import '../../models/user_role.dart';
+import '../../services/auth_service.dart' as auth;
 import '../../providers/theme_provider.dart';
 import '../../utils/theme_constants.dart';
 
@@ -12,7 +12,8 @@ class TailoringWorkflowScreen extends StatefulWidget {
   const TailoringWorkflowScreen({super.key});
 
   @override
-  State<TailoringWorkflowScreen> createState() => _TailoringWorkflowScreenState();
+  State<TailoringWorkflowScreen> createState() =>
+      _TailoringWorkflowScreenState();
 }
 
 class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
@@ -22,7 +23,11 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
 
   // Workflow stages
   final List<String> _stages = [
-    'Cutting', 'Stitching', 'Finishing', 'Quality Check', 'Ready'
+    'Cutting',
+    'Stitching',
+    'Finishing',
+    'Quality Check',
+    'Ready'
   ];
 
   @override
@@ -43,17 +48,17 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
     try {
       // Load orders and work assignments
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       // Load all orders
       await orderProvider.loadOrders();
 
       // Load current employee's work assignments if user is employee
-      if (authProvider.userRole == UserRole.employee) {
+      if (authProvider.userRole == auth.UserRole.employee) {
         // Employee-specific loading would go here
       }
-
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -69,26 +74,11 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer4<OrderProvider, AuthProvider, EmployeeProvider, ThemeProvider>(
-      builder: (context, orderProvider, authProvider, employeeProvider, themeProvider, child) {
-        // Import UserRole class directly to match the type
-        final authUserRole = authProvider.userRole;
-        UserRole userRole;
-
-        // Convert between the two UserRole types if needed
-        switch (authUserRole.toString()) {
-          case 'UserRole.shopOwner':
-            userRole = UserRole.shopOwner;
-            break;
-          case 'UserRole.employee':
-            userRole = UserRole.employee;
-            break;
-          case 'UserRole.customer':
-            userRole = UserRole.customer;
-            break;
-          default:
-            userRole = UserRole.customer;
-        }
+    return Consumer4<OrderProvider, AuthProvider, EmployeeProvider,
+        ThemeProvider>(
+      builder: (context, orderProvider, authProvider, employeeProvider,
+          themeProvider, child) {
+        final userRole = authProvider.userRole;
 
         final orders = orderProvider.orders;
 
@@ -96,9 +86,13 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
           appBar: AppBar(
             title: const Text('Tailoring Workflow'),
             elevation: 0,
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             titleTextStyle: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
@@ -106,35 +100,33 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
               controller: _tabController,
               isScrollable: true,
               tabs: _stages.map((stage) => Tab(text: stage)).toList(),
-              labelColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+              labelColor: themeProvider.isDarkMode
+                  ? DarkAppColors.primary
+                  : AppColors.primary,
               unselectedLabelColor: themeProvider.isDarkMode
                   ? DarkAppColors.onSurface.withValues(alpha: 0.7)
                   : AppColors.onSurface.withValues(alpha: 0.7),
-              indicatorColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+              indicatorColor: themeProvider.isDarkMode
+                  ? DarkAppColors.primary
+                  : AppColors.primary,
             ),
           ),
           body: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : TabBarView(
                   controller: _tabController,
-                  children: _stages.map((stage) => _buildStageContent(
-                    stage,
-                    orders,
-                    userRole,
-                    employeeProvider
-                  )).toList(),
+                  children: _stages
+                      .map((stage) => _buildStageContent(
+                          stage, orders, userRole, employeeProvider))
+                      .toList(),
                 ),
         );
       },
     );
   }
 
-  Widget _buildStageContent(
-    String stage,
-    List<Order> allOrders,
-    UserRole userRole,
-    EmployeeProvider employeeProvider
-  ) {
+  Widget _buildStageContent(String stage, List<Order> allOrders,
+      auth.UserRole userRole, EmployeeProvider employeeProvider) {
     // Filter orders based on current workflow stage
     final stageOrders = _filterOrdersByStage(stage, allOrders, userRole);
 
@@ -156,12 +148,13 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
                 color: Colors.grey,
               ),
             ),
-            if (userRole != UserRole.employee) ...[
+            if (userRole != auth.UserRole.employee) ...[
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {
                   // Navigate to assign orders to this stage
-                  _showStageAssignmentDialog(stage, allOrders, employeeProvider);
+                  _showStageAssignmentDialog(
+                      stage, allOrders, employeeProvider);
                 },
                 icon: const Icon(Icons.assignment),
                 label: const Text('Assign Orders'),
@@ -182,7 +175,8 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
     );
   }
 
-  Widget _buildOrderCard(Order order, String currentStage, UserRole userRole) {
+  Widget _buildOrderCard(
+      Order order, String currentStage, auth.UserRole userRole) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -307,11 +301,13 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
               const SizedBox(width: 4),
               const Icon(Icons.arrow_forward, size: 12, color: Colors.blue),
               const SizedBox(width: 4),
-              _buildProgressStep('Stitching', _getStageStatus(order, 'stitching')),
+              _buildProgressStep(
+                  'Stitching', _getStageStatus(order, 'stitching')),
               const SizedBox(width: 4),
               const Icon(Icons.arrow_forward, size: 12, color: Colors.blue),
               const SizedBox(width: 4),
-              _buildProgressStep('Finishing', _getStageStatus(order, 'finishing')),
+              _buildProgressStep(
+                  'Finishing', _getStageStatus(order, 'finishing')),
               const SizedBox(width: 4),
               const Icon(Icons.arrow_forward, size: 12, color: Colors.blue),
               const SizedBox(width: 4),
@@ -362,11 +358,12 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
     );
   }
 
-  Widget _buildRoleActions(Order order, String currentStage, UserRole userRole) {
-    if (userRole == UserRole.employee) {
+  Widget _buildRoleActions(
+      Order order, String currentStage, auth.UserRole userRole) {
+    if (userRole == auth.UserRole.employee) {
       // Employee can only see actions for their role-appropriate stages
       return _buildEmployeeActions(order, currentStage);
-    } else if (userRole == UserRole.shopOwner) {
+    } else if (userRole == auth.UserRole.shopOwner) {
       // Shop owner can manage workflow transitions
       return _buildOwnerActions(order, currentStage);
     } else {
@@ -380,18 +377,21 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: actions.map((action) => Padding(
-        padding: const EdgeInsets.only(left: 8),
-        child: OutlinedButton.icon(
-          onPressed: () => _handleAction(action, order),
-          icon: Icon(action.icon, size: 16),
-          label: Text(action.label),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: action.color,
-            side: BorderSide(color: action.color.withValues(alpha: 0.5)),
-          ),
-        ),
-      )).toList(),
+      children: actions
+          .map((action) => Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: OutlinedButton.icon(
+                  onPressed: () => _handleAction(action, order),
+                  icon: Icon(action.icon, size: 16),
+                  label: Text(action.label),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: action.color,
+                    side:
+                        BorderSide(color: action.color.withValues(alpha: 0.5)),
+                  ),
+                ),
+              ))
+          .toList(),
     );
   }
 
@@ -425,7 +425,8 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
       decoration: BoxDecoration(
         color: order.status.statusColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: order.status.statusColor.withValues(alpha: 0.3)),
+        border:
+            Border.all(color: order.status.statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -458,7 +459,9 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
   }
 
   Widget _buildPriorityBadge(Order order) {
-    if (order.deliveryDate?.isBefore(DateTime.now().add(const Duration(days: 2))) == true) {
+    if (order.deliveryDate
+            ?.isBefore(DateTime.now().add(const Duration(days: 2))) ==
+        true) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -485,23 +488,24 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
   }
 
   // Helper methods
-  List<Order> _filterOrdersByStage(String stage, List<Order> orders, UserRole userRole) {
+  List<Order> _filterOrdersByStage(
+      String stage, List<Order> orders, auth.UserRole userRole) {
     return orders.where((order) {
       // Filter logic based on stage and user role
       switch (stage) {
         case 'Cutting':
           return order.status == OrderStatus.confirmed ||
-                 order.status == OrderStatus.inProgress;
+              order.status == OrderStatus.inProgress;
         case 'Stitching':
           return order.status == OrderStatus.inProgress ||
-                 order.status == OrderStatus.inProduction;
+              order.status == OrderStatus.inProduction;
         case 'Finishing':
           return order.status == OrderStatus.inProduction;
         case 'Quality Check':
           return order.status == OrderStatus.qualityCheck;
         case 'Ready':
           return order.status == OrderStatus.readyForFitting ||
-                 order.status == OrderStatus.completed;
+              order.status == OrderStatus.completed;
         default:
           return true;
       }
@@ -566,7 +570,8 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
         break;
       default:
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Action "${action.label}" not implemented yet')),
+          SnackBar(
+              content: Text('Action "${action.label}" not implemented yet')),
         );
     }
   }
@@ -574,7 +579,9 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
   void _showAssignDialog(Order order, String currentStage) {
     // Show dialog to assign employee to order
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Assign dialog for stage "$currentStage" - Coming soon')),
+      SnackBar(
+          content:
+              Text('Assign dialog for stage "$currentStage" - Coming soon')),
     );
   }
 
@@ -583,13 +590,17 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
 
   void _startWorkOnOrder(Order order, ActionConfig action) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Started ${action.label.toLowerCase()} for order ${order.id}')),
+      SnackBar(
+          content: Text(
+              'Started ${action.label.toLowerCase()} for order ${order.id}')),
     );
   }
 
   void _completeWorkOnOrder(Order order, ActionConfig action) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Completed ${action.label.toLowerCase()} for order ${order.id}')),
+      SnackBar(
+          content: Text(
+              'Completed ${action.label.toLowerCase()} for order ${order.id}')),
     );
   }
 
@@ -600,7 +611,8 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
   }
 
   // Placeholder for action config
-  List<ActionConfig> _getActionButtonsForStageAndRole(String stage, String role) {
+  List<ActionConfig> _getActionButtonsForStageAndRole(
+      String stage, String role) {
     switch (stage) {
       case 'Cutting':
         return [
@@ -652,12 +664,14 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
     }
   }
 
-  void _showStageAssignmentDialog(String stage, List<Order> allOrders, EmployeeProvider employeeProvider) {
+  void _showStageAssignmentDialog(
+      String stage, List<Order> allOrders, EmployeeProvider employeeProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Assign Orders to $stage Stage'),
-        content: Text('This feature will allow you to assign orders to specific employees for the $stage stage.'),
+        content: Text(
+            'This feature will allow you to assign orders to specific employees for the $stage stage.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -675,7 +689,9 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
   WorkflowStageStatus _getStageStatus(Order order, String stage) {
     switch (order.status) {
       case OrderStatus.confirmed:
-        return stage == 'cutting' ? WorkflowStageStatus.pending : WorkflowStageStatus.pending;
+        return stage == 'cutting'
+            ? WorkflowStageStatus.pending
+            : WorkflowStageStatus.pending;
       case OrderStatus.inProgress:
       case OrderStatus.inProduction:
         return WorkflowStageStatus.inProgress;
@@ -695,7 +711,8 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Move Order to Next Stage'),
-        content: Text('Move order ${order.id} from $currentStage stage to the next stage in the workflow?'),
+        content: Text(
+            'Move order ${order.id} from $currentStage stage to the next stage in the workflow?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -710,7 +727,6 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
     );
   }
 }
-
 
 // Action configuration
 class ActionConfig {

@@ -1,5 +1,4 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/employee.dart' as emp;
@@ -30,27 +29,19 @@ class EmployeeManagementHelper {
         );
       }
 
-      // Create demo employees
-      final demoEmployees = _createDemoEmployees();
-
-      // Use Firebase operations through FirebaseService
-      for (final employee in demoEmployees) {
-        final employeeData = employee.toJson();
-        // Don't include id in Firebase document data
-        employeeData.remove('id');
-        await _firebaseService.addDocument('employees', employeeData);
-      }
+      // Note: Demo employee creation has been disabled
+      // To add employees, use the employee creation UI
 
       if (!silent) {
         Navigator.of(context).pop(); // Close loading dialog
 
-        // Show success message
+        // Show message that demo data is disabled
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('âœ… Success!'),
+            title: const Text('Demo Data Disabled'),
             content: const Text(
-                'Added 5 demo employees to the database!\n\nEmployees added:\nâ€¢ Esther (Owner)\nâ€¢ Rajesh Kumar (Tailor)\nâ€¢ Priya Sharma (Designer)\nâ€¢ Amit Patel (Cutter)\nâ€¢ Sneha Gupta (Finisher)'),
+                'Demo employee creation has been disabled.\n\nTo add employees, use the "Add First Employee" button below.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -304,7 +295,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
   @override
   void initState() {
     super.initState();
-    debugPrint('ðŸ—ï¸ EmployeeListSimple initState - starting initialization');
+    debugPrint(
+        'ðŸ—ï¸ EmployeeListSimple initState - starting initialization');
     // Start with a simple loading state
     _loading = true;
     _initComplete = false;
@@ -358,7 +350,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
       debugPrint('ðŸ“ˆ Found ${employeeProvider.employees.length} employees');
 
       if (mounted) {
-        debugPrint('ðŸ”„ EmployeeListSimple - clearing error and updating state');
+        debugPrint(
+            'ðŸ”„ EmployeeListSimple - clearing error and updating state');
         setState(() {
           _initError = null;
         });
@@ -387,7 +380,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
       builder: (context, authProvider, child) {
         debugPrint(
             'ðŸ” EmployeeListSimple checking authentication for user: ${authProvider.user?.email ?? "null"}');
-        debugPrint('ðŸ‘‘ isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
+        debugPrint(
+            'ðŸ‘‘ isShopOwnerOrAdmin: ${authProvider.isShopOwnerOrAdmin}');
         // Check if user has permission to view employee list
         if (!authProvider.isShopOwnerOrAdmin) {
           debugPrint(
@@ -422,7 +416,8 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
         return Expanded(
           child: Consumer<EmployeeProvider>(
             builder: (context, employeeProvider, child) {
-              debugPrint('ðŸ“Š EmployeeListSimple building with provider state:');
+              debugPrint(
+                  'ðŸ“Š EmployeeListSimple building with provider state:');
               debugPrint('  - _initComplete: $_initComplete');
               debugPrint(
                   '  - employeeProvider.isLoading: ${employeeProvider.isLoading}');

@@ -209,15 +209,6 @@ class AuthService {
           'âœ… Successfully signed in user: ${userCredential.user?.email}');
 
       // Fetch and log user role for debugging
-      if (email == 'admin@demo.com') {
-        final profile = await getUserProfile(userCredential.user!.uid);
-        if (profile != null) {
-          debugPrint(
-              'ðŸ” ADMIN LOGIN: User role assigned is ${profile.role.name}');
-        } else {
-          debugPrint('âŒ ADMIN LOGIN: No profile found for admin user');
-        }
-      }
 
       return userCredential;
     } catch (e) {
@@ -363,17 +354,9 @@ class AuthService {
             UserModel.fromJson(doc.data() as Map<String, dynamic>);
         debugPrint(
             'âœ… User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
-        if (userModel.email == 'admin@demo.com') {
-          debugPrint(
-              'ðŸ” ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
-        }
         return userModel;
       } else {
         debugPrint('âŒ No user profile found for $userId');
-        if ('admin@demo.com' == 'admin@demo.com') {
-          // placeholder, but actually check if this is admin id
-          debugPrint('âŒ ADMIN PROFILE FETCH: No profile exists');
-        }
         return null;
       }
     } catch (e) {
@@ -509,38 +492,4 @@ class AuthService {
     }
     return Exception('An unexpected error occurred.');
   }
-
-  // Demo accounts for testing
-  static const Map<String, Map<String, String>> demoAccounts = {
-    'customer': {
-      'email': 'customer@demo.com',
-      'password': 'password123',
-      'displayName': 'Demo Customer',
-    },
-    'shopOwner': {
-      'email': 'shop@demo.com',
-      'password': 'password123',
-      'displayName': 'Demo Esther',
-    },
-    'employee': {
-      'email': 'employee@demo.com',
-      'password': 'password123',
-      'displayName': 'Demo Employee',
-    },
-    'tailor': {
-      'email': 'tailor@demo.com',
-      'password': 'password123',
-      'displayName': 'Demo Tailor',
-    },
-    'cutter': {
-      'email': 'cutter@demo.com',
-      'password': 'password123',
-      'displayName': 'Demo Cutter',
-    },
-    'finisher': {
-      'email': 'finisher@demo.com',
-      'password': 'password123',
-      'displayName': 'Demo Finisher',
-    },
-  };
 }

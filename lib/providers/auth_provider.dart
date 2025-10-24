@@ -82,10 +82,6 @@ class AuthProvider with ChangeNotifier {
     if (_user != null) {
       try {
         _userProfile = await _authService.getUserProfile(_user!.uid);
-        if (_userProfile?.email == 'admin@demo.com') {
-          debugPrint(
-              '🔍 AUTH PROVIDER LOAD: Admin user profile loaded with role: ${_userProfile?.role.name}');
-        }
         notifyListeners();
       } on FirebaseException catch (e) {
         logError(e);
@@ -505,100 +501,5 @@ class AuthProvider with ChangeNotifier {
   // Check if user has required role
   bool hasRole(UserRole requiredRole) {
     return _userProfile?.role == requiredRole;
-  }
-
-  // Demo login methods with fallback to create account if it doesn't exist
-  Future<bool> demoLoginAsCustomer() async {
-    return await _demoLogin('customer', UserRole.customer);
-  }
-
-  Future<bool> demoLoginAsShopOwner() async {
-    return await _demoLogin('shopOwner', UserRole.shopOwner);
-  }
-
-  Future<bool> demoLoginAsEmployee() async {
-    return await _demoLogin('employee', UserRole.employee);
-  }
-
-  // Updated demo login for employees - all use the consolidated employee role
-  Future<bool> demoLoginAsTailor() async {
-    return await _demoLogin('tailor', UserRole.employee);
-  }
-
-  Future<bool> demoLoginAsCutter() async {
-    return await _demoLogin('cutter', UserRole.employee);
-  }
-
-  Future<bool> demoLoginAsFinisher() async {
-    return await _demoLogin('finisher', UserRole.employee);
-  }
-
-  Future<bool> demoLoginAsHelper() async {
-    return await _demoLogin('helper', UserRole.employee);
-  }
-
-  Future<bool> _demoLogin(String accountKey, UserRole role) async {
-    final account = AuthService.demoAccounts[accountKey]!;
-    final email = account['email']!;
-    final password = account['password']!;
-    final displayName = account['displayName']!;
-
-    debugPrint('🔑 DEMO LOGIN: Starting for $accountKey ($email)');
-    _isLoading = true;
-    _errorMessage = 'Logging in as $displayName...';
-    notifyListeners();
-
-    try {
-      // Step 1: Try to sign in first
-      UserCredential userCredential;
-      try {
-        debugPrint('🔄 DEMO LOGIN: Attempting sign in for $email');
-        userCredential = await _authService.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        debugPrint('✅ DEMO LOGIN: Sign in successful');
-      } catch (e) {
-        // If account doesn't exist or wrong password, create it
-        debugPrint('🔄 DEMO LOGIN: Sign in failed, creating account: $e');
-        userCredential = await _authService.signUpWithEmailAndPassword(
-          email: email,
-          password: password,
-          displayName: displayName,
-          role: role,
-        );
-        debugPrint('✅ DEMO LOGIN: Account created successfully');
-      }
-
-      _user = userCredential.user;
-
-      // Step 2: Ensure profile exists in Firestore
-      await _loadUserProfile();
-
-      // If profile doesn't exist (shouldn't happen but safety check)
-      if (_userProfile == null && _user != null) {
-        debugPrint('🔄 DEMO LOGIN: Profile missing, creating it');
-        await _authService.createUserProfile(_user!, role);
-        await _loadUserProfile();
-      }
-
-      if (_userProfile == null) {
-        throw Exception('Failed to create or load user profile');
-      }
-
-      debugPrint(
-          '✅ DEMO LOGIN: Complete - User: ${_user?.email}, Role: ${_userProfile?.role.name}');
-
-      _isLoading = false;
-      _errorMessage = 'Demo login successful!';
-      notifyListeners();
-      return true;
-    } catch (e) {
-      debugPrint('❌ DEMO LOGIN FAILED: $e');
-      _isLoading = false;
-      _errorMessage = 'Demo login failed: $e';
-      notifyListeners();
-      return false;
-    }
   }
 }

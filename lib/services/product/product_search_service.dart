@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import '../../models/product_models.dart';
 import '../../repositories/product/i_product_repository.dart';
 
@@ -135,7 +134,7 @@ class ProductSearchService {
         final query = options.query.toLowerCase();
         final matchesName = product.name.toLowerCase().contains(query);
         final matchesDescription =
-            product.description?.toLowerCase().contains(query) ?? false;
+            (product.description ?? '').toLowerCase().contains(query);
         final matchesCategory =
             product.category.name.toLowerCase().contains(query);
         final matchesBrand = product.brand.toLowerCase().contains(query);
@@ -167,9 +166,7 @@ class ProductSearchService {
       }
 
       // Active status filter (if applicable)
-      if (product is Product) {
-        // Additional filters can be added here
-      }
+      // Additional filters can be added here
 
       return true;
     }).toList();
@@ -220,7 +217,7 @@ class ProductSearchService {
     }
 
     // Description match
-    if (product.description?.toLowerCase().contains(query) ?? false) {
+    if (product.description.toLowerCase().contains(query) ?? false) {
       score += 0.3;
     }
 

@@ -1,15 +1,16 @@
 // User Role and Permission System for Scalable Tailoring Services
 
-/// Simplified user roles in the tailoring business
+/// User roles in the tailoring business
 enum UserRole {
-  /// Shop Owner/Admin - Full access to everything including user management
-  shopOwner,
-
-  /// Customers - External users with order access
   customer,
-
-  /// Employees - All employee types consolidated (tailors, cutters, finishers, etc.)
+  shopOwner,
+  admin,
   employee,
+  tailor, // Master tailor/couturier
+  cutter, // Fabric cutting specialist
+  finisher, // Final touches and quality control
+  supervisor, // Team supervisor/manager
+  apprentice, // Training/new employee
 }
 
 /// Granular permissions for role-based access control
@@ -143,10 +144,18 @@ class RolePermissions {
   /// Check role hierarchy (higher number = more permissions)
   static int getRoleHierarchy(UserRole role) {
     switch (role) {
+      case UserRole.admin:
       case UserRole.shopOwner:
         return 10;
+      case UserRole.supervisor:
+        return 8;
       case UserRole.employee:
+      case UserRole.tailor:
+      case UserRole.cutter:
+      case UserRole.finisher:
         return 5;
+      case UserRole.apprentice:
+        return 2;
       case UserRole.customer:
         return 1;
     }
@@ -162,23 +171,47 @@ class RolePermissions {
 extension UserRoleExtension on UserRole {
   String get displayName {
     switch (this) {
-      case UserRole.shopOwner:
-        return 'Shop Owner';
-      case UserRole.employee:
-        return 'Employee';
       case UserRole.customer:
         return 'Customer';
+      case UserRole.shopOwner:
+        return 'Shop Owner';
+      case UserRole.admin:
+        return 'Administrator';
+      case UserRole.employee:
+        return 'Employee';
+      case UserRole.tailor:
+        return 'Master Tailor';
+      case UserRole.cutter:
+        return 'Fabric Cutter';
+      case UserRole.finisher:
+        return 'Finisher';
+      case UserRole.supervisor:
+        return 'Supervisor';
+      case UserRole.apprentice:
+        return 'Apprentice';
     }
   }
 
   String get description {
     switch (this) {
-      case UserRole.shopOwner:
-        return 'Full shop management with user and employee administration';
-      case UserRole.employee:
-        return 'Tailoring professional with order and assignment management';
       case UserRole.customer:
-        return 'Customer with order placement and management access';
+        return 'External customer with order management access';
+      case UserRole.shopOwner:
+        return 'Business owner with full operational access';
+      case UserRole.admin:
+        return 'System administrator with complete access';
+      case UserRole.employee:
+        return 'General employee with standard access';
+      case UserRole.tailor:
+        return 'Specialized in garment construction';
+      case UserRole.cutter:
+        return 'Specialized in fabric cutting';
+      case UserRole.finisher:
+        return 'Specialized in final touches and quality';
+      case UserRole.supervisor:
+        return 'Team supervisor with management access';
+      case UserRole.apprentice:
+        return 'Training level with limited access';
     }
   }
 
@@ -195,10 +228,27 @@ extension UserRoleExtension on UserRole {
   }
 
   int get hierarchyLevel {
-    return RolePermissions.getRoleHierarchy(this);
+    switch (this) {
+      case UserRole.admin:
+        return 10;
+      case UserRole.shopOwner:
+        return 9;
+      case UserRole.supervisor:
+        return 8;
+      case UserRole.employee:
+        return 5;
+      case UserRole.tailor:
+      case UserRole.cutter:
+      case UserRole.finisher:
+        return 4;
+      case UserRole.apprentice:
+        return 2;
+      case UserRole.customer:
+        return 1;
+    }
   }
 
   bool canAccessRole(UserRole targetRole) {
-    return RolePermissions.canAccessRole(this, targetRole);
+    return this.hierarchyLevel >= targetRole.hierarchyLevel;
   }
 }

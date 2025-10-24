@@ -1,5 +1,4 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -21,8 +20,6 @@ import 'screens/home/home_screen.dart';
 import 'screens/ai/ai_assistance_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/wishlist_screen.dart';
-import 'services/setup_demo_users.dart';
-import 'services/setup_demo_employees.dart';
 import 'widgets/theme_toggle_widget.dart';
 import 'widgets/loading_splash_screen.dart';
 
@@ -89,14 +86,6 @@ Future<void> initializeApp(InitializationProvider initProvider) async {
     // Initialize dependency injection container
     initProvider.updateProgress(0.5, 'Initializing Services...');
     await injectionContainer.initialize();
-
-    // Setup demo users if needed
-    initProvider.updateProgress(0.6, 'Setting up demo users...');
-    await setupDemoUsers();
-
-    // Setup demo employees if needed
-    initProvider.updateProgress(0.9, 'Setting up demo employees...');
-    await setupDemoEmployees();
 
     // Mark as initialized
     initProvider.updateProgress(1.0, 'Ready!');
@@ -463,63 +452,6 @@ class HomePage extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 32),
-
-            // Demo Credentials
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.amber.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.amber.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'ðŸš€ Demo Credentials',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const _CredentialItem(
-                    role: 'Customer',
-                    email: 'customer@demo.com',
-                    password: 'password123',
-                  ),
-                  const SizedBox(height: 8),
-                  const _CredentialItem(
-                    role: 'Esther (Owner)',
-                    email: 'shop@demo.com',
-                    password: 'password123',
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE8F5E8),
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                    child: const Text(
-                      'ðŸŽ¯ Employee Management Demo: Available for ALL users in the dashboard!',
-                      style: TextStyle(
-                        color: Color(0xFF2E7D32),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
             // Quick Actions
             const Text(
               'Quick Actions',
@@ -636,48 +568,6 @@ class _FeatureCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _CredentialItem extends StatelessWidget {
-  final String role;
-  final String email;
-  final String password;
-
-  const _CredentialItem({
-    required this.role,
-    required this.email,
-    required this.password,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(Icons.person, color: Colors.amber.shade700),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                role,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '$email / $password',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

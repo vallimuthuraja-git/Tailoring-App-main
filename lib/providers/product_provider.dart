@@ -29,10 +29,10 @@ class ProductProvider with ChangeNotifier {
   bool? _activeStatusFilter;
   String _sortOption = 'name';
 
-  // Pagination fields
-  int _currentPage = 0;
+  // Pagination fields (currently unused - for future implementation)
+  // int _currentPage = 0;
   bool _hasMoreProducts = true;
-  final int _pageSize = 20;
+  // final int _pageSize = 20;
 
   // Stream subscription to listen to bloc state changes
   StreamSubscription<ProductState>? _blocSubscription;
@@ -100,7 +100,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<void> refreshProducts() async {
-    _currentPage = 0;
+    // _currentPage = 0; // TODO: Uncomment when implementing pagination
     _hasMoreProducts = true;
     _productBloc.add(const RefreshProducts());
   }

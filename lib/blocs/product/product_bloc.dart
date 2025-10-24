@@ -330,7 +330,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
     try {
       await _productRepository.syncOfflineDataToOnline();
-      final syncStatus = await _productRepository.getSyncStatus();
+      // final syncStatus = await _productRepository.getSyncStatus(); // TODO: Use sync status
       final syncedCount = 1; // TODO: Get actual count from sync result
 
       emit(OfflineDataSynced(syncedCount));
@@ -396,5 +396,3 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     return super.close();
   }
 }
-
-

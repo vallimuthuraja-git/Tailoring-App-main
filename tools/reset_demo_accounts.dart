@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import '../lib/firebase_options.dart';
+import 'package:tailoring_app/firebase_options.dart';
 
 /// Script to reset demo accounts that have wrong passwords
 /// Run this script to delete existing demo accounts and let the app recreate them fresh
@@ -20,7 +20,6 @@ Future<void> resetDemoAccounts() async {
   final demoAccounts = {
     'customer@demo.com': 'password123',
     'shop@demo.com': 'password123',
-    'admin@demo.com': 'password123',
     'employee@demo.com': 'password123',
     'cutter@demo.com': 'password123',
     'finisher@demo.com': 'password123',

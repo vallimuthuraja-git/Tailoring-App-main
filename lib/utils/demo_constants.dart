@@ -8,7 +8,7 @@ class DemoConstants {
   // Demo user emails
   static const String customerEmail = 'customer@demo.com';
   static const String shopOwnerEmail = 'shop@demo.com';
-  static const String adminEmail = 'admin@demo.com';
+
   static const String tailorEmail = 'tailor@demo.com';
   static const String cutterEmail = 'cutter@demo.com';
   static const String finisherEmail = 'finisher@demo.com';

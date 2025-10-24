@@ -36,17 +36,7 @@ class SetupDemoUsers {
       debugPrint('âŒ Error creating demo shop owner: $e');
     }
 
-    // Demo admin
-    try {
-      await _createDemoUser(
-        email: DemoConstants.adminEmail,
-        password: DemoConstants.demoPassword,
-        displayName: 'Admin',
-        role: UserRole.admin,
-      );
-    } catch (e) {
-      debugPrint('âŒ Error creating demo admin: $e');
-    }
+    // Admin demo user creation removed
 
     debugPrint('âœ… Demo users setup completed successfully!');
   }
@@ -170,23 +160,10 @@ class SetupDemoUsers {
       bool shopExists = await _userExistsInAuth(DemoConstants.shopOwnerEmail);
       debugPrint('Shop owner exists in Auth: $shopExists');
 
-      // Check admin
-      bool adminExists = await _userExistsInAuth(DemoConstants.adminEmail);
-      debugPrint('Admin exists in Auth: $adminExists');
-      if (adminExists) {
-        final adminInfo = await getDemoUserInfo(DemoConstants.adminEmail);
-        if (adminInfo != null) {
-          debugPrint(
-              'ðŸ” ADMIN EXISTENCE: Role in Firestore: ${adminInfo['role']}');
-        } else {
-          debugPrint(
-              'âŒ ADMIN EXISTENCE: No Firestore profile found for admin');
-        }
-      }
+      // Admin check removed - admin account no longer needed
 
-      bool allExist = customerExists && shopExists && adminExists;
+      bool allExist = customerExists && shopExists;
       debugPrint('All demo users exist: $allExist');
-      debugPrint('Missing admin: ${!adminExists}');
       debugPrint('One/more demo user missing: ${!allExist}');
 
       return allExist;

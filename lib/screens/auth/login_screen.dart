@@ -877,68 +877,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 // Demo Login Buttons
                                                 Column(
                                                   children: [
-                                                    // Demo Admin Button
-                                                    SizedBox(
-                                                      width: isMobile
-                                                          ? double.infinity
-                                                          : null,
-                                                      height: ResponsiveUtils
-                                                          .responsiveSpacing(
-                                                              48.0, deviceType),
-                                                      child:
-                                                          ElevatedButton.icon(
-                                                        onPressed: authProvider
-                                                                .isLoading
-                                                            ? null
-                                                            : () => _demoLogin(
-                                                                context,
-                                                                UserRole.admin),
-                                                        icon: Icon(
-                                                            Icons
-                                                                .admin_panel_settings,
-                                                            size: ResponsiveUtils
-                                                                .responsiveFontSize(
-                                                                    18.0,
-                                                                    deviceType)),
-                                                        label: Text(
-                                                            'Demo Admin',
-                                                            style: TextStyle(
-                                                                fontSize: ResponsiveUtils
-                                                                    .responsiveFontSize(
-                                                                        16.0,
-                                                                        deviceType))),
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          backgroundColor: themeProvider
-                                                                  .isDarkMode
-                                                              ? Colors
-                                                                  .red.shade700
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8)
-                                                              : Colors
-                                                                  .red.shade600
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.8),
-                                                          foregroundColor:
-                                                              Colors.white,
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12),
-                                                          ),
-                                                          elevation: 0,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: ResponsiveUtils
-                                                            .responsiveSpacing(
-                                                                16.0,
-                                                                deviceType)),
                                                     if (isMobile) ...[
                                                       // Mobile: Stack all buttons vertically
                                                       _buildDemoButton(
@@ -1455,9 +1393,7 @@ class _LoginScreenState extends State<LoginScreen> {
       case UserRole.shopOwner:
         success = await authProvider.demoLoginAsShopOwner();
         break;
-      case UserRole.admin:
-        success = await authProvider.demoLoginAsAdmin();
-        break;
+
       case UserRole.employee:
         success = await authProvider.demoLoginAsEmployee();
         break;
@@ -1544,4 +1480,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

@@ -35,14 +35,14 @@ void main() async {
     );
     debugPrint('âœ… Firebase initialized successfully');
 
-    // Authenticate as admin to get permissions
+    // Authenticate as shop owner to get permissions
     final auth = FirebaseAuth.instance;
-    debugPrint('ðŸ” Authenticating as admin...');
+    debugPrint('ðŸ” Authenticating as shop owner...');
     await auth.signInWithEmailAndPassword(
-      email: DemoConstants.adminEmail,
+      email: DemoConstants.shopOwnerEmail,
       password: DemoConstants.demoPassword,
     );
-    debugPrint('âœ… Authenticated as admin successfully');
+    debugPrint('âœ… Authenticated as shop owner successfully');
 
     final firestore = FirebaseFirestore.instance;
     final usersCollection = firestore.collection('users');
@@ -160,5 +160,3 @@ void main() async {
     rethrow;
   }
 }
-
-

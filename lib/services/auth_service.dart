@@ -205,13 +205,15 @@ class AuthService {
         email: email,
         password: password,
       );
-      debugPrint('âœ… Successfully signed in user: ${userCredential.user?.email}');
+      debugPrint(
+          'âœ… Successfully signed in user: ${userCredential.user?.email}');
 
       // Fetch and log user role for debugging
       if (email == 'admin@demo.com') {
         final profile = await getUserProfile(userCredential.user!.uid);
         if (profile != null) {
-          debugPrint('ðŸ” ADMIN LOGIN: User role assigned is ${profile.role.name}');
+          debugPrint(
+              'ðŸ” ADMIN LOGIN: User role assigned is ${profile.role.name}');
         } else {
           debugPrint('âŒ ADMIN LOGIN: No profile found for admin user');
         }
@@ -362,7 +364,8 @@ class AuthService {
         debugPrint(
             'âœ… User profile found for $userId: ${userModel.email} role ${userModel.role.name}');
         if (userModel.email == 'admin@demo.com') {
-          debugPrint('ðŸ” ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
+          debugPrint(
+              'ðŸ” ADMIN PROFILE FETCH: Role is ${userModel.role.name}');
         }
         return userModel;
       } else {
@@ -509,11 +512,6 @@ class AuthService {
 
   // Demo accounts for testing
   static const Map<String, Map<String, String>> demoAccounts = {
-    'admin': {
-      'email': 'admin@demo.com',
-      'password': 'password123',
-      'displayName': 'Admin',
-    },
     'customer': {
       'email': 'customer@demo.com',
       'password': 'password123',
@@ -546,5 +544,3 @@ class AuthService {
     },
   };
 }
-
-

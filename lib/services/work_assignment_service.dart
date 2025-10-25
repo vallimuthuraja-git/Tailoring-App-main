@@ -226,8 +226,9 @@ class WorkAssignmentService {
 
   double _calculatePerformanceScore(
       emp.Employee employee, List<String> requiredSkills) {
-    if (employee.totalOrdersCompleted == 0)
+    if (employee.totalOrdersCompleted == 0) {
       return 0.5; // Neutral for new employees
+    }
 
     // Base performance score
     double score = employee.averageRating / 5.0; // Normalize to 0-1
@@ -356,16 +357,21 @@ class WorkAssignmentService {
     final skill = skillString.toLowerCase();
 
     if (skill.contains('cutting')) return emp.EmployeeSkill.cutting;
-    if (skill.contains('stitching') || skill.contains('sewing'))
+    if (skill.contains('stitching') || skill.contains('sewing')) {
       return emp.EmployeeSkill.stitching;
-    if (skill.contains('finishing') || skill.contains('final'))
+    }
+    if (skill.contains('finishing') || skill.contains('final')) {
       return emp.EmployeeSkill.finishing;
-    if (skill.contains('alteration') || skill.contains('alter'))
+    }
+    if (skill.contains('alteration') || skill.contains('alter')) {
       return emp.EmployeeSkill.alterations;
-    if (skill.contains('embroidery') || skill.contains('embroider'))
+    }
+    if (skill.contains('embroidery') || skill.contains('embroider')) {
       return emp.EmployeeSkill.embroidery;
-    if (skill.contains('quality') || skill.contains('check'))
+    }
+    if (skill.contains('quality') || skill.contains('check')) {
       return emp.EmployeeSkill.qualityCheck;
+    }
     if (skill.contains('pattern')) return emp.EmployeeSkill.patternMaking;
 
     return emp.EmployeeSkill.stitching; // Default

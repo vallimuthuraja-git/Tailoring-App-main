@@ -1,5 +1,4 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/service.dart';
@@ -25,8 +24,6 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
     with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   ServiceCategory? _selectedCategoryFilter;
-  ServiceType? _selectedTypeFilter;
-  final bool _showOnlyAvailable = true;
   bool _isGridView = true; // Default to grid view
 
   bool _isLoaded = false;
@@ -582,8 +579,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color:
-                          _getServiceColor(service.category).withValues(alpha: 0.1),
+                      color: _getServiceColor(service.category)
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -631,7 +628,8 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen>
                             style: TextStyle(
                               fontSize: 12,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withValues(alpha: 0.6)
+                                  ? DarkAppColors.onSurface
+                                      .withValues(alpha: 0.6)
                                   : AppColors.onSurface.withValues(alpha: 0.6),
                             ),
                           ),

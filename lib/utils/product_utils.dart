@@ -15,8 +15,9 @@ class GridLayoutConstants {
 
   static int getGridCrossAxisCount(double screenWidth) {
     if (screenWidth >= 1200.0) return gridCrossAxisCountDesktop;
-    if (screenWidth >= ResponsiveBreakpoints.tablet)
+    if (screenWidth >= ResponsiveBreakpoints.tablet) {
       return gridCrossAxisCountTablet;
+    }
     return gridCrossAxisCountMobile;
   }
 }
@@ -61,14 +62,17 @@ class SpacingConstants {
 
   static double getResponsivePadding(double screenWidth) {
     if (screenWidth >= 1200.0) return screenPadding * 1.5;
-    if (screenWidth >= ResponsiveBreakpoints.tablet) return screenPadding * 1.2;
+    if (screenWidth >= ResponsiveBreakpoints.tablet) {
+      return screenPadding * 1.2;
+    }
     return screenPadding;
   }
 
   static double getResponsiveSpacing(double screenWidth) {
     if (screenWidth >= 1200.0) return componentSpacing * 1.2;
-    if (screenWidth >= ResponsiveBreakpoints.tablet)
+    if (screenWidth >= ResponsiveBreakpoints.tablet) {
       return componentSpacing * 1.1;
+    }
     return componentSpacing;
   }
 }

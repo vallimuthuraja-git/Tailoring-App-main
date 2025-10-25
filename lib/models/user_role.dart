@@ -4,13 +4,18 @@
 enum UserRole {
   customer,
   shopOwner,
-  admin,
   employee,
-  tailor, // Master tailor/couturier
-  cutter, // Fabric cutting specialist
-  finisher, // Final touches and quality control
-  supervisor, // Team supervisor/manager
-  apprentice, // Training/new employee
+}
+
+/// Employee specialties within the employee role
+enum EmployeeSpecialty {
+  tailor, // Pattern making, alterations, sewing
+  cutter, // Fabric cutting, marking, templates
+  finisher, // Quality control, pressing, finishing
+  supervisor, // Team management, scheduling, oversight
+  apprentice, // Training, basic assistance
+  inventory, // Stock management, supplies tracking
+  customerSvc, // Customer communication, order handling
 }
 
 /// Granular permissions for role-based access control
@@ -144,18 +149,10 @@ class RolePermissions {
   /// Check role hierarchy (higher number = more permissions)
   static int getRoleHierarchy(UserRole role) {
     switch (role) {
-      case UserRole.admin:
       case UserRole.shopOwner:
         return 10;
-      case UserRole.supervisor:
-        return 8;
       case UserRole.employee:
-      case UserRole.tailor:
-      case UserRole.cutter:
-      case UserRole.finisher:
         return 5;
-      case UserRole.apprentice:
-        return 2;
       case UserRole.customer:
         return 1;
     }
@@ -167,6 +164,123 @@ class RolePermissions {
   }
 }
 
+/// Specialty-based feature access for employees
+class SpecialtyFeatures {
+  /// Features accessible to each specialty
+  static const Map<EmployeeSpecialty, Set<String>> featureAccess = {
+    EmployeeSpecialty.tailor: {
+      'pattern_design',
+      'alterations',
+      'sewing_tools',
+      'fabric_measurement',
+      'customer_fitting',
+    },
+    EmployeeSpecialty.cutter: {
+      'fabric_inventory',
+      'cutting_templates',
+      'fabric_marking',
+      'waste_management',
+      'supplier_orders',
+    },
+    EmployeeSpecialty.finisher: {
+      'quality_control',
+      'pressing_station',
+      'finishing_reports',
+      'final_inspection',
+      'packaging_preparation',
+    },
+    EmployeeSpecialty.supervisor: {
+      'employee_management',
+      'schedule_view',
+      'performance_reports',
+      'quality_oversight',
+      'work_assignment',
+    },
+    EmployeeSpecialty.inventory: {
+      'stock_management',
+      'warehouse_access',
+      'supply_tracking',
+      'inventory_reports',
+      'reorder_alerts',
+    },
+    EmployeeSpecialty.customerSvc: {
+      'customer_communication',
+      'order_history',
+      'complaint_handling',
+      'appointment_scheduling',
+      'feedback_collection',
+    },
+    EmployeeSpecialty.apprentice: {
+      'basic_training',
+      'assistance_tasks',
+      'observation_access',
+      'learning_materials',
+    },
+  };
+
+  /// Get all features accessible to an employee with multiple specialties
+  static Set<String> getEmployeeFeatures(List<EmployeeSpecialty> specialties) {
+    final features = <String>{};
+    for (final specialty in specialties) {
+      features.addAll(featureAccess[specialty] ?? {});
+    }
+    return features;
+  }
+
+  /// Check if employee can access a specific feature
+  static bool canAccessFeature(
+      List<EmployeeSpecialty> specialties, String feature) {
+    return getEmployeeFeatures(specialties).contains(feature);
+  }
+
+  /// Get primary specialty display name
+  static String getPrimarySpecialtyName(List<EmployeeSpecialty> specialties) {
+    if (specialties.isEmpty) return 'General';
+    return specialties.first.displayName;
+  }
+}
+
+/// Employee specialty extension methods
+extension EmployeeSpecialtyExtension on EmployeeSpecialty {
+  String get displayName {
+    switch (this) {
+      case EmployeeSpecialty.tailor:
+        return 'Tailor';
+      case EmployeeSpecialty.cutter:
+        return 'Cutter';
+      case EmployeeSpecialty.finisher:
+        return 'Finisher';
+      case EmployeeSpecialty.supervisor:
+        return 'Supervisor';
+      case EmployeeSpecialty.apprentice:
+        return 'Apprentice';
+      case EmployeeSpecialty.inventory:
+        return 'Inventory';
+      case EmployeeSpecialty.customerSvc:
+        return 'Customer Service';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case EmployeeSpecialty.tailor:
+        return 'Pattern making, alterations, and sewing';
+      case EmployeeSpecialty.cutter:
+        return 'Fabric cutting, marking, and waste management';
+      case EmployeeSpecialty.finisher:
+        return 'Quality control, pressing, and final touches';
+      case EmployeeSpecialty.supervisor:
+        return 'Team management, scheduling, and oversight';
+      case EmployeeSpecialty.apprentice:
+        return 'Training and basic assistance tasks';
+      case EmployeeSpecialty.inventory:
+        return 'Stock management and supply tracking';
+      case EmployeeSpecialty.customerSvc:
+        return 'Customer communication and order handling';
+    }
+  }
+}
+
 /// User role extension methods
 extension UserRoleExtension on UserRole {
   String get displayName {
@@ -175,20 +289,8 @@ extension UserRoleExtension on UserRole {
         return 'Customer';
       case UserRole.shopOwner:
         return 'Shop Owner';
-      case UserRole.admin:
-        return 'Administrator';
       case UserRole.employee:
         return 'Employee';
-      case UserRole.tailor:
-        return 'Master Tailor';
-      case UserRole.cutter:
-        return 'Fabric Cutter';
-      case UserRole.finisher:
-        return 'Finisher';
-      case UserRole.supervisor:
-        return 'Supervisor';
-      case UserRole.apprentice:
-        return 'Apprentice';
     }
   }
 
@@ -198,20 +300,8 @@ extension UserRoleExtension on UserRole {
         return 'External customer with order management access';
       case UserRole.shopOwner:
         return 'Business owner with full operational access';
-      case UserRole.admin:
-        return 'System administrator with complete access';
       case UserRole.employee:
-        return 'General employee with standard access';
-      case UserRole.tailor:
-        return 'Specialized in garment construction';
-      case UserRole.cutter:
-        return 'Specialized in fabric cutting';
-      case UserRole.finisher:
-        return 'Specialized in final touches and quality';
-      case UserRole.supervisor:
-        return 'Team supervisor with management access';
-      case UserRole.apprentice:
-        return 'Training level with limited access';
+        return 'General employee with standard operational access';
     }
   }
 
@@ -229,26 +319,16 @@ extension UserRoleExtension on UserRole {
 
   int get hierarchyLevel {
     switch (this) {
-      case UserRole.admin:
-        return 10;
       case UserRole.shopOwner:
-        return 9;
-      case UserRole.supervisor:
-        return 8;
+        return 10;
       case UserRole.employee:
         return 5;
-      case UserRole.tailor:
-      case UserRole.cutter:
-      case UserRole.finisher:
-        return 4;
-      case UserRole.apprentice:
-        return 2;
       case UserRole.customer:
         return 1;
     }
   }
 
   bool canAccessRole(UserRole targetRole) {
-    return this.hierarchyLevel >= targetRole.hierarchyLevel;
+    return hierarchyLevel >= targetRole.hierarchyLevel;
   }
 }

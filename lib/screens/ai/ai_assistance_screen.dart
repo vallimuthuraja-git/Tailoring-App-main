@@ -78,7 +78,12 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
       _isTyping = true;
     });
 
+    // Get providers synchronously before any await
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
     final userId = authProvider.userProfile?.id ?? 'guest';
     final userName = authProvider.userProfile?.displayName ?? 'User';
 
@@ -88,19 +93,16 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
       content: text,
     );
 
-    setState(() {
-      _messages.add(userMessage);
-      _messageController.clear();
-    });
-
-    _scrollToBottom();
+    if (mounted) {
+      setState(() {
+        _messages.add(userMessage);
+        _messageController.clear();
+      });
+      _scrollToBottom();
+    }
 
     // Simulate typing delay
     await Future.delayed(const Duration(milliseconds: 500));
-
-    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-    final productProvider =
-        Provider.of<ProductProvider>(context, listen: false);
 
     final messages = await _chatbotService.processUserMessage(
       conversationId: _conversationId,
@@ -111,12 +113,13 @@ class _AIAssistanceScreenState extends State<AIAssistanceScreen> {
       productProvider: productProvider,
     );
 
-    setState(() {
-      _messages.add(messages[1]); // Add bot response
-      _isTyping = false;
-    });
-
-    _scrollToBottom();
+    if (mounted) {
+      setState(() {
+        _messages.add(messages[1]); // Add bot response
+        _isTyping = false;
+      });
+      _scrollToBottom();
+    }
   }
 
   void _handleQuickReply(String reply) {

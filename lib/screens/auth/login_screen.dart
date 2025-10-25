@@ -29,6 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _loadSavedCredentials();
+
+    // For development mode, pre-fill with first demo account for quick testing
+    if (!const bool.fromEnvironment('dart.vm.product')) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_emailController.text.isEmpty) {
+          final demoAccount = DevSetupService.getDevCredentials().first;
+          _emailController.text = demoAccount['email']!;
+          _passwordController.text = demoAccount['password']!;
+        }
+      });
+    }
   }
 
   @override
@@ -884,30 +895,38 @@ class _LoginScreenState extends State<LoginScreen> {
                                                             16),
                                                     decoration: BoxDecoration(
                                                       color:
-                                                          Colors.orange.shade50,
+                                                          Colors.green.shade50,
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
                                                       border: Border.all(
                                                           color: Colors
-                                                              .orange.shade200),
+                                                              .green.shade200),
                                                     ),
                                                     child: Column(
                                                       children: [
                                                         const Text(
-                                                          '🚀 Quick Login (Development Only)',
+                                                          '🚀 Firebase Demo Accounts',
                                                           style: TextStyle(
                                                             fontSize: 16,
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color:
-                                                                Colors.orange,
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        const Text(
+                                                          'All accounts created via firebase_data_setup.js',
+                                                          style: TextStyle(
+                                                            fontSize: 11,
+                                                            color: Colors.grey,
                                                           ),
                                                         ),
                                                         const SizedBox(
                                                             height: 12),
                                                         const Text(
-                                                          'Password: dev123456',
+                                                          'Password: Pass123',
                                                           style: TextStyle(
                                                             fontSize: 12,
                                                             color: Colors.grey,

@@ -78,14 +78,22 @@ Future<void> initializeApp(InitializationProvider initProvider) async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // Initialize FirebaseService explicitly
-    initProvider.updateProgress(0.4, 'Initializing Firebase Service...');
+    // Initialize FirebaseService - skip connection test for fast startup
+    initProvider.updateProgress(0.5, 'Initializing Firebase Service...');
     final firebaseService = FirebaseService();
-    await firebaseService.initializeFirebase();
+    await firebaseService.initializeFirebase(skipConnectionTest: true);
 
-    // Initialize dependency injection container
-    initProvider.updateProgress(0.5, 'Initializing Services...');
-    await injectionContainer.initialize();
+    // Initialize dependency injection container (parallelize with Firebase)
+    initProvider.updateProgress(0.7, 'Initializing Services...');
+
+    // Use Future.wait to parallelize initialization where possible
+    await Future.wait([
+      injectionContainer.initialize(),
+      // Add any other parallel initialization here
+    ]);
+
+    // Note: Demo accounts can be created via User Management screen
+    // No automatic setup - keeps it simple for development
 
     // Mark as initialized
     initProvider.updateProgress(1.0, 'Ready!');
@@ -167,18 +175,23 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late final ThemeProvider _themeProvider;
   late final InitializationProvider _initProvider;
+  bool _isThemeInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _themeProvider = ThemeProvider();
     _initProvider = widget.initializationProvider ?? InitializationProvider();
-    _initializeTheme();
+    // Defer theme initialization to avoid blocking app start
+    _initializeThemeLater();
   }
 
-  Future<void> _initializeTheme() async {
-    await _themeProvider.initializeTheme();
-    // Theme is now initialized with system detection enabled by default
+  // Initialize theme after app loads to avoid blocking startup
+  void _initializeThemeLater() {
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      await _themeProvider.initializeTheme();
+      setState(() => _isThemeInitialized = true);
+    });
   }
 
   @override
@@ -299,23 +312,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           );
         }
 
-        // Show loading while checking authentication state
-        if (authProvider.isLoading) {
-          return const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Checking authentication...'),
-                ],
-              ),
-            ),
-          );
-        }
-
-        // Navigate based on authentication state
+        // Fast auth state check - avoid loading screen
         if (authProvider.isAuthenticated) {
           return const HomeScreen();
         } else {

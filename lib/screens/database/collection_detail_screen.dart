@@ -25,7 +25,6 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
   final FirebaseService _firebaseService = FirebaseService();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  final bool _isLoading = false;
 
   @override
   void dispose() {
@@ -117,7 +116,8 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'No documents in ${widget.displayName}',
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
@@ -152,8 +152,10 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
     if (_searchQuery.isNotEmpty) {
       // For now, we'll do a simple ID search
       // In a real app, you might want to implement full-text search
-      query = query.where(FieldPath.documentId, isGreaterThanOrEqualTo: _searchQuery)
-                   .where(FieldPath.documentId, isLessThanOrEqualTo: '$_searchQuery\uf8ff');
+      query = query
+          .where(FieldPath.documentId, isGreaterThanOrEqualTo: _searchQuery)
+          .where(FieldPath.documentId,
+              isLessThanOrEqualTo: '$_searchQuery\uf8ff');
     }
 
     return query.snapshots();
@@ -222,7 +224,8 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                       const PopupMenuDivider(),
                       const PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete', style: TextStyle(color: Colors.red)),
+                        child:
+                            Text('Delete', style: TextStyle(color: Colors.red)),
                       ),
                     ],
                   ),
@@ -231,17 +234,17 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
               if (previewFields.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 ...previewFields.map((field) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    '${field['key']}: ${field['value']}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )),
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${field['key']}: ${field['value']}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )),
               ],
               const SizedBox(height: 8),
               Text(
@@ -262,7 +265,15 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
     final previewFields = <Map<String, dynamic>>[];
 
     // Priority fields to show in preview
-    final priorityFields = ['name', 'title', 'email', 'phone', 'status', 'type', 'category'];
+    final priorityFields = [
+      'name',
+      'title',
+      'email',
+      'phone',
+      'status',
+      'type',
+      'category'
+    ];
 
     for (final field in priorityFields) {
       if (data.containsKey(field)) {
@@ -429,7 +440,8 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Document'),
-        content: const Text('Are you sure you want to delete this document? This action cannot be undone.'),
+        content: const Text(
+            'Are you sure you want to delete this document? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -438,10 +450,12 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
           ElevatedButton(
             onPressed: () async {
               try {
-                await _firebaseService.deleteDocument(widget.collectionName, doc.id);
+                await _firebaseService.deleteDocument(
+                    widget.collectionName, doc.id);
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Document deleted successfully')),
+                  const SnackBar(
+                      content: Text('Document deleted successfully')),
                 );
               } catch (e) {
                 Navigator.of(context).pop();
@@ -458,4 +472,3 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
     );
   }
 }
-

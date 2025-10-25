@@ -488,8 +488,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   void _showMoreOptions() {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
-    final customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
+    final _ = Provider.of<CustomerProvider>(context, listen: false);
 
     showModalBottomSheet(
       context: context,
@@ -659,4 +658,3 @@ extension StringExtensions on String {
     return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
-

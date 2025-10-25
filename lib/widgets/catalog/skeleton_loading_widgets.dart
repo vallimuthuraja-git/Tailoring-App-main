@@ -651,9 +651,9 @@ class _ProgressiveLoadingIndicatorState
                             decoration: BoxDecoration(
                               color: themeProvider.isDarkMode
                                   ? DarkAppColors.primary
-                                      .withOpacity(animation.value)
+                                      .withValues(alpha: animation.value)
                                   : AppColors.primary
-                                      .withOpacity(animation.value),
+                                      .withValues(alpha: animation.value),
                               shape: BoxShape.circle,
                             ),
                           );
@@ -971,4 +971,3 @@ class StaggeredFadeIn extends StatelessWidget {
     );
   }
 }
-

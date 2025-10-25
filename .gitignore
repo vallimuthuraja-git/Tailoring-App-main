@@ -16,6 +16,8 @@ flutter_*.iml
 # Firebase
 .firebase/hosting.*.cache
 .firebase/
+serviceAccountKey.json
+serviceAccountKey.json
 
 # IDE
 .metadata

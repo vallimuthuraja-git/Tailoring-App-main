@@ -1,5 +1,4 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/employee_provider.dart';
@@ -112,7 +111,8 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
       debugPrint('âŒ EmployeeManagementHome: Error setting up tabs: $e');
 
       // Fallback tabs in case of error
-      debugPrint('ðŸ”„ EmployeeManagementHome: Using fallback tabs due to error');
+      debugPrint(
+          'ðŸ”„ EmployeeManagementHome: Using fallback tabs due to error');
       _tabs = [
         const EmployeeListSimple(),
       ];
@@ -134,12 +134,7 @@ class _EmployeeManagementHomeState extends State<EmployeeManagementHome> {
         debugPrint('ðŸ” EmployeeManagementHome build: Checking permissions');
         // Check if user has permission to access employee management
         final hasEmployeeManagementAccess = authProvider.isShopOwnerOrAdmin ||
-            authProvider.hasRole(UserRole.employee) ||
-            authProvider.hasRole(UserRole.tailor) ||
-            authProvider.hasRole(UserRole.cutter) ||
-            authProvider.hasRole(UserRole.finisher) ||
-            authProvider.hasRole(UserRole.supervisor) ||
-            authProvider.hasRole(UserRole.apprentice);
+            authProvider.hasRole(UserRole.employee);
 
         debugPrint(
             'ðŸ”‘ EmployeeManagementHome: hasEmployeeManagementAccess: $hasEmployeeManagementAccess');

@@ -52,12 +52,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
   bool _processingPayment = false;
 
   // Additional validation state
-  String? _phoneError;
-  String? _emailError;
-  String? _addressError;
   String? _dateError;
   String? _timeSlotError;
-  final Map<String, String?> _measurementErrors = {};
 
   // Step 5: Special Instructions
   final _instructionsController = TextEditingController();
@@ -393,10 +389,8 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
 
   void _clearFieldError(String label) {
     // Clear field-specific errors
-    if (label.contains('Name')) _phoneError = null;
-    if (label.contains('Phone')) _phoneError = null;
-    if (label.contains('Email')) {}
-    if (label.contains('Address')) _addressError = null;
+    // Error fields have been simplified for this implementation
+    // Additional error handling can be added as needed
   }
 
   String? _validateCustomerName(String? value) {
@@ -950,6 +944,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
                   ? null
                   : () {
                       if (!_agreeToTerms) {
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text(
@@ -959,6 +954,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
                       }
 
                       if (_selectedPaymentMethod.isEmpty) {
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text('Please select a payment method')),
@@ -1107,11 +1103,13 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
         // Process the booking after successful payment
         await _createServiceOrder();
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Payment failed. Please try again.')),
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Payment error: $e')),
       );
@@ -1171,22 +1169,25 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
       );
 
       if (success) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Service booked successfully!')),
         );
         Navigator.of(context).pop(true);
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Failed to book service. Please try again.')),
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -1279,11 +1280,4 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
     final maxSteps = widget.service.requiresMeasurement ? 4 : 3;
     return _currentStep == maxSteps - 1;
   }
-
-  Future<void> _bookService() async {
-    // This method is now handled by _processPayment
-    // Keeping for compatibility but delegating to new method
-    await _createServiceOrder();
-  }
 }
-

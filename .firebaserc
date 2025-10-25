@@ -1,5 +1,7 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "tailoringapp-c768d"
+  },
   "targets": {
     "tailoringapp-c768d": {
       "hosting": {

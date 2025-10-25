@@ -1,5 +1,4 @@
-﻿
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/injection_container.dart';
 import '../models/product_models.dart';
@@ -418,13 +417,6 @@ class _ComprehensiveProductsScreenState
       _editingProduct = null; // null for new product
     });
     _tabController.animateTo(3); // Switch to Edit tab
-  }
-
-  void _showAddProductDialog() {
-    // TODO: Implement add product dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add product feature coming soon')),
-    );
   }
 
   void _showCheckoutDialog(CartProvider cartProvider) {

@@ -16,26 +16,26 @@ dependencies:
   http: ^1.2.2
   shared_preferences: ^2.4.1
   image_picker: ^1.1.2
-  path_provider: ^2.1.5
+  path_provider: ^2.1.3
+  path: ^1.9.0
   url_launcher: ^6.3.1
-  flex_color_scheme: ^8.0.1
-  firebase_core: ^4.1.0
-  firebase_auth: ^6.0.2
-  cloud_firestore: ^6.0.1
-  firebase_storage: ^13.0.1
-  fl_chart: ^1.1.0
+  flex_color_scheme: ^8.3.1
+  firebase_core: ^4.2.0
+  firebase_auth: ^6.1.1
+  cloud_firestore: ^6.0.3
+  firebase_storage: ^13.0.3
+  fl_chart: ^1.1.1
   intl_phone_field: ^3.2.0
-  google_sign_in: ^6.2.1
+  google_sign_in: ^6.3.0
   flutter_facebook_auth: ^7.0.1
   flutter_cube: ^0.1.0
 
   # Offline Storage & Sync
-  sqflite: ^2.4.1
-  connectivity_plus: ^7.0.0
-  shimmer: ^3.0.0
+  sqflite: ^2.3.3
+  connectivity_plus: ^6.0.3
 
   # State Management
-  flutter_bloc: ^8.1.6
+  flutter_bloc: ^9.1.1
   equatable: ^2.0.7
 
   # Logging
@@ -44,8 +44,6 @@ dependencies:
   # PWA Support for Web
   flutter_web_plugins:
     sdk: flutter
-# Device Detection
-device_info_plus: ^11.2.0
 
 # Loading Animations
 shimmer: ^3.0.0
@@ -60,7 +58,7 @@ cached_network_image: ^3.4.1
 flutter_staggered_grid_view: ^0.6.2
 
 # Sharing functionality
-share_plus: ^10.1.0
+# share_plus: ^10.1.0 # Commented out for web-only development
 
 # Platform-specific packages (updated versions)
 characters: ^1.4.1

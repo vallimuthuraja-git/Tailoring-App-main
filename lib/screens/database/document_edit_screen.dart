@@ -54,7 +54,9 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
             IconButton(
               icon: Icon(_isEditing ? Icons.save : Icons.edit),
               tooltip: _isEditing ? 'Save Changes' : 'Edit Document',
-              onPressed: _isEditing ? _saveDocument : () => setState(() => _isEditing = true),
+              onPressed: _isEditing
+                  ? _saveDocument
+                  : () => setState(() => _isEditing = true),
             ),
         ],
       ),
@@ -129,12 +131,21 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
     final fields = <Widget>[];
 
     // Sort fields to show important ones first
-    final sortedKeys = _documentData.keys.toList()..sort((a, b) {
-      const priorityFields = ['id', 'name', 'title', 'email', 'phone', 'status', 'type'];
-      final aPriority = priorityFields.contains(a) ? 1 : 0;
-      final bPriority = priorityFields.contains(b) ? 1 : 0;
-      return bPriority.compareTo(aPriority);
-    });
+    final sortedKeys = _documentData.keys.toList()
+      ..sort((a, b) {
+        const priorityFields = [
+          'id',
+          'name',
+          'title',
+          'email',
+          'phone',
+          'status',
+          'type'
+        ];
+        final aPriority = priorityFields.contains(a) ? 1 : 0;
+        final bPriority = priorityFields.contains(b) ? 1 : 0;
+        return bPriority.compareTo(aPriority);
+      });
 
     for (final key in sortedKeys) {
       if (key == 'id' && widget.documentId != null) {
@@ -293,6 +304,7 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
   }
 
   void _addNewField() {
+    final controller = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -301,13 +313,14 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: TextEditingController(),
+              controller: controller,
               decoration: const InputDecoration(
                 labelText: 'Field Name',
                 hintText: 'Enter field name',
               ),
               onSubmitted: (fieldName) {
-                if (fieldName.isNotEmpty && !_documentData.containsKey(fieldName)) {
+                if (fieldName.isNotEmpty &&
+                    !_documentData.containsKey(fieldName)) {
                   setState(() {
                     _documentData[fieldName] = '';
                   });
@@ -324,9 +337,13 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              final fieldName = (context.findRenderObject() as RenderBox)
-                  .toString()
-                  .split('\n')[1]; // This is a simplified approach
+              final fieldName = controller.text.trim();
+              if (fieldName.isNotEmpty &&
+                  !_documentData.containsKey(fieldName)) {
+                setState(() {
+                  _documentData[fieldName] = '';
+                });
+              }
               Navigator.of(context).pop();
             },
             child: const Text('Add'),
@@ -387,13 +404,17 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
     try {
       if (widget.documentId == null) {
         // Create new document
-        final docRef = await _firebaseService.addDocument(widget.collectionName, _documentData);
+        final docRef = await _firebaseService.addDocument(
+            widget.collectionName, _documentData);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Document created successfully with ID: ${docRef.id}')),
+          SnackBar(
+              content:
+                  Text('Document created successfully with ID: ${docRef.id}')),
         );
       } else {
         // Update existing document
-        await _firebaseService.updateDocument(widget.collectionName, widget.documentId!, _documentData);
+        await _firebaseService.updateDocument(
+            widget.collectionName, widget.documentId!, _documentData);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Document updated successfully')),
         );
@@ -461,7 +482,9 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
   }
 
   int _getMaxLinesForField(String key, dynamic value) {
-    if (value is List || value is Map || key.toLowerCase().contains('description')) {
+    if (value is List ||
+        value is Map ||
+        key.toLowerCase().contains('description')) {
       return 5;
     }
     if (value is String && value.length > 50) {

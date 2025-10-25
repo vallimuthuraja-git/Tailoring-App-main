@@ -2,7 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import '../firebase_options.dart';
+import '../../firebase_options.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -30,41 +30,52 @@ class FirebaseService {
   CollectionReference get orders => _firestore.collection('orders');
   CollectionReference get products => _firestore.collection('products');
   CollectionReference get measurements => _firestore.collection('measurements');
-  CollectionReference get notifications => _firestore.collection('notifications');
+  CollectionReference get notifications =>
+      _firestore.collection('notifications');
 
   // Chat collections
   CollectionReference chatCollection(String conversationId) =>
       _firestore.collection('chat').doc(conversationId).collection('messages');
 
-  // Initialize Firebase with connection testing
-  Future<void> initializeFirebase() async {
+  // Initialize Firebase (fast mode for development)
+  Future<void> initializeFirebase({bool skipConnectionTest = false}) async {
     try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      // Test connection after initialization
-      await _testConnection();
+
+      // Skip connection test in development mode to speed up initialization
+      if (!skipConnectionTest && !kReleaseMode) {
+        debugPrint('⚡ Skipping Firebase connection test for faster startup');
+        _isConnected = true; // Assume connected for development
+        _connectionError = null;
+      } else if (!skipConnectionTest) {
+        // Test connection after initialization only in production
+        await _testConnection();
+      }
     } catch (e) {
       _isConnected = false;
       _connectionError = 'Firebase initialization failed: $e';
-      debugPrint('âŒ Firebase initialization failed: $e');
+      debugPrint('❌ Firebase initialization failed: $e');
       rethrow;
     }
   }
 
-  // Test Firebase connection
+  // Test Firebase connection (only when needed)
   Future<void> _testConnection() async {
     try {
-      debugPrint('ðŸ” Testing Firebase connection...');
+      debugPrint('🔍 Testing Firebase connection...');
       // Test basic firestore connectivity
-      await _firestore.collection('test').limit(1).get();
+      await _firestore.collection('test').limit(1).get().timeout(
+            const Duration(seconds: 5), // Reduce timeout
+          );
       _isConnected = true;
       _connectionError = null;
-      debugPrint('âœ… Firebase connection successful');
+      debugPrint('✅ Firebase connection successful');
     } catch (e) {
       _isConnected = false;
       _connectionError = 'Firebase connection failed: $e';
-      debugPrint('âŒ Firebase connection failed: $e');
+      debugPrint('❌ Firebase connection failed: $e');
     }
   }
 
@@ -80,7 +91,9 @@ class FirebaseService {
   }
 
   // Generic CRUD operations with enhanced error handling
-  Future<DocumentReference> addDocument(String collection, Map<String, dynamic> data, {int maxRetries = 2}) async {
+  Future<DocumentReference> addDocument(
+      String collection, Map<String, dynamic> data,
+      {int maxRetries = 2}) async {
     debugPrint('ðŸ’¾ Adding document to collection: $collection');
     debugPrint('ðŸ“„ Data keys: ${data.keys.toList()}');
 
@@ -91,9 +104,10 @@ class FirebaseService {
           await _testConnection();
         }
 
-        final docRef = await _firestore.collection(collection).add(data).timeout(
-          const Duration(seconds: 10),
-        );
+        final docRef =
+            await _firestore.collection(collection).add(data).timeout(
+                  const Duration(seconds: 10),
+                );
 
         // Verify the document was created
         final docSnapshot = await docRef.get();
@@ -101,12 +115,13 @@ class FirebaseService {
           throw Exception('Document not created successfully');
         }
 
-        debugPrint('âœ… Document added successfully to $collection with ID: ${docRef.id}');
+        debugPrint(
+            'âœ… Document added successfully to $collection with ID: ${docRef.id}');
         return docRef;
-
       } catch (e) {
         retryCount++;
-        debugPrint('âŒ Failed attempt $retryCount to add document to $collection: $e');
+        debugPrint(
+            'âŒ Failed attempt $retryCount to add document to $collection: $e');
 
         if (retryCount == maxRetries) {
           debugPrint('ðŸš« Giving up after $maxRetries attempts');
@@ -119,7 +134,8 @@ class FirebaseService {
     throw Exception('Failed to add document after $maxRetries attempts');
   }
 
-  Future<void> updateDocument(String collection, String docId, Map<String, dynamic> data) async {
+  Future<void> updateDocument(
+      String collection, String docId, Map<String, dynamic> data) async {
     await _firestore.collection(collection).doc(docId).update(data);
   }
 
@@ -131,33 +147,37 @@ class FirebaseService {
     return await _firestore.collection(collection).doc(docId).get();
   }
 
- Future<QuerySnapshot> getCollection(String collection, {int maxRetries = 3}) async {
-   debugPrint('ðŸ” Fetching collection: $collection');
-   debugPrint('ðŸ‘¤ Auth state: ${FirebaseAuth.instance.currentUser?.email ?? 'No authenticated user'}');
+  Future<QuerySnapshot> getCollection(String collection,
+      {int maxRetries = 3}) async {
+    debugPrint('ðŸ” Fetching collection: $collection');
+    debugPrint(
+        'ðŸ‘¤ Auth state: ${FirebaseAuth.instance.currentUser?.email ?? 'No authenticated user'}');
 
-   int retryCount = 0;
-   while (retryCount < maxRetries) {
-     try {
-       final result = await _firestore.collection(collection).get().timeout(
-         const Duration(seconds: 15),
-       );
-       debugPrint('âœ… Successfully fetched ${result.docs.length} documents from $collection');
-       return result;
-     } catch (e) {
-       retryCount++;
-       debugPrint('âŒ Failed attempt $retryCount to fetch $collection: $e');
+    int retryCount = 0;
+    while (retryCount < maxRetries) {
+      try {
+        final result = await _firestore.collection(collection).get().timeout(
+              const Duration(seconds: 15),
+            );
+        debugPrint(
+            'âœ… Successfully fetched ${result.docs.length} documents from $collection');
+        return result;
+      } catch (e) {
+        retryCount++;
+        debugPrint('âŒ Failed attempt $retryCount to fetch $collection: $e');
 
-       if (retryCount == maxRetries) {
-         debugPrint('ðŸš« Giving up after $maxRetries attempts for collection: $collection');
-         rethrow;
-       }
+        if (retryCount == maxRetries) {
+          debugPrint(
+              'ðŸš« Giving up after $maxRetries attempts for collection: $collection');
+          rethrow;
+        }
 
-       // Wait before retrying
-       await Future.delayed(Duration(seconds: retryCount));
-     }
-   }
-   throw Exception('Failed to fetch collection after $maxRetries attempts');
- }
+        // Wait before retrying
+        await Future.delayed(Duration(seconds: retryCount));
+      }
+    }
+    throw Exception('Failed to fetch collection after $maxRetries attempts');
+  }
 
   // Real-time listeners
   Stream<DocumentSnapshot> documentStream(String collection, String docId) {
@@ -216,7 +236,9 @@ class FirebaseService {
   }
 
   Query orderBy(String collection, String field, {bool descending = false}) {
-    return _firestore.collection(collection).orderBy(field, descending: descending);
+    return _firestore
+        .collection(collection)
+        .orderBy(field, descending: descending);
   }
 
   Query limit(String collection, int count) {
@@ -224,7 +246,8 @@ class FirebaseService {
   }
 
   // Pagination
-  Future<QuerySnapshot> paginate(String collection, DocumentSnapshot? lastDoc, {int limit = 20}) async {
+  Future<QuerySnapshot> paginate(String collection, DocumentSnapshot? lastDoc,
+      {int limit = 20}) async {
     Query query = _firestore.collection(collection).limit(limit);
     if (lastDoc != null) {
       query = query.startAfterDocument(lastDoc);
@@ -268,5 +291,3 @@ class FirebaseService {
     return 'An unexpected error occurred.';
   }
 }
-
-

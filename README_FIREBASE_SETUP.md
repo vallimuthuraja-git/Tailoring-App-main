@@ -68,9 +68,9 @@ dependencies:
   image_picker: ^1.0.4
 
   # Firebase (add these)
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
+  firebase_core: ^4.2.0
+  firebase_auth: ^6.1.1
+  cloud_firestore: ^6.0.3
 ```
 
 ### Step 7: Update main.dart

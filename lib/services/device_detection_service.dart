@@ -2,11 +2,10 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:device_info_plus/device_info_plus.dart'; // TODO: Re-enable when dependency is resolved
 
 /// Device detection service for cross-platform app functionality
-/// Currently uses Platform and MediaQuery for basic detection
-/// Future: Re-enable device_info_plus for detailed hardware information
+/// Uses Platform and MediaQuery for reliable cross-platform detection
+/// No native dependencies required for basic functionality
 
 class DeviceInfo {
   final String platform;
@@ -124,9 +123,6 @@ class DeviceDetectionService {
   static DeviceDetectionService get instance => _instance;
 
   DeviceDetectionService._internal();
-
-  // final DeviceInfoPlugin? deviceInfo = DeviceInfoPlugin(); // TODO: Re-enable when dependency is resolved
-  final dynamic deviceInfo = null;
 
   // Platform-independent method to detect system theme preference
   Future<Brightness?> _getSystemBrightness() async {

@@ -45,14 +45,8 @@ class RoleBasedRouteGuard extends StatelessWidget {
   bool hasRequiredRole(auth.UserRole userRole, auth.UserRole requiredRole) {
     // Role hierarchy logic - higher number = more permissions
     final roleHierarchy = {
-      auth.UserRole.admin: 10, // Full access (equivalent to business owner)
-      auth.UserRole.shopOwner: 9, // High-level business operations
-      auth.UserRole.supervisor: 8, // Team supervision
+      auth.UserRole.shopOwner: 10, // Full access (business owner)
       auth.UserRole.employee: 5, // General employee
-      auth.UserRole.tailor: 4, // Specialized tailor
-      auth.UserRole.cutter: 4, // Specialized cutter
-      auth.UserRole.finisher: 4, // Specialized finisher
-      auth.UserRole.apprentice: 2, // Training level
       auth.UserRole.customer: 1, // External customer
     };
 
@@ -159,14 +153,8 @@ class RoleBasedWidget extends StatelessWidget {
         final userRole = authProvider.userRole;
 
         final roleHierarchy = {
-          auth.UserRole.admin: 10,
-          auth.UserRole.shopOwner: 9,
-          auth.UserRole.supervisor: 8,
+          auth.UserRole.shopOwner: 10,
           auth.UserRole.employee: 5,
-          auth.UserRole.tailor: 4,
-          auth.UserRole.cutter: 4,
-          auth.UserRole.finisher: 4,
-          auth.UserRole.apprentice: 2,
           auth.UserRole.customer: 1,
         };
 
@@ -230,14 +218,8 @@ class RoleBasedNavigationItem extends StatelessWidget {
         final userRole = authProvider.userRole;
 
         final roleHierarchy = {
-          auth.UserRole.admin: 10,
-          auth.UserRole.shopOwner: 9,
-          auth.UserRole.supervisor: 8,
+          auth.UserRole.shopOwner: 10,
           auth.UserRole.employee: 5,
-          auth.UserRole.tailor: 4,
-          auth.UserRole.cutter: 4,
-          auth.UserRole.finisher: 4,
-          auth.UserRole.apprentice: 2,
           auth.UserRole.customer: 1,
         };
 
@@ -268,20 +250,8 @@ extension RoleCheck on auth.UserRole {
         return 'Customer';
       case auth.UserRole.shopOwner:
         return 'Shop Owner';
-      case auth.UserRole.admin:
-        return 'Administrator';
       case auth.UserRole.employee:
         return 'Employee';
-      case auth.UserRole.tailor:
-        return 'Master Tailor';
-      case auth.UserRole.cutter:
-        return 'Fabric Cutter';
-      case auth.UserRole.finisher:
-        return 'Finisher';
-      case auth.UserRole.supervisor:
-        return 'Supervisor';
-      case auth.UserRole.apprentice:
-        return 'Apprentice';
     }
   }
 
@@ -291,39 +261,17 @@ extension RoleCheck on auth.UserRole {
         return 'External customer with order management access';
       case auth.UserRole.shopOwner:
         return 'Business owner with full operational access';
-      case auth.UserRole.admin:
-        return 'System administrator with complete access';
       case auth.UserRole.employee:
-        return 'General employee with standard access';
-      case auth.UserRole.tailor:
-        return 'Specialized in garment construction';
-      case auth.UserRole.cutter:
-        return 'Specialized in fabric cutting';
-      case auth.UserRole.finisher:
-        return 'Specialized in final touches and quality';
-      case auth.UserRole.supervisor:
-        return 'Team supervisor with management access';
-      case auth.UserRole.apprentice:
-        return 'Training level with limited access';
+        return 'General employee with standard operational access';
     }
   }
 
   int get hierarchyLevel {
     switch (this) {
-      case auth.UserRole.admin:
-        return 10;
       case auth.UserRole.shopOwner:
-        return 9;
-      case auth.UserRole.supervisor:
-        return 8;
+        return 10;
       case auth.UserRole.employee:
         return 5;
-      case auth.UserRole.tailor:
-      case auth.UserRole.cutter:
-      case auth.UserRole.finisher:
-        return 4;
-      case auth.UserRole.apprentice:
-        return 2;
       case auth.UserRole.customer:
         return 1;
     }
@@ -336,30 +284,6 @@ extension RoleCheck on auth.UserRole {
   bool hasPermission(String permission) {
     // Define permission mappings for each role
     final rolePermissions = {
-      auth.UserRole.admin: [
-        'create_user',
-        'read_user',
-        'update_user',
-        'delete_user',
-        'create_order',
-        'read_order',
-        'update_order',
-        'delete_order',
-        'create_product',
-        'read_product',
-        'update_product',
-        'delete_product',
-        'create_inventory',
-        'read_inventory',
-        'update_inventory',
-        'delete_inventory',
-        'view_analytics',
-        'view_reports',
-        'export_data',
-        'system_settings',
-        'business_config',
-        'security_settings',
-      ],
       auth.UserRole.shopOwner: [
         'read_user',
         'update_user',
@@ -378,40 +302,11 @@ extension RoleCheck on auth.UserRole {
         'export_data',
         'business_config',
       ],
-      auth.UserRole.supervisor: [
-        'read_user',
-        'read_order',
-        'update_order',
-        'read_product',
-        'update_product',
-        'read_inventory',
-        'view_reports',
-      ],
       auth.UserRole.employee: [
         'read_order',
         'update_order',
         'read_product',
         'read_inventory',
-      ],
-      auth.UserRole.tailor: [
-        'read_order',
-        'update_order',
-        'read_product',
-      ],
-      auth.UserRole.cutter: [
-        'read_order',
-        'update_order',
-        'read_product',
-        'read_inventory',
-      ],
-      auth.UserRole.finisher: [
-        'read_order',
-        'update_order',
-        'read_product',
-      ],
-      auth.UserRole.apprentice: [
-        'read_order',
-        'read_product',
       ],
       auth.UserRole.customer: [
         'create_order',
@@ -449,9 +344,9 @@ extension RoleCheckExtensions on BuildContext {
     return authProvider.userRole;
   }
 
-  bool isAdmin() => hasRole(auth.UserRole.admin);
+  bool isAdmin() =>
+      hasRole(auth.UserRole.shopOwner); // Admin now maps to shopOwner
   bool isShopOwner() => hasRole(auth.UserRole.shopOwner);
-  bool isSupervisor() => hasRole(auth.UserRole.supervisor);
   bool isEmployee() => hasRole(auth.UserRole.employee);
   bool isCustomer() => hasRole(auth.UserRole.customer);
 }

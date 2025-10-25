@@ -47,23 +47,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Checkout'),
-            backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+            backgroundColor: themeProvider.isDarkMode
+                ? DarkAppColors.surface
+                : AppColors.surface,
             elevation: 0,
             iconTheme: IconThemeData(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
             titleTextStyle: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           body: cartItems.isEmpty
               ? _buildEmptyCart(themeProvider)
-              : _buildCheckoutContent(context, cartProvider, themeProvider, isLoggedIn),
+              : _buildCheckoutContent(
+                  context, cartProvider, themeProvider, isLoggedIn),
           bottomNavigationBar: cartItems.isEmpty
               ? null
-              : _buildBottomBar(context, cartProvider, themeProvider, isLoggedIn),
+              : _buildBottomBar(
+                  context, cartProvider, themeProvider, isLoggedIn),
         );
       },
     );
@@ -87,7 +95,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -109,7 +119,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildCheckoutContent(BuildContext context, CartProvider cartProvider, ThemeProvider themeProvider, bool isLoggedIn) {
+  Widget _buildCheckoutContent(BuildContext context, CartProvider cartProvider,
+      ThemeProvider themeProvider, bool isLoggedIn) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -134,12 +145,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildOrderSummaryCard(CartProvider cartProvider, ThemeProvider themeProvider) {
+  Widget _buildOrderSummaryCard(
+      CartProvider cartProvider, ThemeProvider themeProvider) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: themeProvider.isDarkMode
@@ -161,7 +175,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               Icon(
                 Icons.receipt_long,
-                color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
               ),
               const SizedBox(width: 12),
               Text(
@@ -169,7 +185,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
               const Spacer(),
@@ -198,7 +216,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.background
+                            : AppColors.background,
                       ),
                       child: item.product.imageUrls.isNotEmpty
                           ? ClipRRect(
@@ -214,7 +234,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               Icons.inventory_2,
                               size: 20,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withValues(alpha: 0.3)
+                                  ? DarkAppColors.onSurface
+                                      .withValues(alpha: 0.3)
                                   : AppColors.onSurface.withValues(alpha: 0.3),
                             ),
                     ),
@@ -229,7 +250,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             item.product.name,
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                              color: themeProvider.isDarkMode
+                                  ? DarkAppColors.onSurface
+                                  : AppColors.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -239,7 +262,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               color: themeProvider.isDarkMode
-                                  ? DarkAppColors.onSurface.withValues(alpha: 0.7)
+                                  ? DarkAppColors.onSurface
+                                      .withValues(alpha: 0.7)
                                   : AppColors.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
@@ -252,7 +276,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       '₹${item.totalPrice.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary,
                       ),
                     ),
                   ],
@@ -271,7 +297,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
               Text(
@@ -279,7 +307,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.primary
+                      : AppColors.primary,
                 ),
               ),
             ],
@@ -294,7 +324,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: themeProvider.isDarkMode
@@ -318,7 +350,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 Icon(
                   Icons.person,
-                  color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.primary
+                      : AppColors.primary,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -326,7 +360,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                    color: themeProvider.isDarkMode
+                        ? DarkAppColors.onSurface
+                        : AppColors.onSurface,
                   ),
                 ),
               ],
@@ -343,7 +379,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.background
+                    : AppColors.background,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -364,7 +402,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.background
+                    : AppColors.background,
               ),
               keyboardType: TextInputType.phone,
               validator: (value) {
@@ -389,7 +429,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.background
+                    : AppColors.background,
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -405,7 +447,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+                fillColor: themeProvider.isDarkMode
+                    ? DarkAppColors.background
+                    : AppColors.background,
               ),
               maxLines: 3,
               validator: (value) {
@@ -421,14 +465,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildPaymentSummary(CartProvider cartProvider, ThemeProvider themeProvider) {
+  Widget _buildPaymentSummary(
+      CartProvider cartProvider, ThemeProvider themeProvider) {
     final summary = cartProvider.getCartSummary();
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: themeProvider.isDarkMode
@@ -450,7 +497,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               Icon(
                 Icons.payment,
-                color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.primary
+                    : AppColors.primary,
               ),
               const SizedBox(width: 12),
               Text(
@@ -458,14 +507,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           const Divider(),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -480,13 +530,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Text(
                 '₹${summary['totalAmount'].toStringAsFixed(0)}',
                 style: TextStyle(
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -502,13 +553,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 '₹${summary['estimatedAdvance'].toStringAsFixed(0)}',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.primary
+                      : AppColors.primary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -523,14 +575,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Text(
                 '₹${summary['estimatedRemaining'].toStringAsFixed(0)}',
                 style: TextStyle(
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           const Divider(),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -539,7 +592,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
               Text(
@@ -547,7 +602,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.primary
+                      : AppColors.primary,
                 ),
               ),
             ],
@@ -557,13 +614,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, CartProvider cartProvider, ThemeProvider themeProvider, bool isLoggedIn) {
+  Widget _buildBottomBar(BuildContext context, CartProvider cartProvider,
+      ThemeProvider themeProvider, bool isLoggedIn) {
     final summary = cartProvider.getCartSummary();
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -584,7 +644,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.onSurface
+                      : AppColors.onSurface,
                 ),
               ),
               Text(
@@ -592,7 +654,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                  color: themeProvider.isDarkMode
+                      ? DarkAppColors.primary
+                      : AppColors.primary,
                 ),
               ),
             ],
@@ -617,10 +681,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _isPlacingOrder ? null : () => _placeOrder(context, cartProvider),
+                  onPressed: _isPlacingOrder
+                      ? null
+                      : () => _placeOrder(context, cartProvider),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
-                    foregroundColor: themeProvider.isDarkMode ? DarkAppColors.onPrimary : AppColors.onPrimary,
+                    backgroundColor: themeProvider.isDarkMode
+                        ? DarkAppColors.primary
+                        : AppColors.primary,
+                    foregroundColor: themeProvider.isDarkMode
+                        ? DarkAppColors.onPrimary
+                        : AppColors.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -634,7 +704,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         )
                       : const Text(
                           'Place Order',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),
               ),
@@ -645,7 +716,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Future<void> _placeOrder(BuildContext context, CartProvider cartProvider) async {
+  Future<void> _placeOrder(
+      BuildContext context, CartProvider cartProvider) async {
     // Validate form
     if (!_formKey.currentState!.validate()) {
       return;
@@ -658,13 +730,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
 
       // Convert cart items to order items
-      final orderItems = cartProvider.items.map((cartItem) {
+      final _ = cartProvider.items.map((cartItem) {
         return OrderItem.fromJson(cartItem.toOrderItemData());
       }).toList();
 
       final success = await cartProvider.placeOrderFromCart(
         context: context,
-        customerId: authProvider.user?.uid ?? 'customer_${DateTime.now().millisecondsSinceEpoch}',
+        customerId: authProvider.user?.uid ??
+            'customer_${DateTime.now().millisecondsSinceEpoch}',
         orderProvider: orderProvider,
         measurements: {}, // Can be extended for measurements
         specialInstructions: null, // Can be added in future
@@ -679,7 +752,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Navigator.of(context).pop(); // Go back to cart
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(cartProvider.errorMessage ?? 'Failed to place order')),
+          SnackBar(
+              content:
+                  Text(cartProvider.errorMessage ?? 'Failed to place order')),
         );
       }
     } catch (e) {

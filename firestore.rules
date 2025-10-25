@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
+    // Enhanced helper functions with proper role validation
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -10,40 +10,57 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    function isAdmin() {
+    function isNotLocked() {
+      return !exists(/databases/$(database)/documents/users/$(request.auth.uid)) ||
+             !get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('lockedUntil', null) ||
+             timestamp.date(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.lockedUntil) < timestamp.date(request.time);
+    }
+
+    function hasRole(roleIndex) {
       return isAuthenticated() &&
+            isNotLocked() &&
             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == roleIndex;
+    }
+
+    function isAdmin() {
+      return hasRole(2); // admin role is index 2
     }
 
     function isShopOwner() {
-      return isAuthenticated() &&
-            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'shopOwner';
+      return hasRole(1); // shopOwner role is index 1
     }
 
     function isEmployee() {
-      return isAuthenticated() &&
-            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employee';
+      return hasRole(4) || hasRole(5) || hasRole(6) || hasRole(7) || hasRole(8); // employee roles
     }
 
     function isCustomer() {
-      return isAuthenticated() &&
-            exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'customer';
+      return hasRole(0); // customer role is index 0
     }
 
     function hasAnyRole() {
       return isAdmin() || isShopOwner() || isEmployee() || isCustomer();
     }
 
-    // Users collection - allow read/write for authenticated users
+    function isVerified() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isEmailVerified', false) == true;
+    }
+
+    function isActiveAccount() {
+      return isAuthenticated() &&
+             isNotLocked() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    // Users collection - allow read/write for authenticated users and creation for initial setup
     match /users/{userId} {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
       allow read: if isAdmin() || isShopOwner();
-      allow create: if request.auth != null; // Allow demo account creation
-      allow read: if request.auth != null; // Allow all authenticated users to read profiles
+      allow create: if true; // Allow demo account creation during development
+      allow read: if true; // Allow all users to read profiles during development
     }
 
     // Customers collection

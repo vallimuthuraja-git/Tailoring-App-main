@@ -557,10 +557,12 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
       // Refresh the list
       customerProvider.loadAllCustomers();
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Quick customer added successfully!')));
     } catch (e) {
       debugPrint('âŒ Quick customer creation failed: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to add customer: $e')));
     }
@@ -1556,6 +1558,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
           // Refresh the customer list
           customerProvider.loadAllCustomers();
 
+          if (!mounted) return;
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -1577,6 +1580,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
             ),
           );
         } else {
+          if (!mounted) return;
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -1616,6 +1620,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen>
 
   void _populateDemoCustomers(BuildContext context) async {
     // Demo functionality removed - this was using missing ComprehensiveDemoDataService
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
           content: Text('Demo data functionality is currently unavailable')),

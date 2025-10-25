@@ -1021,32 +1021,6 @@ class _CustomerServiceDetailScreenState
     );
   }
 
-  Widget _buildRecommendationShimmerLoader(ThemeProvider themeProvider) {
-    final baseColor =
-        themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface;
-
-    return SizedBox(
-      height: 200,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(
-              3,
-              (index) => Container(
-                    width: 200,
-                    margin: const EdgeInsets.only(right: 12),
-                    height: 180,
-                    decoration: BoxDecoration(
-                      color: baseColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Center(child: CircularProgressIndicator()),
-                  )),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer4<ThemeProvider, WishlistProvider, ReviewProvider,
@@ -1136,10 +1110,6 @@ class _CustomerServiceDetailScreenState
 
                       // Shop/Contact Information Section
                       _buildShopContactInformation(themeProvider),
-
-                      const SizedBox(height: 24),
-
-                      // Service Recommendations Section
 
                       const SizedBox(height: 32),
                     ],

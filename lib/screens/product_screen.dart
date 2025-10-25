@@ -448,9 +448,3 @@ class _ProductScreenState extends State<ProductScreen>
     );
   }
 }
-
-extension on CartProvider {
-  int get totalQuantity {
-    return items.fold(0, (sum, item) => sum + item.quantity);
-  }
-}

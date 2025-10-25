@@ -11,6 +11,13 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Enhanced security states
+  bool _isTwoFactorRequired = false;
+  String? _twoFactorMethod;
+  bool _isAccountLocked = false;
+  int _minutesUntilUnlock = 0;
+  int _loginAttemptsRemaining = 5;
+
   // Getters
   User? get user => _user;
   UserModel? get userProfile => _userProfile;
@@ -19,12 +26,32 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isEmailVerified => _user?.emailVerified ?? false;
   UserRole get userRole => _userProfile?.role ?? UserRole.customer;
+  bool get isTwoFactorRequired => _isTwoFactorRequired;
+  String? get twoFactorMethod => _twoFactorMethod;
+  bool get isAccountLocked => _isAccountLocked;
+  int get minutesUntilUnlock => _minutesUntilUnlock;
+  int get loginAttemptsRemaining => _loginAttemptsRemaining;
   AuthService get authService => _authService;
   User? get currentUser => _user; // For compatibility with existing code
 
   // Check if user is shop owner
   bool get isShopOwner {
     return _userProfile?.role == UserRole.shopOwner;
+  }
+
+  // Check if user is admin (now maps to shop owner)
+  bool get isAdmin {
+    return _userProfile?.role == UserRole.shopOwner;
+  }
+
+  // Check if user is employee (includes all specialized roles now consolidated into employee)
+  bool get isEmployee {
+    return _userProfile?.role == UserRole.employee;
+  }
+
+  // Check if user is customer
+  bool get isCustomer {
+    return _userProfile?.role == UserRole.customer;
   }
 
   // Check if user is shop owner (legacy alias)
@@ -52,29 +79,73 @@ class AuthProvider with ChangeNotifier {
     return _userProfile?.photoUrl ?? _user?.photoURL;
   }
 
+  // Get social providers
+  List<String>? get socialProviders {
+    return _userProfile?.socialProviders;
+  }
+
+  // Get preferences
+  Map<String, dynamic>? get userPreferences {
+    return _userProfile?.preferences;
+  }
+
+  // Get account security status
+  bool get twoFactorEnabled {
+    return _userProfile?.twoFactorEnabled ?? false;
+  }
+
   // Constructor
   AuthProvider() {
     _initializeAuth();
   }
 
-  // Initialize authentication
+  // Initialize authentication with enhanced security
   void _initializeAuth() async {
     _user = _authService.currentUser;
 
     if (_user != null) {
-      await _loadUserProfile();
+      // Defer profile loading for faster initial auth check
+      Future.delayed(const Duration(milliseconds: 100), () async {
+        await _loadUserProfile();
+        _updateSecurityStatus();
+      });
     }
 
     // Listen to auth state changes
-    _authService.authStateChanges.listen((User? user) async {
-      _user = user;
-      if (user != null) {
-        await _loadUserProfile();
-      } else {
-        _userProfile = null;
-      }
-      notifyListeners();
-    });
+    _authService.authStateChanges.listen(_onAuthStateChanged);
+  }
+
+  // Handle auth state changes
+  Future<void> _onAuthStateChanged(User? user) async {
+    _user = user;
+    if (user != null) {
+      await _loadUserProfile();
+      _updateSecurityStatus();
+    } else {
+      _userProfile = null;
+      _resetSecurityStatus();
+    }
+    notifyListeners();
+  }
+
+  // Update security status based on user profile
+  void _updateSecurityStatus() {
+    if (_userProfile != null) {
+      _isTwoFactorRequired = _userProfile!.twoFactorEnabled;
+      _twoFactorMethod = _userProfile!.twoFactorMethod;
+      _isAccountLocked = _userProfile!.isAccountLocked;
+      _minutesUntilUnlock = _userProfile!.minutesUntilUnlock;
+      _loginAttemptsRemaining = 5 - (_userProfile!.loginAttempts % 5);
+    }
+  }
+
+  // Reset security status
+  void _resetSecurityStatus() {
+    _isTwoFactorRequired = false;
+    _twoFactorMethod = null;
+    _isAccountLocked = false;
+    _minutesUntilUnlock = 0;
+    _loginAttemptsRemaining = 5;
   }
 
   // Load user profile from Firestore
@@ -95,303 +166,42 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Sign up
-  Future<bool> signUp({
-    required String email,
-    required String password,
-    String? displayName,
-    String? phoneNumber,
-    UserRole role = UserRole.customer,
-    String? gender,
-    DateTime? dateOfBirth,
-  }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      UserCredential userCredential =
-          await _authService.signUpWithEmailAndPassword(
-        email: email,
-        password: password,
-        displayName: displayName,
-        phoneNumber: phoneNumber,
-        role: role,
-        gender: gender,
-        dateOfBirth: dateOfBirth,
-      );
-
-      _user = userCredential.user;
-      await _loadUserProfile();
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    }
+  // Check if the current user has the specified role
+  bool hasRole(UserRole role) {
+    return userRole == role;
   }
 
-  // Sign in with Google
-  Future<bool> signInWithGoogle() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      UserCredential userCredential = await _authService.signInWithGoogle();
-      _user = userCredential.user;
-      await _loadUserProfile();
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    }
-  }
-
-  // Sign in with Facebook
-  Future<bool> signInWithFacebook() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      UserCredential userCredential = await _authService.signInWithFacebook();
-      _user = userCredential.user;
-      await _loadUserProfile();
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    }
-  }
-
-  // Sign in
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      UserCredential userCredential =
-          await _authService.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      _user = userCredential.user;
-      await _loadUserProfile();
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    }
-  }
-
-  // Phone authentication
-  Future<bool> startPhoneVerification({
-    required String phoneNumber,
-    required Function(String verificationId) onCodeSent,
-    required Function(String error) onError,
-    required Function(UserCredential userCredential) onVerified,
-  }) async {
-    try {
-      _isLoading = true;
-      _errorMessage = null;
-      notifyListeners();
-
-      await _authService.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        onCodeSent: onCodeSent,
-        onError: onError,
-        onVerified: onVerified,
-      );
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<UserCredential> verifyOTP({
-    required String verificationId,
-    required String smsCode,
-    UserRole role = UserRole.customer,
-  }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      UserCredential userCredential = await _authService.verifyOTP(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
-
-      _user = userCredential.user;
-      await _loadUserProfile();
-
-      // If new user, create profile
-      final existingProfile = await _authService.getUserProfile(_user!.uid);
-      if (existingProfile == null) {
-        // Create user profile for phone auth
-        await _authService.createUserProfile(_user!, role, _user!.phoneNumber);
-      }
-
-      _isLoading = false;
-      notifyListeners();
-      return userCredential;
-    } catch (e) {
-      _isLoading = false;
-      _errorMessage = e.toString();
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  Future<bool> resendOTP({
-    required String phoneNumber,
-    required Function(String verificationId) onCodeSent,
-    required Function(String error) onError,
-  }) async {
-    try {
-      await _authService.resendOTP(
-        phoneNumber: phoneNumber,
-        onCodeSent: onCodeSent,
-        onError: onError,
-      );
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
-
-  // Sign out
+  // Sign out the current user
   Future<void> signOut() async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _authService.signOut();
       _user = null;
       _userProfile = null;
-      _errorMessage = null;
+      _resetSecurityStatus();
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'Failed to sign out';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
+  }
 
-    _isLoading = false;
+  // Change password for the current user
+  Future<bool> changePassword(
+      String currentPassword, String newPassword) async {
+    _isLoading = true;
     notifyListeners();
-  }
-
-  // Send password reset email
-  Future<bool> sendPasswordResetEmail(String email) async {
     try {
-      await _authService.sendPasswordResetEmail(email);
+      await _authService.changePassword(currentPassword, newPassword);
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
+      _errorMessage = 'Failed to change password';
       return false;
-    }
-  }
-
-  // Send email verification
-  Future<bool> sendEmailVerification() async {
-    try {
-      await _authService.sendEmailVerification();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
       notifyListeners();
-      return false;
-    }
-  }
-
-  // Check email verification status
-  Future<bool> checkEmailVerification() async {
-    try {
-      bool isVerified = await _authService.isEmailVerified();
-      if (_userProfile != null) {
-        _userProfile = UserModel(
-          id: _userProfile!.id,
-          email: _userProfile!.email,
-          displayName: _userProfile!.displayName,
-          phoneNumber: _userProfile!.phoneNumber,
-          photoUrl: _userProfile!.photoUrl,
-          role: _userProfile!.role,
-          isEmailVerified: isVerified,
-          createdAt: _userProfile!.createdAt,
-          updatedAt: DateTime.now(),
-        );
-      }
-      notifyListeners();
-      return isVerified;
-    } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
-      return false;
     }
   }
 
@@ -402,10 +212,10 @@ class AuthProvider with ChangeNotifier {
     String? photoUrl,
     String? gender,
     DateTime? dateOfBirth,
+    Map<String, dynamic>? preferences,
   }) async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _authService.updateUserProfile(
         displayName: displayName,
@@ -413,93 +223,105 @@ class AuthProvider with ChangeNotifier {
         photoUrl: photoUrl,
         gender: gender,
         dateOfBirth: dateOfBirth,
+        preferences: preferences,
       );
-
-      // Reload user profile
       await _loadUserProfile();
-
-      _isLoading = false;
-      notifyListeners();
       return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
     } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
+      _errorMessage = 'Failed to update profile';
       return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Delete account
-  Future<bool> deleteAccount() async {
+  // Sign in with email and password
+  Future<bool> signIn({
+    required String email,
+    required String password,
+  }) async {
     _isLoading = true;
     notifyListeners();
-
     try {
-      await _authService.deleteAccount();
-      _user = null;
-      _userProfile = null;
-      _errorMessage = null;
-
-      _isLoading = false;
-      notifyListeners();
+      // Use fast mode for development to avoid security overhead
+      await _authService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+        skipSecurityChecks: !const bool.fromEnvironment('dart.vm.product'),
+      );
       return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
     } catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
+      _errorMessage = 'Failed to sign in';
       return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Change password
-  Future<bool> changePassword(
-      String currentPassword, String newPassword) async {
+  // Sign up with email and password
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    String? displayName,
+    String? phoneNumber,
+    UserRole role = UserRole.customer,
+    String? gender,
+    DateTime? dateOfBirth,
+  }) async {
     _isLoading = true;
     notifyListeners();
-
     try {
-      await _authService.changePassword(currentPassword, newPassword);
-
-      _isLoading = false;
-      notifyListeners();
+      await _authService.signUpWithEmailAndPassword(
+        email: email,
+        password: password,
+        displayName: displayName ?? email.split('@').first,
+        phoneNumber: phoneNumber,
+        role: role,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+      );
       return true;
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
     } catch (e) {
+      _errorMessage = 'Failed to sign up';
+      return false;
+    } finally {
       _isLoading = false;
-      logError(e);
-      _errorMessage = getUserFriendlyErrorMessage(e);
       notifyListeners();
+    }
+  }
+
+  // Sign in with Google
+  Future<bool> signInWithGoogle() async {
+    try {
+      await _authService.signInWithGoogle();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to sign in with Google';
       return false;
     }
   }
 
-  // Clear error message
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
+  // Sign in with Facebook
+  Future<bool> signInWithFacebook() async {
+    try {
+      await _authService.signInWithFacebook();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to sign in with Facebook';
+      return false;
+    }
   }
 
-  // Check if user has required role
-  bool hasRole(UserRole requiredRole) {
-    return _userProfile?.role == requiredRole;
+  // Send password reset email
+  Future<bool> sendPasswordResetEmail(String email) async {
+    try {
+      await _authService.sendPasswordResetEmail(email);
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to send password reset email';
+      return false;
+    }
   }
 }

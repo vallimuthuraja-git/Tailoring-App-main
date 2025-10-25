@@ -33,6 +33,7 @@ class EmployeeManagementHelper {
       // To add employees, use the employee creation UI
 
       if (!silent) {
+        if (!context.mounted) return;
         Navigator.of(context).pop(); // Close loading dialog
 
         // Show message that demo data is disabled
@@ -98,185 +99,6 @@ class EmployeeManagementHelper {
       BuildContext context, Function onRefresh) async {
     await onRefresh();
   }
-
-  static List<emp.Employee> _createDemoEmployees() {
-    return [
-      // Esther as the shop owner (first employee)
-      emp.Employee(
-        id: 'demo_owner',
-        userId: 'demo_user_owner',
-        displayName: 'Esther',
-        email: 'shop@demo.com',
-        phoneNumber: '+91-9876543210',
-        role: UserRole.shopOwner,
-        skills: [emp.EmployeeSkill.qualityCheck, emp.EmployeeSkill.alterations],
-        specializations: [
-          'Shop Management',
-          'Quality Assurance',
-          'Customer Service',
-          'Business Operations'
-        ],
-        experienceYears: 8,
-        certifications: ['Certified Master Tailor'],
-        availability: emp.EmployeeAvailability.fullTime,
-        preferredWorkDays: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday'
-        ],
-        preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
-        preferredEndTime: const emp.TimeOfDay(hour: 18, minute: 0),
-        canWorkRemotely: false,
-        location: 'Main Shop',
-        totalOrdersCompleted: 0,
-        ordersInProgress: 0,
-        averageRating: 0.0,
-        completionRate: 0.0,
-        strengths: [],
-        areasForImprovement: [],
-        baseRatePerHour: 150.0,
-        performanceBonusRate: 25.0,
-        paymentTerms: 'Monthly',
-        totalEarnings: 0.0,
-        recentAssignments: [],
-        consecutiveDaysWorked: 0,
-        isActive: true,
-        joinedDate: DateTime.now(),
-        additionalInfo: {},
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      emp.Employee(
-        id: 'demo_emp_2',
-        userId: 'demo_user_2',
-        displayName: 'Priya Sharma',
-        email: 'priya@designer.com',
-        phoneNumber: '+91-9876543211',
-        skills: [emp.EmployeeSkill.patternMaking, emp.EmployeeSkill.embroidery],
-        specializations: [
-          'Design Consultation',
-          'Bespoke Patterns',
-          'Traditional Embroidery'
-        ],
-        experienceYears: 12,
-        certifications: ['Fashion Design Diploma', 'Master Embroidery Artist'],
-        availability: emp.EmployeeAvailability.fullTime,
-        preferredWorkDays: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday'
-        ],
-        preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
-        preferredEndTime: const emp.TimeOfDay(hour: 17, minute: 0),
-        canWorkRemotely: true,
-        location: 'Design Studio',
-        totalOrdersCompleted: 0,
-        ordersInProgress: 0,
-        averageRating: 0.0,
-        completionRate: 0.0,
-        strengths: [],
-        areasForImprovement: [],
-        baseRatePerHour: 200.0,
-        performanceBonusRate: 45.0,
-        paymentTerms: 'Monthly',
-        totalEarnings: 0.0,
-        recentAssignments: [],
-        consecutiveDaysWorked: 0,
-        isActive: true,
-        joinedDate: DateTime.now(),
-        additionalInfo: {},
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      emp.Employee(
-        id: 'demo_emp_3',
-        userId: 'demo_user_3',
-        displayName: 'Amit Patel',
-        email: 'amit@cutter.com',
-        phoneNumber: '+91-9876543212',
-        skills: [emp.EmployeeSkill.cutting, emp.EmployeeSkill.qualityCheck],
-        specializations: [
-          'Fabric Cutting',
-          'Material Optimization',
-          'Quality Inspection'
-        ],
-        experienceYears: 6,
-        certifications: ['Precision Cutting Specialist'],
-        availability: emp.EmployeeAvailability.partTime,
-        preferredWorkDays: ['Tuesday', 'Wednesday', 'Friday', 'Saturday'],
-        preferredStartTime: const emp.TimeOfDay(hour: 10, minute: 0),
-        preferredEndTime: const emp.TimeOfDay(hour: 16, minute: 0),
-        canWorkRemotely: false,
-        location: 'Cutting Department',
-        totalOrdersCompleted: 0,
-        ordersInProgress: 0,
-        averageRating: 0.0,
-        completionRate: 0.0,
-        strengths: [],
-        areasForImprovement: [],
-        baseRatePerHour: 120.0,
-        performanceBonusRate: 20.0,
-        paymentTerms: 'Monthly',
-        totalEarnings: 0.0,
-        recentAssignments: [],
-        consecutiveDaysWorked: 0,
-        isActive: true,
-        joinedDate: DateTime.now(),
-        additionalInfo: {},
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      emp.Employee(
-        id: 'demo_emp_4',
-        userId: 'demo_user_4',
-        displayName: 'Sneha Gupta',
-        email: 'sneha@finisher.com',
-        phoneNumber: '+91-9876543213',
-        skills: [emp.EmployeeSkill.finishing],
-        specializations: [
-          'Final Inspection',
-          'Button Attachment',
-          'Hem Finishing',
-          'Pressing'
-        ],
-        experienceYears: 5,
-        certifications: ['Finishing Expert Certification'],
-        availability: emp.EmployeeAvailability.fullTime,
-        preferredWorkDays: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday'
-        ],
-        preferredStartTime: const emp.TimeOfDay(hour: 9, minute: 0),
-        preferredEndTime: const emp.TimeOfDay(hour: 17, minute: 0),
-        canWorkRemotely: false,
-        location: 'Finishing Department',
-        totalOrdersCompleted: 0,
-        ordersInProgress: 0,
-        averageRating: 0.0,
-        completionRate: 0.0,
-        strengths: [],
-        areasForImprovement: [],
-        baseRatePerHour: 110.0,
-        performanceBonusRate: 15.0,
-        paymentTerms: 'Monthly',
-        totalEarnings: 0.0,
-        recentAssignments: [],
-        consecutiveDaysWorked: 0,
-        isActive: true,
-        joinedDate: DateTime.now(),
-        additionalInfo: {},
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    ];
-  }
 }
 
 class EmployeeListSimple extends StatefulWidget {
@@ -287,10 +109,8 @@ class EmployeeListSimple extends StatefulWidget {
 }
 
 class _EmployeeListSimpleState extends State<EmployeeListSimple> {
-  bool? _selectedStatusFilter;
   bool _initComplete = false;
   String? _initError;
-  bool _loading = true;
 
   @override
   void initState() {
@@ -298,7 +118,6 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
     debugPrint(
         'ðŸ—ï¸ EmployeeListSimple initState - starting initialization');
     // Start with a simple loading state
-    _loading = true;
     _initComplete = false;
 
     // Use a simple delayed initialization to avoid complex async issues
@@ -318,7 +137,6 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
         'ðŸš€ EmployeeListSimple _initializeSimple - starting simple initialization');
     // Simple synchronous initialization first
     setState(() {
-      _loading = false;
       _initComplete = true;
     });
     debugPrint(
@@ -456,16 +274,16 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                             await EmployeeManagementHelper
                                 .populateDemoEmployees(context, silent: true);
                             await employeeProvider.loadEmployees();
+                            if (!mounted) return;
                             setState(() {
-                              _loading = false;
                               _initComplete = true;
                               _initError = null;
                             });
                           } catch (e) {
                             debugPrint('âŒ Emergency bypass failed: $e');
+                            if (!mounted) return;
                             setState(() {
                               _initError = 'Emergency bypass failed: $e';
-                              _loading = false;
                               _initComplete = true;
                             });
                           }
@@ -687,23 +505,24 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                                         listen: false);
                                                 await employeeProvider
                                                     .loadEmployees();
-                                                if (context.mounted) {
-                                                  Navigator.of(context)
-                                                      .pop(); // Close loading
-                                                  await employeeProvider
-                                                      .loadEmployees();
-                                                }
+                                                if (!mounted) return;
+                                                Navigator.of(context)
+                                                    .pop(); // Close loading
+                                                await employeeProvider
+                                                    .loadEmployees();
+                                                if (!mounted) return;
+                                                // Second call doesn't need navigator, but if we add it later, check mounted
                                               } catch (e) {
-                                                if (context.mounted) {
-                                                  Navigator.of(context)
-                                                      .pop(); // Close loading
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                        content: Text(
-                                                            'Failed to setup employees: $e')),
-                                                  );
-                                                }
+                                                if (!mounted) return;
+                                                Navigator.of(context)
+                                                    .pop(); // Close loading
+                                                if (!mounted) return;
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                      content: Text(
+                                                          'Failed to setup employees: $e')),
+                                                );
                                               }
                                             },
                                             icon: Icon(Icons.bolt),
@@ -729,10 +548,10 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                                                     _initComplete = false;
                                                     _initError = null;
                                                   });
-                                                  final populated =
-                                                      await EmployeeManagementHelper
-                                                          .checkAndPopulateIfEmpty(
-                                                              context);
+                                                  // Check and populate if empty, but don't need the result here
+                                                  await EmployeeManagementHelper
+                                                      .checkAndPopulateIfEmpty(
+                                                          context);
                                                   await EmployeeManagementHelper
                                                       .forceRefreshEmployees(
                                                           context, () async {
@@ -1204,6 +1023,7 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
             onPressed: () {
               // TODO: Implement actual edit functionality
               Navigator.pop(context);
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content: Text('Edit functionality coming soon!')),
@@ -1338,7 +1158,9 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                     onPressed: () async {
                       await EmployeeManagementHelper.populateDemoEmployees(
                           context);
+                      if (!mounted) return;
                       Navigator.pop(context);
+                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Demo data populated!')),
                       );
@@ -1355,7 +1177,9 @@ class _EmployeeListSimpleState extends State<EmployeeListSimple> {
                       await EmployeeManagementHelper.forceRefreshEmployees(
                           context, () async {
                         await employeeProvider.loadEmployees();
+                        if (!mounted) return;
                         Navigator.pop(context);
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Refreshed!')),
                         );

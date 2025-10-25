@@ -4,7 +4,6 @@ import '../widgets/catalog/unified_product_card.dart';
 import '../models/product_models.dart';
 import '../providers/theme_provider.dart';
 import '../providers/cart_provider.dart';
-import '../providers/product_provider.dart';
 import '../product_data_access.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +26,7 @@ class MockProductProvider with ChangeNotifier {
   bool isProductInWishlist(String productId) => false;
   Future<bool> toggleWishlist(String productId) async => true;
   // Add other required methods if needed
+  @override
   void notifyListeners() {} // Override to do nothing for test
 }
 

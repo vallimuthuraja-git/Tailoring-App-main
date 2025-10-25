@@ -1,5 +1,4 @@
-﻿
-// Service Create Screen with Offline Support
+﻿// Service Create Screen with Offline Support
 // Form to create new tailoring services with comprehensive customization options
 
 import 'dart:io';
@@ -41,8 +40,8 @@ class _ServiceCreateScreenState extends State<ServiceCreateScreen> {
   bool _isActive = true;
   bool _isLoading = false;
 
-  // Image upload state
-  final List<XFile> _selectedImages = [];
+  // Image upload state - disabled for web-only development
+  final List<dynamic> _selectedImages = []; // Dummy for compatibility
   final List<String> _uploadedImageUrls = [];
   bool _isUploadingImages = false;
   double _uploadProgress = 0.0;

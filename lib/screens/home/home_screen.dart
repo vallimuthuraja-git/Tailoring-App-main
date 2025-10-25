@@ -15,6 +15,8 @@ import '../workflow/tailoring_workflow_screen.dart';
 import '../ai/ai_assistance_screen.dart';
 import '../employee/simple_employee_list_screen.dart';
 import '../dashboard/analytics_dashboard_screen.dart';
+import '../admin/user_management_screen.dart';
+import '../auth/login_screen.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/global_bottom_navigation_bar.dart';
 
@@ -145,7 +147,7 @@ class DashboardTab extends StatelessWidget {
                       : AppColors.onSurface,
                 ),
                 tooltip: 'Logout',
-                onPressed: () => _showLogoutDialog(context),
+                onPressed: () => _showLogoutDialog(context, authProvider),
               ),
               IconButton(
                 icon: Icon(
@@ -350,7 +352,7 @@ class DashboardTab extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -365,10 +367,15 @@ class DashboardTab extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop(); // Close dialog
-                final authProvider =
-                    Provider.of<AuthProvider>(context, listen: false);
                 await authProvider.signOut();
-                // The AuthWrapper will handle navigation to login screen
+                // Force navigation to login by clearing all routes and pushing login
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
+                    (route) => false, // Remove all routes
+                  );
+                }
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
@@ -466,6 +473,19 @@ class DashboardTab extends StatelessWidget {
           color: Colors.cyan,
           onTap: () {
             // Navigate to reports
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.group_add,
+          title: 'User Management',
+          color: Colors.red,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UserManagementScreen(),
+              ),
+            );
           },
         ),
         _QuickActionCard(

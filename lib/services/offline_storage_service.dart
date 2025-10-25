@@ -7,13 +7,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/employee.dart';
 
 /// Offline storage service that works across all platforms
 class OfflineStorageService {
   static const String _dbName = 'tailoring_app.db';
-  static const String _webDbName = 'tailoring_app_offline';
 
   // Singleton pattern
   static OfflineStorageService? _instance;
@@ -25,7 +23,6 @@ class OfflineStorageService {
   OfflineStorageService._();
 
   Database? _database;
-  late SharedPreferences _prefs;
   final Connectivity _connectivity = Connectivity();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -33,22 +30,17 @@ class OfflineStorageService {
   final Map<String, bool> _syncStatus = {};
   final Map<String, DateTime> _lastSyncTime = {};
 
-  // Platform-specific storage
-  late final dynamic _storage;
-
   Future<void> initialize() async {
-    _prefs = await SharedPreferences.getInstance();
-
     if (kIsWeb) {
       // Web platform - use IndexedDB via web APIs
       await _initializeWebStorage();
     } else {
       // Mobile platform - use SQLite
-      await _initializeSQLite();
+      // await _initializeSQLite(); // Commented out for web-only
     }
 
     // Start connectivity monitoring
-    _connectivity.onConnectivityChanged.listen(_onConnectivityChanged);
+    // _connectivity.onConnectivityChanged.listen(_onConnectivityChanged); // Commented out for web-only
   }
 
   Future<void> _initializeSQLite() async {
@@ -156,11 +148,14 @@ class OfflineStorageService {
 
     // Create indexes for better performance
     await db.execute('CREATE INDEX idx_employees_userId ON employees(userId)');
-    await db.execute('CREATE INDEX idx_assignments_employeeId ON work_assignments(employeeId)');
-    await db.execute('CREATE INDEX idx_sync_queue_timestamp ON sync_queue(timestamp)');
+    await db.execute(
+        'CREATE INDEX idx_assignments_employeeId ON work_assignments(employeeId)');
+    await db.execute(
+        'CREATE INDEX idx_sync_queue_timestamp ON sync_queue(timestamp)');
   }
 
-  Future<void> _onUpgradeDatabase(Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgradeDatabase(
+      Database db, int oldVersion, int newVersion) async {
     // Handle database migrations here
     debugPrint('Database upgraded from $oldVersion to $newVersion');
   }
@@ -212,7 +207,8 @@ class OfflineStorageService {
       'performanceBonusRate': employee.performanceBonusRate,
       'paymentTerms': employee.paymentTerms,
       'totalEarnings': employee.totalEarnings,
-      'recentAssignments': jsonEncode(employee.recentAssignments.map((a) => a.toJson()).toList()),
+      'recentAssignments': jsonEncode(
+          employee.recentAssignments.map((a) => a.toJson()).toList()),
       'lastActive': employee.lastActive?.toIso8601String(),
       'consecutiveDaysWorked': employee.consecutiveDaysWorked,
       'isActive': employee.isActive ? 1 : 0,
@@ -295,14 +291,17 @@ class OfflineStorageService {
 
     final maps = await db.query('employees', orderBy: 'displayName ASC');
 
-    return maps.map((map) {
-      try {
-        return Employee.fromJson(_convertFromSQLite(map));
-      } catch (e) {
-        debugPrint('Error parsing employee: $e');
-        return null;
-      }
-    }).whereType<Employee>().toList();
+    return maps
+        .map((map) {
+          try {
+            return Employee.fromJson(_convertFromSQLite(map));
+          } catch (e) {
+            debugPrint('Error parsing employee: $e');
+            return null;
+          }
+        })
+        .whereType<Employee>()
+        .toList();
   }
 
   Future<List<Employee>> _getAllEmployeesWeb() async {
@@ -386,7 +385,8 @@ class OfflineStorageService {
 
   Future<void> _saveWorkAssignmentWeb(WorkAssignment assignment) async {
     debugPrint('Web storage: Saving work assignment ${assignment.id}');
-    await _addToSyncQueue('work_assignments', assignment.id, 'create', assignment.toJson());
+    await _addToSyncQueue(
+        'work_assignments', assignment.id, 'create', assignment.toJson());
   }
 
   Future<List<WorkAssignment>> getEmployeeAssignments(String employeeId) async {
@@ -397,7 +397,8 @@ class OfflineStorageService {
     }
   }
 
-  Future<List<WorkAssignment>> _getEmployeeAssignmentsSQLite(String employeeId) async {
+  Future<List<WorkAssignment>> _getEmployeeAssignmentsSQLite(
+      String employeeId) async {
     final db = _database;
     if (db == null) return [];
 
@@ -408,25 +409,31 @@ class OfflineStorageService {
       orderBy: 'assignedAt DESC',
     );
 
-    return maps.map((map) {
-      try {
-        return WorkAssignment.fromJson(_convertFromSQLite(map));
-      } catch (e) {
-        debugPrint('Error parsing work assignment: $e');
-        return null;
-      }
-    }).whereType<WorkAssignment>().toList();
+    return maps
+        .map((map) {
+          try {
+            return WorkAssignment.fromJson(_convertFromSQLite(map));
+          } catch (e) {
+            debugPrint('Error parsing work assignment: $e');
+            return null;
+          }
+        })
+        .whereType<WorkAssignment>()
+        .toList();
   }
 
-  Future<List<WorkAssignment>> _getEmployeeAssignmentsWeb(String employeeId) async {
+  Future<List<WorkAssignment>> _getEmployeeAssignmentsWeb(
+      String employeeId) async {
     debugPrint('Web storage: Getting assignments for employee $employeeId');
     return [];
   }
 
   // Sync Queue Management
-  Future<void> _addToSyncQueue(String collection, String documentId, String operation, Map<String, dynamic> data) async {
+  Future<void> _addToSyncQueue(String collection, String documentId,
+      String operation, Map<String, dynamic> data) async {
     final queueItem = {
-      'id': '${collection}_${documentId}_${DateTime.now().millisecondsSinceEpoch}',
+      'id':
+          '${collection}_${documentId}_${DateTime.now().millisecondsSinceEpoch}',
       'collection': collection,
       'documentId': documentId,
       'operation': operation,
@@ -441,15 +448,17 @@ class OfflineStorageService {
     } else {
       final db = _database;
       if (db != null) {
-        await db.insert('sync_queue', queueItem, conflictAlgorithm: ConflictAlgorithm.replace);
+        await db.insert('sync_queue', queueItem,
+            conflictAlgorithm: ConflictAlgorithm.replace);
       }
     }
 
     // Try to sync immediately if online
-    final connectivityResults = await _connectivity.checkConnectivity();
-    if (connectivityResults.isNotEmpty && connectivityResults.first != ConnectivityResult.none) {
-      await syncPendingChanges();
-    }
+    // final connectivityResults = await _connectivity.checkConnectivity(); // Commented out for web-only
+    // if (connectivityResults.isNotEmpty &&
+    //     connectivityResults.first != ConnectivityResult.none) {
+    await syncPendingChanges();
+    // }
   }
 
   Future<void> syncPendingChanges() async {
@@ -530,7 +539,8 @@ class OfflineStorageService {
     }
 
     if (data['preferredWorkDays'] != null) {
-      data['preferredWorkDays'] = jsonDecode(data['preferredWorkDays'] as String);
+      data['preferredWorkDays'] =
+          jsonDecode(data['preferredWorkDays'] as String);
     }
 
     if (data['strengths'] != null) {
@@ -538,11 +548,13 @@ class OfflineStorageService {
     }
 
     if (data['areasForImprovement'] != null) {
-      data['areasForImprovement'] = jsonDecode(data['areasForImprovement'] as String);
+      data['areasForImprovement'] =
+          jsonDecode(data['areasForImprovement'] as String);
     }
 
     if (data['recentAssignments'] != null) {
-      data['recentAssignments'] = jsonDecode(data['recentAssignments'] as String);
+      data['recentAssignments'] =
+          jsonDecode(data['recentAssignments'] as String);
     }
 
     if (data['additionalInfo'] != null) {
@@ -596,7 +608,8 @@ class OfflineStorageService {
     if (!kIsWeb) {
       final db = _database;
       if (db != null) {
-        final cutoff = DateTime.now().subtract(olderThan).millisecondsSinceEpoch;
+        final cutoff =
+            DateTime.now().subtract(olderThan).millisecondsSinceEpoch;
 
         await db.delete(
           'sync_queue',
@@ -613,5 +626,3 @@ class OfflineStorageService {
     }
   }
 }
-
-

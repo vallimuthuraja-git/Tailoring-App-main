@@ -205,19 +205,17 @@ class CartProvider with ChangeNotifier {
       final cartData = prefs.getString('cart_items');
 
       if (cartData != null) {
-        final List<dynamic> decodedData = json.decode(cartData);
+        final List<dynamic> _ = json.decode(cartData);
         _items.clear();
+        // TODO: Implement proper cart item restoration from stored data
 
         // Note: In a real app, you'd need to fetch the actual Product objects
         // from the ProductProvider or Firebase based on the productId
         // For now, we'll store basic product info in the cart persistence
 
+        // TODO: Implement cart item restoration
         // This is a simplified version - you'd need proper product fetching
-        for (final _itemData in decodedData) {
-          // TODO: Implement cart item restoration
-          // Skip items without valid product data for now
-          // In a full implementation, you'd fetch the product from the database
-        }
+        // In a full implementation, you'd fetch products from the database
       }
 
       _isLoading = false;

@@ -1,17 +1,16 @@
 ﻿// Firebase Storage Service for image uploads
 // Handles secure image uploads with progress tracking and error handling
 
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
 
 class FirebaseStorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   /// Upload single image to Firebase Storage with progress tracking
   Future<String?> uploadImage(
-    XFile imageFile, {
+    dynamic imageFile, {
+    // Using dynamic to avoid XFile import issues on web
     String folder = 'services',
     Function(double)? onProgress,
     required String serviceId,
@@ -28,15 +27,9 @@ class FirebaseStorageService {
       // Upload task for progress tracking
       UploadTask uploadTask;
 
-      if (kIsWeb) {
-        // For web platform
-        final bytes = await imageFile.readAsBytes();
-        uploadTask = ref.putData(bytes);
-      } else {
-        // For mobile platforms
-        final file = File(imageFile.path);
-        uploadTask = ref.putFile(file);
-      }
+      // Web-only implementation - since we disabled mobile packages
+      final bytes = await imageFile.readAsBytes();
+      uploadTask = ref.putData(bytes);
 
       // Monitor upload progress
       uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
@@ -61,7 +54,8 @@ class FirebaseStorageService {
 
   /// Upload multiple images with progress tracking
   Future<List<String>> uploadMultipleImages(
-    List<XFile> imageFiles, {
+    List<dynamic> imageFiles, {
+    // Using dynamic to avoid XFile import issues on web
     String folder = 'services',
     Function(double)? onProgress,
     Function(int, int)? onImageComplete,
@@ -246,7 +240,8 @@ class FirebaseStorageService {
 
   /// Batch upload with concurrent operations for better performance
   Future<List<String>> batchUploadImages(
-    List<XFile> imageFiles, {
+    List<dynamic> imageFiles, {
+    // Using dynamic to avoid XFile import issues on web
     String folder = 'services',
     int maxConcurrent = 3,
     Function(double)? onProgress,
@@ -288,5 +283,3 @@ class FirebaseStorageService {
     return uploadedUrls;
   }
 }
-
-

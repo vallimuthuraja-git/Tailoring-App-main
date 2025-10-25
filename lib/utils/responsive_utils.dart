@@ -1000,7 +1000,6 @@ class UnifiedProductGridItem extends StatelessWidget {
     return UnifiedProductCard(
       product: product,
       index: index,
-      showHeroAnimation: true,
     );
   }
 }

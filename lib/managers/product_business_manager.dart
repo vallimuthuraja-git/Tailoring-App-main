@@ -1,3 +1,8 @@
+/// File: product_business_manager.dart
+/// Purpose: High-level business logic coordinator for product management operations
+/// Functionality: Orchestrates complex product operations including CRUD, analytics, caching, search, pagination, and offline synchronization
+/// Dependencies: Product repository, ProductBloc, connectivity service, analytics service, cache service, search service
+/// Usage: Acts as a facade for complex product business operations, coordinating multiple services and managing state
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -7,9 +12,10 @@ import '../blocs/product/product_events.dart';
 import '../blocs/product/product_states.dart';
 import '../product_data_access.dart' as data_access;
 
-/// Product Manager that orchestrates business logic and coordinates between
-/// BLoC, repositories, and services
-class ProductManager {
+/// Product Business Manager - Orchestrates Business Logic
+/// Manages complex product operations, analytics, caching, and offline sync
+/// Coordinates between BLoC, repositories, and services for advanced functionality
+class ProductBusinessManager {
   // Core dependencies
   final data_access.ProductRepository _productRepository;
   final ProductBloc _productBloc;
@@ -31,7 +37,7 @@ class ProductManager {
   final int _pageSize = 20;
 
   // Constructor
-  ProductManager({
+  ProductBusinessManager({
     required data_access.ProductRepository productRepository,
     required ProductBloc productBloc,
     required Connectivity connectivity,

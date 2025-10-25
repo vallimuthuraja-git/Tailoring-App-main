@@ -1,3 +1,8 @@
+/// File: address.dart
+/// Purpose: Data model for delivery addresses in the tailoring shop management system
+/// Functionality: Represents address information with validation methods, formatting utilities, and JSON serialization
+/// Dependencies: None (uses only standard Dart classes)
+/// Usage: Used for storing and managing customer delivery addresses, with support for multiple address types and validation
 /// Address model for delivery addresses
 class Address {
   final String id;
@@ -114,7 +119,9 @@ class Address {
       postalCode,
       country,
     ];
-    return addressParts.where((part) => part != null && part.isNotEmpty).join(', ');
+    return addressParts
+        .where((part) => part != null && part.isNotEmpty)
+        .join(', ');
   }
 
   // Get display title for address

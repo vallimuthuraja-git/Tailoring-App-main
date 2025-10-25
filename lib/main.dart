@@ -1,4 +1,9 @@
-﻿import 'package:flutter/material.dart';
+﻿/// File: main.dart
+/// Purpose: Entry point of the Tailoring Shop Management System Flutter application
+/// Functionality: Initializes Firebase, sets up provider architecture, manages app theme, handles authentication wrapper, and defines main app structure
+/// Dependencies: Firebase Core, Provider package for state management, various custom services and providers
+/// Usage: Automatically runs when the app starts, bootstraps all necessary components and displays the appropriate screen based on authentication status
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';

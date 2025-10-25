@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/injection_container.dart';
 import '../models/product_models.dart';
@@ -15,17 +15,17 @@ import '../widgets/catalog/skeleton_loading_widgets.dart';
 import '../screens/catalog/product_detail_screen.dart';
 import '../screens/catalog/product_edit_screen.dart';
 
-/// Comprehensive Products Screen integrating all product features
-class ComprehensiveProductsScreen extends StatefulWidget {
-  const ComprehensiveProductsScreen({super.key});
+/// Admin Product Management Screen - Advanced Interface
+/// Comprehensive hub for administrators to manage all product operations
+/// including CRUD, analytics, inventory, and batch operations
+class AdminProductManagement extends StatefulWidget {
+  const AdminProductManagement({super.key});
 
   @override
-  State<ComprehensiveProductsScreen> createState() =>
-      _ComprehensiveProductsScreenState();
+  State<AdminProductManagement> createState() => _AdminProductManagementState();
 }
 
-class _ComprehensiveProductsScreenState
-    extends State<ComprehensiveProductsScreen>
+class _AdminProductManagementState extends State<AdminProductManagement>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isSearchExpanded = false;
@@ -68,7 +68,7 @@ class _ComprehensiveProductsScreenState
       ],
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Products Hub'),
+          title: const Text('Product Management Hub'),
           bottom: TabBar(
             controller: _tabController,
             tabs: const [
@@ -446,12 +446,4 @@ class _ComprehensiveProductsScreenState
       ),
     );
   }
-}
-
-/// Extension to add isGridView to ThemeProvider (assuming it exists)
-extension ThemeProviderExtension on ThemeProvider {
-  bool get isGridView =>
-      true; // Placeholder - implement based on your ThemeProvider
-  void
-      toggleViewMode() {} // Placeholder - implement based on your ThemeProvider
 }

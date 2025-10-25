@@ -1,3 +1,8 @@
+/// File: product_states.dart
+/// Purpose: Definition of all possible states for the ProductBloc
+/// Functionality: Contains state classes representing different conditions of product data (loading, loaded, error, filtered, etc.)
+/// Dependencies: Equatable package for value comparison, product models
+/// Usage: States are emitted by ProductBloc to notify UI components about changes in product data and application status
 import 'package:equatable/equatable.dart';
 import '../../models/product_models.dart';
 

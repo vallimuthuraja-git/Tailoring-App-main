@@ -1,3 +1,8 @@
+/// File: product_events.dart
+/// Purpose: Definition of all events that can be dispatched to the ProductBloc
+/// Functionality: Contains event classes for product operations like loading, adding, updating, deleting, searching, filtering, and synchronization
+/// Dependencies: Equatable package for value comparison, product models
+/// Usage: Events are dispatched to ProductBloc to trigger state changes and business logic execution
 import 'package:equatable/equatable.dart';
 import '../../models/product_models.dart';
 

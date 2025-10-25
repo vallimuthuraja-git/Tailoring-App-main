@@ -1,4 +1,9 @@
-﻿import 'dart:async';
+﻿/// File: product_bloc.dart
+/// Purpose: Business logic component for product management using BLoC pattern
+/// Functionality: Manages product operations, state transitions, caching, filtering, searching, and offline/online synchronization
+/// Dependencies: Flutter BLoC, connectivity_plus, product models, product repository, product events and states
+/// Usage: Used as the central state manager for all product-related operations in the application
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -14,12 +19,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   StreamSubscription<List<Product>>? _productsSubscription;
+  Timer? _connectivityDebounceTimer; // Debounce connectivity changes
 
   // Cached data
   List<Product> _allProducts = [];
   List<Product> _filteredProducts = [];
   String _searchQuery = '';
   ProductCategory? _selectedCategory;
+  List<String> _productIds = []; // Track product IDs for change detection
+  bool _currentOnlineStatus = false; // Cache connectivity status
 
   ProductBloc({
     required ProductRepository productRepository,
@@ -55,7 +63,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       (List<ConnectivityResult> results) {
         if (results.isNotEmpty) {
           final isOnline = results.first != ConnectivityResult.none;
-          add(ConnectivityStatusChanged(isOnline));
+          // Debounce connectivity changes to prevent spam
+          _connectivityDebounceTimer?.cancel();
+          _connectivityDebounceTimer =
+              Timer(const Duration(milliseconds: 500), () {
+            if (isOnline != _currentOnlineStatus) {
+              _currentOnlineStatus = isOnline;
+              add(ConnectivityStatusChanged(isOnline));
+            }
+          });
         }
       },
     );
@@ -81,6 +97,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final isOnline = await _isOnline();
       final products = await _productRepository.getProducts();
       _allProducts = products;
+      _productIds = products.map((p) => p.id).toList();
 
       // Apply current filters if any
       _applyFilters();
@@ -379,9 +396,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     _productsSubscription?.cancel();
     _productsSubscription = _productRepository.getProductsStream().listen(
       (products) {
-        _allProducts = products;
-        _applyFilters();
-        add(const LoadProducts());
+        final newIds = products.map((p) => p.id).toList();
+        if (_haveIdsChanged(newIds)) {
+          _allProducts = products;
+          _productIds = newIds;
+          _applyFilters();
+          add(const LoadProducts());
+        }
       },
       onError: (error) {
         debugPrint('Error in products stream: $error');
@@ -389,8 +410,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     );
   }
 
+  bool _haveIdsChanged(List<String> newIds) {
+    if (newIds.length != _productIds.length) return true;
+    for (int i = 0; i < newIds.length; i++) {
+      if (newIds[i] != _productIds[i]) return true;
+    }
+    return false;
+  }
+
   @override
   Future<void> close() {
+    _connectivityDebounceTimer?.cancel();
     _connectivitySubscription?.cancel();
     _productsSubscription?.cancel();
     return super.close();

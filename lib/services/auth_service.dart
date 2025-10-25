@@ -120,13 +120,20 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Handle invalid role indices that may exist in old data
+    int roleIndex = json['role'] ?? 0;
+    if (roleIndex < 0 || roleIndex >= UserRole.values.length) {
+      debugPrint('⚠️ Invalid role index $roleIndex, defaulting to customer');
+      roleIndex = 0; // Default to customer
+    }
+
     return UserModel(
       id: json['id'],
       email: json['email'],
       displayName: json['displayName'],
       phoneNumber: json['phoneNumber'],
       photoUrl: json['photoUrl'],
-      role: UserRole.values[json['role'] ?? 0],
+      role: UserRole.values[roleIndex],
       isEmailVerified: json['isEmailVerified'] ?? false,
       twoFactorEnabled: json['twoFactorEnabled'] ?? false,
       twoFactorMethod: json['twoFactorMethod'],

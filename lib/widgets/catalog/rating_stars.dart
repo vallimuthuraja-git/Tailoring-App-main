@@ -16,9 +16,15 @@ class RatingStars extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    if (product.rating.averageRating <= 0) {
+    // Data validation: Check for valid rating data
+    if (product.rating.averageRating <= 0 ||
+        product.rating.averageRating.isNaN ||
+        product.rating.reviewCount < 0) {
       return const SizedBox.shrink();
     }
+
+    // Clamp rating to valid range (0-5)
+    final clampedRating = product.rating.averageRating.clamp(0.0, 5.0);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -26,9 +32,9 @@ class RatingStars extends StatelessWidget {
         ...List.generate(
           5,
           (index) => Icon(
-            index < product.rating.averageRating.floor()
+            index < clampedRating.floor()
                 ? Icons.star
-                : index < product.rating.averageRating
+                : index < clampedRating
                     ? Icons.star_half
                     : Icons.star_border,
             size: 10,
@@ -37,7 +43,7 @@ class RatingStars extends StatelessWidget {
         ),
         const SizedBox(width: 2),
         Text(
-          '${product.rating.averageRating.toStringAsFixed(1)} (${product.rating.reviewCount})',
+          '${clampedRating.toStringAsFixed(1)} (${product.rating.reviewCount})',
           style: TextStyle(
             fontSize: 8,
             color: themeProvider.isDarkMode
@@ -50,4 +56,3 @@ class RatingStars extends StatelessWidget {
     );
   }
 }
-

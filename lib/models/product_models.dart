@@ -1,3 +1,8 @@
+/// File: product_models.dart
+/// Purpose: Core data models for product management including Product, ProductVariant, ProductReview, and search-related classes
+/// Functionality: Defines the structure and behavior of products, their variants, reviews, ratings, and search functionality
+/// Dependencies: Flutter Material, Equatable package
+/// Usage: Used throughout the application to represent product data, handle serialization/deserialization, and manage product-related operations
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 

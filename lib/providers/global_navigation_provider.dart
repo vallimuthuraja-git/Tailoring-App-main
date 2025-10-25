@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'package:tailoring_app/services/auth_service.dart';
-import '../screens/comprehensive_products_screen.dart';
+import '../screens/products_screen.dart';
 import '../screens/services/service_catalog_screen.dart';
 import '../screens/orders/order_history_screen.dart';
 import '../screens/profile/profile_screen.dart';
@@ -41,7 +41,7 @@ class GlobalNavigationProvider with ChangeNotifier {
         onNavigateToServices: navigateToServices,
         onNavigateToOrders: navigateToOrders,
       ),
-      const ComprehensiveProductsScreen(),
+      const ProductsScreen(),
       const ServiceCatalogScreen(),
       const OrderHistoryScreen(),
       const ProfileScreen(),

@@ -1,3 +1,8 @@
+/// File: product_data_access.dart
+/// Purpose: Central export module for all product-related data access components
+/// Functionality: Exports product models, repositories, and services for unified access across the application
+/// Dependencies: Various product-related classes and services (models, repositories, analytics, cache, search)
+/// Usage: Import this file to access all product data access functionality in one place
 // Product data access library
 // Exports all product-related repositories, services, and models
 

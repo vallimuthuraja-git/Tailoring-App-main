@@ -1,4 +1,9 @@
-﻿import 'package:flutter/foundation.dart';
+﻿/// File: injection_container.dart
+/// Purpose: Dependency injection container for managing application-wide services and repositories
+/// Functionality: Initializes and provides access to Firebase services, repositories, BLoCs, and other dependencies in a singleton pattern
+/// Dependencies: Firebase service, connectivity package, product data access components, ProductBloc
+/// Usage: Used throughout the app to access shared instances of services and repositories instead of creating new instances
+import 'package:flutter/foundation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import '../product_data_access.dart' as data_access;
@@ -115,6 +120,3 @@ class InjectionContainer {
 
 /// Global instance for easy access
 final injectionContainer = InjectionContainer();
-
-
-

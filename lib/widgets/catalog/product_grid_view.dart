@@ -4,7 +4,6 @@ import '../../models/product_models.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/responsive_utils.dart';
-import '../../utils/product_screen_constants.dart';
 import 'unified_product_card.dart';
 
 /// Modular widget for displaying products in grid or list view with pagination
@@ -33,7 +32,7 @@ class ProductGridView extends StatelessWidget {
             child: isGridView
                 ? GridView.builder(
                     padding: ResponsiveUtils.getAdaptivePadding(context,
-                        basePadding: ProductScreenConstants.screenPadding),
+                        basePadding: 16.0),
                     gridDelegate: ProductGridDelegate.fromContext(context),
                     itemCount: products.length,
                     itemBuilder: (context, index) {
@@ -50,7 +49,7 @@ class ProductGridView extends StatelessWidget {
                   )
                 : ListView.builder(
                     padding: ResponsiveUtils.getAdaptivePadding(context,
-                        basePadding: ProductScreenConstants.screenPadding),
+                        basePadding: 16.0),
                     itemCount: products.length,
                     itemBuilder: (context, index) {
                       final product = products[index];
@@ -97,27 +96,6 @@ class ProductGridView extends StatelessWidget {
           },
         ),
       ],
-    );
-  }
-}
-
-/// Custom grid delegate for responsive product grid
-class ProductGridDelegate extends SliverGridDelegateWithFixedCrossAxisCount {
-  const ProductGridDelegate({
-    required super.crossAxisCount,
-    super.mainAxisSpacing = ProductScreenConstants.gridMainAxisSpacing,
-    super.crossAxisSpacing = ProductScreenConstants.gridCrossAxisSpacing,
-    super.childAspectRatio = ProductScreenConstants.imageAspectRatio,
-  });
-
-  factory ProductGridDelegate.fromContext(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisCount =
-        ProductScreenConstants.getGridCrossAxisCount(screenWidth);
-
-    return ProductGridDelegate(
-      crossAxisCount: crossAxisCount,
-      childAspectRatio: ProductScreenConstants.imageAspectRatio,
     );
   }
 }

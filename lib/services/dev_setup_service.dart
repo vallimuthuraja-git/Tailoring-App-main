@@ -3,24 +3,61 @@ import 'package:flutter/material.dart';
 import '../../utils/demo_accounts_util.dart';
 
 class DevSetupService {
-  /// Get comprehensive Firebase demo credentials (from updated firebase_data_setup.js & demo_accounts_util.dart)
-  static List<Map<String, String>> getFirebaseDemoCredentials() {
-    return demoUsers.map((user) {
-      final roleInt = user['role'] as int;
-      final roleName = roleInt == 3
-          ? 'shop owner'
-          : roleInt == 1
-              ? 'employee'
-              : roleInt == 0
-                  ? 'customer'
-                  : 'unknown';
+  /// Current active demo accounts - these are the 4 real users created in Firebase with Madurai, Tamil Nadu details
+  static const List<Map<String, dynamic>> currentDemoUsers = [
+    // Shop Owner - Madurai Master Tailor
+    {
+      'email': 'owner@tailoring.com',
+      'password': 'Owner123!',
+      'displayName': 'Arun Kumar Rajendran',
+      'role': 2, // shopOwner
+      'roleName': 'shop owner',
+      'phone': '+914524567890',
+      'location': 'Madurai, Tamil Nadu',
+    },
+    // Customer - Madurai Software Engineer
+    {
+      'email': 'customer@tailoring.com',
+      'password': 'Customer123!',
+      'displayName': 'Priya Senthilkumar',
+      'role': 0, // customer
+      'roleName': 'customer',
+      'phone': '+914524567891',
+      'location': 'Madurai, Tamil Nadu',
+    },
+    // Employee 1 - Stitching Master
+    {
+      'email': 'tailor1@tailoring.com',
+      'password': 'Tailor123!',
+      'displayName': 'Suresh Rajalingam',
+      'role': 1, // employee
+      'roleName': 'employee',
+      'phone': '+914524567892',
+      'specialty': 'Stitching Master',
+      'location': 'Madurai, Tamil Nadu',
+    },
+    // Employee 2 - Designer Tailor
+    {
+      'email': 'tailor2@tailoring.com',
+      'password': 'Tailor456!',
+      'displayName': 'Lakshmi Balasubramanian',
+      'role': 1, // employee
+      'roleName': 'employee',
+      'phone': '+914524567893',
+      'specialty': 'Designer Tailor',
+      'location': 'Madurai, Tamil Nadu',
+    },
+  ];
 
+  /// Get current active Firebase demo credentials (only the 4 real users)
+  static List<Map<String, String>> getFirebaseDemoCredentials() {
+    return currentDemoUsers.map((user) {
       return <String, String>{
         'email': user['email']!,
         'password': user['password']!,
         'displayName': user['displayName']!,
-        'role': roleName,
-        'description': _getRoleDescription(roleInt),
+        'role': user['roleName']!,
+        'description': _getRoleDescription(user['role'] as int),
       };
     }).toList();
   }
@@ -67,70 +104,50 @@ class DevSetupService {
     return organized;
   }
 
-  /// Get quick login buttons for UI (grouped by role type)
+  /// Get quick login buttons for UI - updated for Madurai, Tamil Nadu accounts
   static List<Map<String, dynamic>> getQuickLoginButtons() {
-    final credentials = getQuickLoginCredentials();
-    final buttons = <Map<String, dynamic>>[];
-
-    // Add SUPER ADMIN first with special styling
-    if (credentials.containsKey('shop owner')) {
-      final shopOwners = credentials['shop owner']!;
-      final superAdmin = shopOwners.firstWhere(
-        (user) => user['email'] == 'admin@tailoring-app.com',
-        orElse: () => <String, String>{},
-      );
-
-      if (superAdmin.isNotEmpty) {
-        buttons.add({
-          'title': '🔥 Super Admin',
-          'subtitle': 'FULL CONTROL',
-          'email': superAdmin['email']!,
-          'password': superAdmin['password']!,
-          'color': const Color(0xFFFF6B35), // Orange/Red - distinctive
-          'icon': Icons.admin_panel_settings,
-          'isSuperAdmin': true,
-        });
-      }
-
-      // Add other shop owners (exclude super admin)
-      final otherShopOwners = shopOwners
-          .where((user) => user['email'] != 'admin@tailoring-app.com');
-
-      buttons.addAll(otherShopOwners.map((user) => {
-            'title': '🏪 ${_getShortName(user['displayName']!)}',
-            'subtitle': 'Shop Owner',
-            'email': user['email']!,
-            'password': user['password']!,
-            'color': const Color(0xFF9C27B0), // Purple
-            'icon': Icons.business,
-          }));
-    }
-
-    // Add employees
-    if (credentials.containsKey('employee')) {
-      buttons.addAll(credentials['employee']!.map((user) => {
-            'title': '👷 ${_getShortName(user['displayName']!)}',
-            'subtitle': 'Employee',
-            'email': user['email']!,
-            'password': user['password']!,
-            'color': const Color(0xFF2196F3), // Blue
-            'icon': Icons.work,
-          }));
-    }
-
-    // Add customers
-    if (credentials.containsKey('customer')) {
-      buttons.addAll(credentials['customer']!.map((user) => {
-            'title': '👤 ${_getShortName(user['displayName']!)}',
-            'subtitle': 'Customer',
-            'email': user['email']!,
-            'password': user['password']!,
-            'color': const Color(0xFF4CAF50), // Green
-            'icon': Icons.person,
-          }));
-    }
-
-    return buttons;
+    return [
+      // Shop Owner - Arun Kumar Rajendran - Master Tailor
+      {
+        'title': '🏪 Shop Owner',
+        'subtitle': 'Arun Kumar Rajendran',
+        'email': 'owner@tailoring.com',
+        'password': 'Owner123!',
+        'color': const Color(0xFF9C27B0), // Purple
+        'icon': Icons.business,
+        'location': 'Madurai, TN',
+      },
+      // Customer - Priya Senthilkumar - Software Engineer
+      {
+        'title': '🛒 Customer',
+        'subtitle': 'Priya Senthilkumar',
+        'email': 'customer@tailoring.com',
+        'password': 'Customer123!',
+        'color': const Color(0xFF4CAF50), // Green
+        'icon': Icons.shopping_cart,
+        'location': 'Madurai, TN',
+      },
+      // Tailor 1 - Suresh Rajalingam - Stitching Master
+      {
+        'title': '✂️ Stitching Master',
+        'subtitle': 'Suresh Rajalingam',
+        'email': 'tailor1@tailoring.com',
+        'password': 'Tailor123!',
+        'color': const Color(0xFF2196F3), // Blue
+        'icon': Icons.content_cut,
+        'location': 'Madurai, TN',
+      },
+      // Tailor 2 - Lakshmi Balasubramanian - Designer
+      {
+        'title': '🎨 Designer',
+        'subtitle': 'Lakshmi Balasubramanian',
+        'email': 'tailor2@tailoring.com',
+        'password': 'Tailor456!',
+        'color': const Color(0xFFE91E63), // Pink
+        'icon': Icons.design_services,
+        'location': 'Madurai, TN',
+      },
+    ];
   }
 
   static String _getRoleDescription(int role) {

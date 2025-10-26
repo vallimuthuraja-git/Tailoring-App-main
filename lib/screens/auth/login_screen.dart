@@ -30,13 +30,13 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _loadSavedCredentials();
 
-    // For development mode, pre-fill with first demo account for quick testing
+    // For development mode, pre-fill with shop owner account for quick testing
     if (!const bool.fromEnvironment('dart.vm.product')) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_emailController.text.isEmpty) {
-          final demoAccount = DevSetupService.getDevCredentials().first;
-          _emailController.text = demoAccount['email']!;
-          _passwordController.text = demoAccount['password']!;
+          // Use the updated Madurai account rather than old demo account
+          _emailController.text = 'owner@tailoring.com';
+          _passwordController.text = 'Owner123!';
         }
       });
     }

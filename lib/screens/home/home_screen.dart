@@ -16,9 +16,11 @@ import '../ai/ai_assistance_screen.dart';
 import '../employee/simple_employee_list_screen.dart';
 import '../dashboard/analytics_dashboard_screen.dart';
 import '../admin/user_management_screen.dart';
+import '../admin/product_catalog_screen.dart';
 import '../auth/login_screen.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/global_bottom_navigation_bar.dart';
+import '../../services/firebase_service.dart';
 
 // Using beautiful theme-level opacity extensions
 // No more deprecated withValues(alpha:) calls - everything uses withValues() internally
@@ -281,8 +283,13 @@ class DashboardTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                _buildQuickActions(isShopOwner, onNavigateToProducts,
-                    onNavigateToOrders, context, deviceType),
+                _buildQuickActions(
+                    authProvider,
+                    isShopOwner,
+                    onNavigateToProducts,
+                    onNavigateToOrders,
+                    context,
+                    deviceType),
 
                 const SizedBox(height: 32),
 
@@ -352,6 +359,176 @@ class DashboardTab extends StatelessWidget {
     );
   }
 
+  void _showAddProductOptions(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDark = themeProvider.isDarkMode;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? DarkAppColors.surface : AppColors.surface,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(Icons.inventory_2,
+                color: isDark ? DarkAppColors.primary : AppColors.primary),
+            title: const Text('Upload from CSV'),
+            subtitle: const Text('Import products in bulk'),
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('CSV upload coming soon!')),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.add_circle, color: const Color(0xFF4CAF50)),
+            title: const Text('Add Single Product'),
+            subtitle: const Text('Manual product entry'),
+            onTap: () {
+              Navigator.pop(context);
+              _showAddSingleProductDialog(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.library_add, color: const Color(0xFF2196F3)),
+            title: const Text('Add Product Variant'),
+            subtitle: const Text('Add variant to existing product'),
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Product variants coming soon!')),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.category, color: const Color(0xFF9C27B0)),
+            title: const Text('Add Product Category'),
+            subtitle: const Text('Create new category'),
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Category management coming soon!')),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  void _showAddSingleProductDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final priceController = TextEditingController();
+    final stockController = TextEditingController();
+    final descriptionController = TextEditingController();
+    String selectedCategory = 'Mens Wear';
+
+    final categories = ['Mens Wear', 'Womens Wear', 'Kids Wear', 'Custom'];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add New Product'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Product Name'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Price (₹)'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: stockController,
+                decoration: const InputDecoration(labelText: 'Stock Quantity'),
+                keyboardType: TextInputType.number,
+              ),
+              DropdownButtonFormField<String>(
+                value: selectedCategory,
+                decoration: const InputDecoration(labelText: 'Category'),
+                items: categories.map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (value) => selectedCategory = value!,
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // TODO: Implement product creation
+              final productData = {
+                'name': nameController.text,
+                'basePrice': double.tryParse(priceController.text) ?? 0.0,
+                'stockCount': int.tryParse(stockController.text) ?? 0,
+                'category': _getCategoryIndex(selectedCategory),
+                'description': descriptionController.text,
+                'imageUrls': [],
+                'availableSizes': ['S', 'M', 'L'],
+                'availableFabrics': ['Cotton', 'Polyester'],
+                'isActive': true,
+                'brand': 'Royal Tailors',
+              };
+
+              try {
+                final firebaseService = FirebaseService();
+                await firebaseService.addDocument('products', productData);
+
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content:
+                            Text('${productData['name']} added successfully!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Failed to add product: $e'),
+                        backgroundColor: Colors.red),
+                  );
+                }
+              }
+            },
+            child: const Text('Add Product'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  int _getCategoryIndex(String categoryName) {
+    const categoryMap = {
+      'Mens Wear': 0,
+      'Womens Wear': 1,
+      'Kids Wear': 2,
+      'Custom': 3,
+    };
+    return categoryMap[categoryName] ?? 3;
+  }
+
   void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
     showDialog(
       context: context,
@@ -389,62 +566,115 @@ class DashboardTab extends StatelessWidget {
   }
 
   Widget _buildQuickActions(
+      AuthProvider authProvider,
       bool isShopOwner,
       VoidCallback? onNavigateToProducts,
       VoidCallback onNavigateToOrders,
       BuildContext context,
       DeviceType deviceType) {
-    if (isShopOwner) {
+    // TEMPORARY: Force show shop owner actions if user is owner@tailoring.com
+    final userEmail = authProvider.email ?? '';
+    final isForceShopOwner = userEmail == 'owner@tailoring.com' || isShopOwner;
+    if (isForceShopOwner) {
       final actions = [
+        // Core Business Management
         _QuickActionCard(
-          icon: Icons.people_alt,
-          title: 'View Employees',
-          color: Colors.blue,
+          icon: Icons.dashboard,
+          title: 'Business Dashboard',
+          color: const Color(0xFF2196F3), // Blue
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const SimpleEmployeeListScreen(),
+                builder: (context) => const AnalyticsDashboardScreen(),
               ),
             );
           },
         ),
         _QuickActionCard(
-          icon: Icons.inventory,
-          title: 'Manage Products',
-          color: Colors.orange,
-          onTap: onNavigateToProducts ?? () {},
+          icon: Icons.inventory_2,
+          title: 'Product Catalog',
+          color: const Color(0xFFFF9800), // Orange
+          onTap: () {
+            // Check role before allowing access
+            if (authProvider.isShopOwnerOrAdmin) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductCatalogScreen(),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content:
+                      Text('Access denied: Shop Owner privileges required'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
         ),
         _QuickActionCard(
-          icon: Icons.people,
-          title: 'Customers',
-          color: Colors.teal,
+          icon: Icons.add_box,
+          title: 'Add New Product',
+          color: const Color(0xFF4CAF50), // Green
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CustomerManagementScreen(),
-              ),
+            // Check role before allowing access
+            if (authProvider.isShopOwnerOrAdmin) {
+              _showAddProductOptions(context);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content:
+                      Text('Access denied: Shop Owner privileges required'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+        ),
+
+        // Service Management
+        _QuickActionCard(
+          icon: Icons.design_services,
+          title: 'Service Management',
+          color: const Color(0xFF9C27B0), // Purple
+          onTap: () {
+            // Navigate to service management
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Service management coming soon!')),
             );
           },
         ),
         _QuickActionCard(
-          icon: Icons.group,
-          title: 'Team Management',
-          color: Colors.purple,
+          icon: Icons.rule,
+          title: 'Pricing Rules',
+          color: const Color(0xFFFF5722), // Red-Orange
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const EmployeeManagementHome(),
-              ),
+            // Navigate to pricing rules
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Pricing rules coming soon!')),
             );
           },
         ),
         _QuickActionCard(
-          icon: Icons.receipt_long,
-          title: 'Order Mgmt',
-          color: Colors.indigo,
+          icon: Icons.category,
+          title: 'Fabric Inventory',
+          color: const Color(0xFF795548), // Brown
+          onTap: () {
+            // Navigate to fabric inventory
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Fabric inventory coming soon!')),
+            );
+          },
+        ),
+
+        // Order & Workflow Management
+        _QuickActionCard(
+          icon: Icons.assignment,
+          title: 'Active Orders',
+          color: const Color(0xFF00BCD4), // Cyan
           onTap: () {
             Navigator.push(
               context,
@@ -455,9 +685,24 @@ class DashboardTab extends StatelessWidget {
           },
         ),
         _QuickActionCard(
-          icon: Icons.people,
-          title: 'Customer Mgmt',
-          color: Colors.teal,
+          icon: Icons.timeline,
+          title: 'Production Flow',
+          color: const Color(0xFF3F51B5), // Indigo
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TailoringWorkflowScreen(),
+              ),
+            );
+          },
+        ),
+
+        // Customer & Employee Management
+        _QuickActionCard(
+          icon: Icons.people_alt,
+          title: 'Customer Database',
+          color: const Color(0xFF009688), // Teal
           onTap: () {
             Navigator.push(
               context,
@@ -468,17 +713,49 @@ class DashboardTab extends StatelessWidget {
           },
         ),
         _QuickActionCard(
-          icon: Icons.analytics,
-          title: 'Reports',
-          color: Colors.cyan,
+          icon: Icons.groups,
+          title: 'Employee Team',
+          color: const Color(0xFF673AB7), // Deep Purple
           onTap: () {
-            // Navigate to reports
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EmployeeManagementHome(),
+              ),
+            );
+          },
+        ),
+
+        // Financial & Analytics
+        _QuickActionCard(
+          icon: Icons.attach_money,
+          title: 'Financial Reports',
+          color: const Color(0xFF8BC34A), // Light Green
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Financial reports coming soon!')),
+            );
           },
         ),
         _QuickActionCard(
-          icon: Icons.group_add,
-          title: 'User Management',
-          color: Colors.red,
+          icon: Icons.bar_chart,
+          title: 'Business Analytics',
+          color: const Color(0xFFFFC107), // Amber
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AnalyticsDashboardScreen(),
+              ),
+            );
+          },
+        ),
+
+        // System Administration
+        _QuickActionCard(
+          icon: Icons.admin_panel_settings,
+          title: 'System Admin',
+          color: const Color(0xFF607D8B), // Blue Grey
           onTap: () {
             Navigator.push(
               context,
@@ -489,9 +766,19 @@ class DashboardTab extends StatelessWidget {
           },
         ),
         _QuickActionCard(
-          icon: Icons.storage,
-          title: 'Database Mgmt',
-          color: Colors.purple,
+          icon: Icons.settings_applications,
+          title: 'Business Settings',
+          color: const Color(0xFF9E9E9E), // Grey
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Business settings coming soon!')),
+            );
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.backup_table,
+          title: 'Database Tools',
+          color: const Color(0xFF795548), // Brown
           onTap: () {
             Navigator.push(
               context,
@@ -501,28 +788,27 @@ class DashboardTab extends StatelessWidget {
             );
           },
         ),
+
+        // Marketing & Communication
         _QuickActionCard(
-          icon: Icons.engineering,
-          title: 'Workflow',
-          color: Colors.indigo,
+          icon: Icons.campaign,
+          title: 'Marketing Hub',
+          color: const Color(0xFFE91E63), // Pink
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const TailoringWorkflowScreen(),
-              ),
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Marketing hub coming soon!')),
             );
           },
         ),
         _QuickActionCard(
-          icon: Icons.analytics,
-          title: 'Analytics',
-          color: Colors.cyan,
+          icon: Icons.smart_toy,
+          title: 'AI Assistant',
+          color: const Color(0xFF2196F3), // Blue
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const AnalyticsDashboardScreen(),
+                builder: (context) => const AIAssistanceScreen(),
               ),
             );
           },

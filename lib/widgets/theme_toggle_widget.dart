@@ -36,14 +36,16 @@ class ThemeToggleWidget extends StatelessWidget {
               child: ListTile(
                 leading: Icon(
                   Icons.light_mode,
-                  color: themeProvider.isLightMode && !themeProvider.isGlassyMode
-                      ? AppColors.primary
-                      : null,
+                  color:
+                      themeProvider.isLightMode && !themeProvider.isGlassyMode
+                          ? AppColors.primary
+                          : null,
                 ),
                 title: const Text('Light Mode'),
-                trailing: themeProvider.isLightMode && !themeProvider.isGlassyMode
-                    ? const Icon(Icons.check, color: AppColors.primary)
-                    : null,
+                trailing:
+                    themeProvider.isLightMode && !themeProvider.isGlassyMode
+                        ? const Icon(Icons.check, color: AppColors.primary)
+                        : null,
               ),
             ),
             PopupMenuItem(
@@ -56,9 +58,10 @@ class ThemeToggleWidget extends StatelessWidget {
                       : null,
                 ),
                 title: const Text('Dark Mode'),
-                trailing: themeProvider.isDarkMode && !themeProvider.isGlassyMode
-                    ? const Icon(Icons.check, color: DarkAppColors.primary)
-                    : null,
+                trailing:
+                    themeProvider.isDarkMode && !themeProvider.isGlassyMode
+                        ? const Icon(Icons.check, color: DarkAppColors.primary)
+                        : null,
               ),
             ),
             PopupMenuItem(
@@ -67,12 +70,18 @@ class ThemeToggleWidget extends StatelessWidget {
                 leading: Icon(
                   Icons.blur_on,
                   color: themeProvider.isGlassyMode
-                      ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                      ? (themeProvider.isDarkMode
+                          ? DarkAppColors.primary
+                          : AppColors.primary)
                       : null,
                 ),
-                title: Text('Glassy Mode (${themeProvider.isDarkMode ? 'Dark' : 'Light'})'),
+                title: Text(
+                    'Glassy Mode (${themeProvider.isDarkMode ? 'Dark' : 'Light'})'),
                 trailing: themeProvider.isGlassyMode
-                    ? Icon(Icons.check, color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                    ? Icon(Icons.check,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
                     : null,
               ),
             ),
@@ -83,13 +92,18 @@ class ThemeToggleWidget extends StatelessWidget {
                 leading: Icon(
                   Icons.smartphone,
                   color: themeProvider.currentTheme == ThemeMode.system
-                      ? (themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                      ? (themeProvider.isDarkMode
+                          ? DarkAppColors.primary
+                          : AppColors.primary)
                       : null,
                 ),
                 title: const Text('Follow System'),
                 subtitle: const Text('Automatically match device theme'),
                 trailing: themeProvider.currentTheme == ThemeMode.system
-                    ? Icon(Icons.check, color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary)
+                    ? Icon(Icons.check,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.primary
+                            : AppColors.primary)
                     : null,
               ),
             ),
@@ -100,7 +114,8 @@ class ThemeToggleWidget extends StatelessWidget {
                 leading: Icon(
                   themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
                 ),
-                title: Text('Quick ${themeProvider.isDarkMode ? 'Light' : 'Dark'} Toggle'),
+                title: Text(
+                    'Quick ${themeProvider.isDarkMode ? 'Light' : 'Dark'} Toggle'),
               ),
             ),
           ],
@@ -113,7 +128,9 @@ class ThemeToggleWidget extends StatelessWidget {
             ),
             child: Icon(
               themeProvider.currentThemeIcon,
-              color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onSurface
+                  : AppColors.onSurface,
             ),
           ),
         );
@@ -121,4 +138,3 @@ class ThemeToggleWidget extends StatelessWidget {
     );
   }
 }
-

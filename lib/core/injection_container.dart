@@ -1,15 +1,19 @@
 ﻿/// File: injection_container.dart
 /// Purpose: Dependency injection container for managing application-wide services and repositories
-/// Functionality: Initializes and provides access to Firebase services, repositories, BLoCs, and other dependencies in a singleton pattern
-/// Dependencies: Firebase service, connectivity package, product data access components, ProductBloc
-/// Usage: Used throughout the app to access shared instances of services and repositories instead of creating new instances
+/// Functionality: Initializes and provides access to Firebase services and other core dependencies in a singleton pattern
+/// Dependencies: Firebase service, connectivity package
+/// Usage: Used throughout the app to access shared instances of core services
+/// NOTE: Product-related dependencies are temporarily commented out due to export issues
+library;
+
 import 'package:flutter/foundation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import '../product_data_access.dart' as data_access;
-import '../blocs/product/product_bloc.dart';
-import '../services/product/product_analytics_service.dart';
 import '../services/firebase_service.dart';
+import '../product/product_repository.dart';
+import '../product/firebase_product_repository.dart';
+import '../product/product_bloc.dart';
+import '../product/product_analytics_service.dart';
 
 /// Simple dependency injection container
 class InjectionContainer {
@@ -17,22 +21,14 @@ class InjectionContainer {
   factory InjectionContainer() => _instance;
   InjectionContainer._internal();
 
-  // Services
+  // Core Services
   late final FirebaseService _firebaseService;
   late final Connectivity _connectivity;
 
-  // Repositories
-  late final data_access.FirebaseProductRepository _firebaseProductRepository;
-  late final data_access.OfflineProductRepository _offlineProductRepository;
-  late final data_access.ProductRepository _productRepository;
-
-  // Services
-  late final data_access.ProductSearchService _productSearchService;
-  late final data_access.ProductCacheService _productCacheService;
-  late final ProductAnalyticsService _productAnalyticsService;
-
-  // BLoC
+  // Product-related dependencies
   late final ProductBloc _productBloc;
+  late final IProductRepository _productRepository;
+  late final ProductAnalyticsService _productAnalyticsService;
 
   /// Initialize all dependencies
   Future<void> initialize() async {
@@ -43,27 +39,10 @@ class InjectionContainer {
     await _firebaseService.initializeFirebase();
 
     // Initialize repositories
-    _firebaseProductRepository =
-        data_access.FirebaseProductRepository(_firebaseService);
-    _offlineProductRepository = data_access.OfflineProductRepository();
+    _productRepository = FirebaseProductRepository(_firebaseService);
 
-    _productRepository = data_access.ProductRepository(
-      _firebaseProductRepository,
-      _offlineProductRepository,
-      _connectivity,
-    );
-
-    // Initialize services
-    _productSearchService =
-        data_access.ProductSearchService(productRepository: _productRepository);
-    _productCacheService = data_access.ProductCacheService();
+    // Initialize analytics service
     _productAnalyticsService = ProductAnalyticsService(_productRepository);
-
-    // Initialize services that need async setup
-    // await Future.wait([
-    //   _productCacheService.initialize(),
-    //   _productAnalyticsService.initialize(),
-    // ]);
 
     // Initialize BLoC
     _productBloc = ProductBloc(
@@ -71,7 +50,7 @@ class InjectionContainer {
       connectivity: _connectivity,
     );
 
-    debugPrint('âœ… All dependencies initialized');
+    debugPrint('✅ Core dependencies initialized');
   }
 
   // Getters for accessing dependencies
@@ -79,23 +58,11 @@ class InjectionContainer {
   FirebaseService get firebaseService => _firebaseService;
   Connectivity get connectivity => _connectivity;
 
-  // Repositories
-  data_access.FirebaseProductRepository get firebaseProductRepository =>
-      _firebaseProductRepository;
-  data_access.OfflineProductRepository get offlineProductRepository =>
-      _offlineProductRepository;
-  data_access.ProductRepository get productRepository => _productRepository;
-
-  // Services
-  data_access.ProductSearchService get productSearchService =>
-      _productSearchService;
-  data_access.ProductCacheService get productCacheService =>
-      _productCacheService;
+  // Product dependencies
+  ProductBloc get productBloc => _productBloc;
+  IProductRepository get productRepository => _productRepository;
   ProductAnalyticsService get productAnalyticsService =>
       _productAnalyticsService;
-
-  // BLoC
-  ProductBloc get productBloc => _productBloc;
 
   /// Create a new ProductBloc instance (useful for scoped BLoCs)
   ProductBloc createProductBloc() {
@@ -108,7 +75,7 @@ class InjectionContainer {
   /// Dispose of all resources
   Future<void> dispose() async {
     await _productBloc.close();
-    debugPrint('âœ… Dependencies disposed');
+    debugPrint('✅ Core dependencies disposed');
   }
 
   /// Reset all dependencies (useful for testing)

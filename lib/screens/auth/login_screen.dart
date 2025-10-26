@@ -885,93 +885,180 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                                 const SizedBox(height: 32),
 
-                                                // Development Login Buttons (only in development)
+                                                // Quick Login Buttons (development mode)
                                                 if (const bool.fromEnvironment(
                                                         'dart.vm.product') ==
                                                     false) ...[
                                                   Container(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            16),
+                                                            20),
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          Colors.green.shade50,
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          Colors.blue.shade50
+                                                              .withValues(
+                                                                  alpha: 0.8),
+                                                          Colors.purple.shade50
+                                                              .withValues(
+                                                                  alpha: 0.6),
+                                                        ],
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end: Alignment
+                                                            .bottomRight,
+                                                      ),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              12),
+                                                              16),
                                                       border: Border.all(
-                                                          color: Colors
-                                                              .green.shade200),
+                                                        color: Colors
+                                                            .blue.shade200,
+                                                        width: 1.5,
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.blue
+                                                              .withValues(
+                                                                  alpha: 0.1),
+                                                          blurRadius: 8,
+                                                          spreadRadius: 1,
+                                                        ),
+                                                      ],
                                                     ),
                                                     child: Column(
                                                       children: [
-                                                        const Text(
-                                                          '🚀 Firebase Demo Accounts',
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: Colors.green,
-                                                          ),
+                                                        Row(
+                                                          children: [
+                                                            const Icon(
+                                                              Icons
+                                                                  .admin_panel_settings,
+                                                              color:
+                                                                  Colors.purple,
+                                                              size: 24,
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 12),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                const Text(
+                                                                  '🚀 Quick Login - Demo Accounts',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .purple,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '10 user accounts created via firebase_data_setup.js',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        11,
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade600,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(
-                                                            height: 8),
-                                                        const Text(
-                                                          'All accounts created via firebase_data_setup.js',
-                                                          style: TextStyle(
-                                                            fontSize: 11,
-                                                            color: Colors.grey,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 12),
-                                                        const Text(
-                                                          'Password: Pass123',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors.grey,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 12),
+                                                            height: 16),
                                                         Wrap(
                                                           spacing: 8,
                                                           runSpacing: 8,
+                                                          alignment:
+                                                              WrapAlignment
+                                                                  .center,
                                                           children: DevSetupService
-                                                                  .getDevCredentials()
-                                                              .map((cred) {
-                                                            return ElevatedButton
-                                                                .icon(
-                                                              onPressed: () =>
-                                                                  _handleDevLogin(
-                                                                      cred[
-                                                                          'email']!,
-                                                                      cred[
-                                                                          'password']!),
-                                                              icon: Icon(
-                                                                  _getRoleIcon(cred[
-                                                                      'role']!)),
-                                                              label: Text(cred[
-                                                                  'displayName']!),
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                backgroundColor:
-                                                                    _getRoleColor(
-                                                                        cred[
-                                                                            'role']!),
-                                                                foregroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        16,
-                                                                    vertical:
-                                                                        8),
+                                                                  .getQuickLoginButtons()
+                                                              .map(
+                                                                  (buttonData) {
+                                                            return SizedBox(
+                                                              width: 160,
+                                                              child:
+                                                                  ElevatedButton(
+                                                                onPressed: () => _handleQuickLogin(
+                                                                    buttonData[
+                                                                            'email']
+                                                                        as String,
+                                                                    buttonData[
+                                                                            'password']
+                                                                        as String),
+                                                                style: ElevatedButton
+                                                                    .styleFrom(
+                                                                  backgroundColor:
+                                                                      buttonData[
+                                                                              'color']
+                                                                          as Color,
+                                                                  foregroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  minimumSize:
+                                                                      const Size(
+                                                                          double
+                                                                              .infinity,
+                                                                          50),
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            12),
+                                                                  ),
+                                                                  elevation: 2,
+                                                                ),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    Text(
+                                                                      buttonData[
+                                                                              'title']
+                                                                          as String,
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              12,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                    Text(
+                                                                      buttonData[
+                                                                              'subtitle']
+                                                                          as String,
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              10),
+                                                                    ),
+                                                                  ],
+                                                                ),
                                                               ),
                                                             );
                                                           }).toList(),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        Text(
+                                                          'Tap any button to instantly login as that user!',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .grey.shade600,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
                                                         ),
                                                       ],
                                                     ),
@@ -1141,6 +1228,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Development login handlers
   void _handleDevLogin(String email, String password) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.signIn(email: email, password: password);
+
+    if (success && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
+  }
+
+  // Quick login handler for demo accounts
+  void _handleQuickLogin(String email, String password) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final success = await authProvider.signIn(email: email, password: password);
 

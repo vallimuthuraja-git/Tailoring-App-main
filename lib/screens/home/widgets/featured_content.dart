@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../utils/theme_constants.dart';
 import '../../../utils/responsive_utils.dart';
-import '../../../../models/product_models.dart';
+import '../../../product/product_models.dart';
 
 class FeaturedContent extends StatefulWidget {
   final List<Product> products;

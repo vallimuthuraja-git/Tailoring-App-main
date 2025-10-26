@@ -17,7 +17,8 @@ class AutoThemeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = this.themeProvider ?? Provider.of<ThemeProvider>(context);
+    final themeProvider =
+        this.themeProvider ?? Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
       theme: themeProvider.currentThemeData,
@@ -27,10 +28,14 @@ class AutoThemeApp extends StatelessWidget {
         child: Builder(
           builder: (context) => DefaultTextStyle(
             style: TextStyle(
-              color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
             ),
             child: Container(
-              color: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+              color: themeProvider.isDarkMode
+                  ? DarkAppColors.background
+                  : AppColors.background,
               child: child,
             ),
           ),
@@ -58,10 +63,14 @@ class AutoThemeWrapper extends StatelessWidget {
       data: themeProvider.currentThemeData,
       child: DefaultTextStyle(
         style: TextStyle(
-          color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onBackground
+              : AppColors.onBackground,
         ),
         child: Container(
-          color: themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.background
+              : AppColors.background,
           child: child,
         ),
       ),
@@ -71,7 +80,8 @@ class AutoThemeWrapper extends StatelessWidget {
 
 /// AutoThemeBuilder - Automatically rebuilds when theme changes
 class AutoThemeBuilder extends StatelessWidget {
-  final Widget Function(BuildContext context, ThemeProvider themeProvider) builder;
+  final Widget Function(BuildContext context, ThemeProvider themeProvider)
+      builder;
 
   const AutoThemeBuilder({
     super.key,
@@ -114,7 +124,9 @@ extension AutoThemeExtension on Widget {
             data: themeProvider.currentThemeData,
             child: DefaultTextStyle(
               style: TextStyle(
-                color: themeProvider.isDarkMode ? DarkAppColors.onBackground : AppColors.onBackground,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.onBackground
+                    : AppColors.onBackground,
               ),
               child: this,
             ),
@@ -159,7 +171,10 @@ class AutoThemeScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) => Scaffold(
-        backgroundColor: backgroundColor ?? (themeProvider.isDarkMode ? DarkAppColors.background : AppColors.background),
+        backgroundColor: backgroundColor ??
+            (themeProvider.isDarkMode
+                ? DarkAppColors.background
+                : AppColors.background),
         appBar: appBar,
         body: body,
         floatingActionButton: floatingActionButton,
@@ -198,12 +213,18 @@ class AutoThemeAppBar extends StatelessWidget implements PreferredSizeWidget {
         centerTitle: centerTitle,
         elevation: elevation,
         leading: leading,
-        backgroundColor: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        backgroundColor: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         iconTheme: IconThemeData(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
         ),
         titleTextStyle: TextStyle(
-          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+          color: themeProvider.isDarkMode
+              ? DarkAppColors.onSurface
+              : AppColors.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),

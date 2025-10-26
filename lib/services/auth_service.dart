@@ -353,7 +353,7 @@ class AuthService {
         throw Exception('Too many attempts. Please slow down.');
       }
       _recordRateLimitAttempt(email, 'fast_login');
-      throw e;
+      rethrow;
     }
   }
 

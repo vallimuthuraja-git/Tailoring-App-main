@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../models/product_models.dart';
+import '../../../product/product_models.dart';
 import '../../models/order.dart';
-import '../../../product_data_access.dart';
+import '../../product/product_data_access.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';

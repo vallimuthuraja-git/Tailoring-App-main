@@ -32,8 +32,9 @@ Future<void> main() async {
     // Setup employee data
     await setupEmployeesDirectly();
 
-    if (kDebugMode)
+    if (kDebugMode) {
       debugPrint('\n🎉 Firebase data setup completed successfully!');
+    }
 
     // List the created accounts
     debugPrint('\n📋 Created Demo Accounts:');

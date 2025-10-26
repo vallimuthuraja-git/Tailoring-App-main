@@ -4,35 +4,90 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import '../../firebase_options.dart';
 
-// Demo user data for testing
+// Comprehensive demo user data for Indian tailoring shop
 const List<Map<String, dynamic>> demoUsers = [
+  // SUPER ADMIN - FULL SYSTEM ACCESS
   {
-    'email': 'shop@demo.com',
-    'password': 'Pass123',
-    'displayName': 'Shop Owner',
+    'email': 'admin@tailoring-app.com',
+    'password': 'Admin123!',
+    'displayName': 'Super Admin',
+    'role': 3, // UserRole.shopOwner
+    'phone': '+91-9999999999',
+    'isSuperAdmin': true,
+    'fullAccess': true,
+  },
+  // Shop Owners
+  {
+    'email': 'owner@royal-tailors.com',
+    'password': 'Tailor123!',
+    'displayName': 'Rajesh Sharma',
     'role': 3, // UserRole.shopOwner
     'phone': '+91-9876543210',
   },
   {
-    'email': 'customer@demo.com',
-    'password': 'Pass123',
-    'displayName': 'Demo Customer',
-    'role': 0, // UserRole.customer
+    'email': 'manager@sarika-designs.com',
+    'password': 'Designer123!',
+    'displayName': 'Sarika Patel',
+    'role': 3, // UserRole.shopOwner
     'phone': '+91-9876543211',
   },
+  // Employees
   {
-    'email': 'employee0@demo.com',
-    'password': 'Pass123',
-    'displayName': 'Employee 0',
+    'email': 'vikram.kumar@royal-tailors.com',
+    'password': 'Tailor123!',
+    'displayName': 'Vikram Kumar',
     'role': 1, // UserRole.employee
     'phone': '+91-9876543212',
   },
   {
-    'email': 'employee1@demo.com',
-    'password': 'Pass123',
-    'displayName': 'Employee 1',
+    'email': 'priya.singh@sarika-designs.com',
+    'password': 'Designer123!',
+    'displayName': 'Priya Singh',
     'role': 1, // UserRole.employee
     'phone': '+91-9876543213',
+  },
+  {
+    'email': 'amit.verma@royal-tailors.com',
+    'password': 'Tailor123!',
+    'displayName': 'Amit Verma',
+    'role': 1, // UserRole.employee
+    'phone': '+91-9876543214',
+  },
+  {
+    'email': 'deepa.krishnan@sarika-designs.com',
+    'password': 'Designer123!',
+    'displayName': 'Deepa Krishnan',
+    'role': 1, // UserRole.employee
+    'phone': '+91-9876543215',
+  },
+  // Customers
+  {
+    'email': 'rahul.agrawal@gmail.com',
+    'password': 'Customer123!',
+    'displayName': 'Rahul Agrawal',
+    'role': 0, // UserRole.customer
+    'phone': '+91-9876543216',
+  },
+  {
+    'email': 'meera.sharma@outlook.com',
+    'password': 'Customer123!',
+    'displayName': 'Meera Sharma',
+    'role': 0, // UserRole.customer
+    'phone': '+91-9876543217',
+  },
+  {
+    'email': 'karan.jain@yahoo.com',
+    'password': 'Customer123!',
+    'displayName': 'Karan Jain',
+    'role': 0, // UserRole.customer
+    'phone': '+91-9876543218',
+  },
+  {
+    'email': 'isha.patel@icloud.com',
+    'password': 'Customer123!',
+    'displayName': 'Isha Patel',
+    'role': 0, // UserRole.customer
+    'phone': '+91-9876543219',
   },
 ];
 

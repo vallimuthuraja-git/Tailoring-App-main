@@ -1,6 +1,5 @@
-﻿
-import 'package:flutter/material.dart';
-import '../../../../models/product_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../../product/product_models.dart';
 import '../../../models/service.dart';
 import '../../services/service_catalog_screen.dart';
 import '../../orders/order_history_screen.dart';

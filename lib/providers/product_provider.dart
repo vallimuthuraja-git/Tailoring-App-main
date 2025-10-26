@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/product_models.dart';
-import '../blocs/product/product_bloc.dart';
-import '../blocs/product/product_events.dart';
-import '../blocs/product/product_states.dart';
+import '../product/product_models.dart';
+import '../product/product_events.dart';
+import '../product/product_states.dart';
+import '../product/product_bloc.dart';
 
 /// Enhanced loading states for better UX
 enum LoadingState {
@@ -17,7 +17,7 @@ enum LoadingState {
 
 /// ProductProvider that integrates with ProductBloc for state management
 class ProductProvider with ChangeNotifier {
-  final ProductBloc _productBloc;
+  final ProductBloc? _productBloc;
 
   // Local state for UI convenience
   List<Product> _products = [];
@@ -42,7 +42,71 @@ class ProductProvider with ChangeNotifier {
   }
 
   void _initializeBlocSubscription() {
-    _blocSubscription = _productBloc.stream.listen(_onBlocStateChanged);
+    if (_productBloc != null) {
+      _blocSubscription = _productBloc!.stream.listen(_onBlocStateChanged);
+    } else {
+      // Initialize with basic data since no bloc
+      _initializeBasicData();
+    }
+  }
+
+  void _initializeBasicData() {
+    // Initialize with sample products for demo purposes
+    _products = [
+      Product(
+        id: '1',
+        name: 'Classic White Shirt',
+        description:
+            'A comfortable classic white shirt with cotton fabric, perfect for casual and formal wear.',
+        basePrice: 2999.0,
+        originalPrice: null,
+        discountPercentage: 0.0,
+        category: ProductCategory.womensWear,
+        brand: 'FashionWear',
+        imageUrls: ['assets/images/sample_shirt.jpg'],
+        specifications: {},
+        availableSizes: ['XS', 'S', 'M', 'L', 'XL'],
+        availableFabrics: ['Cotton', 'Polyester'],
+        customizationOptions: [],
+        stockCount: 50,
+        soldCount: 23,
+        rating: ProductRating(
+            averageRating: 4.5, reviewCount: 12, recentReviews: []),
+        isActive: true,
+        isPopular: true,
+        isNewArrival: false,
+        isOnSale: false,
+        createdAt: DateTime.now().subtract(const Duration(days: 30)),
+        updatedAt: DateTime.now(),
+      ),
+      Product(
+        id: '2',
+        name: 'Elegant Black Dress',
+        description:
+            'A beautiful evening dress with premium fabric and elegant design for special occasions.',
+        basePrice: 5999.0,
+        originalPrice: 7999.0,
+        discountPercentage: 0.25,
+        category: ProductCategory.womensWear,
+        brand: 'LuxuryWear',
+        imageUrls: ['assets/images/sample_dress.jpg'],
+        specifications: {},
+        availableSizes: ['XS', 'S', 'M', 'L', 'XL'],
+        availableFabrics: ['Silk', 'Chiffon'],
+        customizationOptions: ['Embroider Name', 'Change Color'],
+        stockCount: 25,
+        soldCount: 15,
+        rating: ProductRating(
+            averageRating: 4.8, reviewCount: 25, recentReviews: []),
+        isActive: true,
+        isPopular: false,
+        isNewArrival: true,
+        isOnSale: true,
+        createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        updatedAt: DateTime.now(),
+      ),
+    ];
+    notifyListeners();
   }
 
   void _onBlocStateChanged(ProductState state) {
@@ -80,7 +144,7 @@ class ProductProvider with ChangeNotifier {
 
   // Actions that delegate to BLoC
   void loadProducts() {
-    _productBloc.add(const LoadProducts());
+    _productBloc?.add(LoadProducts());
   }
 
   Future<void> loadMoreProducts() async {
@@ -92,7 +156,7 @@ class ProductProvider with ChangeNotifier {
     try {
       // For now, just reload all products
       // In a real implementation, this would load paginated data
-      _productBloc.add(const LoadProducts());
+      _productBloc?.add(LoadProducts());
     } finally {
       _loadingState = LoadingState.idle;
       notifyListeners();
@@ -102,11 +166,11 @@ class ProductProvider with ChangeNotifier {
   Future<void> refreshProducts() async {
     // _currentPage = 0; // TODO: Uncomment when implementing pagination
     _hasMoreProducts = true;
-    _productBloc.add(const RefreshProducts());
+    _productBloc?.add(RefreshProducts());
   }
 
   Future<Product?> getProductById(String productId) async {
-    _productBloc.add(LoadProduct(productId));
+    _productBloc?.add(LoadProduct(productId));
     // For immediate return, we could wait for state change
     // But for simplicity, return from current products
     return _products.where((p) => p.id == productId).isEmpty
@@ -119,7 +183,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _productBloc.add(AddProduct(product));
+      _productBloc?.add(AddProduct(product));
       _loadingState = LoadingState.idle;
       notifyListeners();
       return true;
@@ -136,7 +200,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _productBloc.add(UpdateProduct(product));
+      _productBloc?.add(UpdateProduct(product));
       _loadingState = LoadingState.idle;
       notifyListeners();
       return true;
@@ -153,7 +217,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _productBloc.add(DeleteProduct(productId));
+      _productBloc?.add(DeleteProduct(productId));
       _loadingState = LoadingState.idle;
       notifyListeners();
       return true;
@@ -173,7 +237,7 @@ class ProductProvider with ChangeNotifier {
 
   void filterByCategory(ProductCategory? category) {
     _selectedCategory = category;
-    _productBloc.add(FilterProductsByCategory(category));
+    _productBloc?.add(FilterProductsByCategory(category));
   }
 
   void sortProducts(String sortOption) {
@@ -186,7 +250,7 @@ class ProductProvider with ChangeNotifier {
     _selectedCategory = null;
     _priceRange = null;
     _activeStatusFilter = null;
-    _productBloc.add(const ClearFilters());
+    _productBloc?.add(ClearFilters());
   }
 
   void filterByPriceRange(RangeValues? range) {

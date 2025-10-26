@@ -2,9 +2,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../models/product_models.dart';
-import '../product_data_access.dart';
-import '../widgets/catalog/unified_product_card.dart';
+import '../product/product_models.dart';
+import '../product/products_screen.dart';
 
 /// Enum representing different device types
 enum DeviceType { mobile, tablet, desktop }
@@ -987,11 +986,13 @@ class ProductGridDelegate extends SliverGridDelegateWithMaxCrossAxisExtent {
 class UnifiedProductGridItem extends StatelessWidget {
   final Product product;
   final int index;
+  final VoidCallback? onTap;
 
   const UnifiedProductGridItem({
     super.key,
     required this.product,
     required this.index,
+    this.onTap,
   });
 
   @override
@@ -999,6 +1000,7 @@ class UnifiedProductGridItem extends StatelessWidget {
     // Use the new unified product card for better layout and maintainability
     return UnifiedProductCard(
       product: product,
+      onTap: onTap ?? () {}, // Provide empty callback if no tap handler
       index: index,
     );
   }

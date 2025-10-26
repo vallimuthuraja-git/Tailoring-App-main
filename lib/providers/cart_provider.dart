@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item.dart';
-import '../models/product_models.dart';
+import '../product/product_models.dart';
 import '../models/order.dart';
 import '../providers/order_provider.dart';
 import 'dart:convert';

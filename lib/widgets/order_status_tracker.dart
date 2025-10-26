@@ -25,7 +25,9 @@ class OrderStatusTracker extends StatelessWidget {
       height: height,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeProvider.isDarkMode ? DarkAppColors.surface : AppColors.surface,
+        color: themeProvider.isDarkMode
+            ? DarkAppColors.surface
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: themeProvider.isDarkMode
@@ -62,14 +64,17 @@ class OrderStatusTracker extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                        color: themeProvider.isDarkMode
+                            ? DarkAppColors.onSurface
+                            : AppColors.onSurface,
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: order.status.statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -170,7 +175,9 @@ class OrderStatusTracker extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                color: themeProvider.isDarkMode
+                    ? DarkAppColors.onSurface
+                    : AppColors.onSurface,
               ),
             ),
           ],
@@ -180,7 +187,9 @@ class OrderStatusTracker extends StatelessWidget {
   }
 
   List<Widget> _buildStatusSteps(ThemeProvider themeProvider) {
-    final allStatuses = OrderStatus.values.where((status) => status != OrderStatus.cancelled).toList();
+    final allStatuses = OrderStatus.values
+        .where((status) => status != OrderStatus.cancelled)
+        .toList();
     final currentStatusIndex = allStatuses.indexOf(order.status);
 
     return List.generate(allStatuses.length, (index) {
@@ -224,7 +233,9 @@ class OrderStatusTracker extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface
+                              : AppColors.onSurface,
                         ),
                       ),
               ),
@@ -367,7 +378,9 @@ class OrderCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.onSurface
+                                : AppColors.onSurface,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -398,7 +411,9 @@ class OrderCard extends StatelessWidget {
                         order.items.first.productName,
                         style: TextStyle(
                           fontSize: 14,
-                          color: themeProvider.isDarkMode ? DarkAppColors.onSurface : AppColors.onSurface,
+                          color: themeProvider.isDarkMode
+                              ? DarkAppColors.onSurface
+                              : AppColors.onSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -454,7 +469,9 @@ class OrderCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: themeProvider.isDarkMode ? DarkAppColors.primary : AppColors.primary,
+                            color: themeProvider.isDarkMode
+                                ? DarkAppColors.primary
+                                : AppColors.primary,
                           ),
                         ),
                         if (order.remainingAmount > 0)

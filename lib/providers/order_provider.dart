@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/order.dart';
-import '../models/product_models.dart';
+import '../product/product_models.dart';
 import '../services/firebase_service.dart';
 
 class OrderProvider with ChangeNotifier {

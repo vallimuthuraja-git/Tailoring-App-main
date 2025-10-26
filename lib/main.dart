@@ -3,10 +3,12 @@
 /// Functionality: Initializes Firebase, sets up provider architecture, manages app theme, handles authentication wrapper, and defines main app structure
 /// Dependencies: Firebase Core, Provider package for state management, various custom services and providers
 /// Usage: Automatically runs when the app starts, bootstraps all necessary components and displays the appropriate screen based on authentication status
+library;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import '../firebase_options.dart';
 import 'services/firebase_service.dart';
 import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';
@@ -24,7 +26,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/ai/ai_assistance_screen.dart';
 import 'screens/profile/profile_screen.dart';
-import 'screens/wishlist_screen.dart';
+import 'product/wishlist_screen.dart';
 import 'widgets/theme_toggle_widget.dart';
 import 'widgets/loading_splash_screen.dart';
 
@@ -205,10 +207,9 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider.value(value: _initProvider),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        // Temporarily commented out due to product export issues - using demo data
         ChangeNotifierProvider(
-          create: (_) => ProductProvider(
-            injectionContainer.productBloc,
-          ),
+          create: (_) => ProductProvider(null),
         ),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()),

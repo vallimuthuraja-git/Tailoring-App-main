@@ -13,13 +13,14 @@ import '../customer/customer_management_screen.dart';
 import '../cart/cart_screen.dart';
 import '../workflow/tailoring_workflow_screen.dart';
 import '../ai/ai_assistance_screen.dart';
-import '../employee/simple_employee_list_screen.dart';
 import '../dashboard/analytics_dashboard_screen.dart';
 import '../admin/user_management_screen.dart';
 import '../admin/product_catalog_screen.dart';
 import '../auth/login_screen.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/global_bottom_navigation_bar.dart';
+import '../../widgets/role_based_guard.dart';
+import '../../services/auth_service.dart' as auth;
 import '../../services/firebase_service.dart';
 
 // Using beautiful theme-level opacity extensions
@@ -596,23 +597,66 @@ class DashboardTab extends StatelessWidget {
           title: 'Product Catalog',
           color: const Color(0xFFFF9800), // Orange
           onTap: () {
-            // Check role before allowing access
-            if (authProvider.isShopOwnerOrAdmin) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProductCatalogScreen(),
+            // Use RoleBased navigation widget for proper access control
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoleBasedRouteGuard(
+                  requiredRole: auth.UserRole.shopOwner,
+                  fallbackWidget: const Scaffold(
+                    body: Center(
+                      child: Text(
+                          'All access disabled: Shop Owner privileges required'),
+                    ),
+                  ),
+                  child: const ProductCatalogScreen(),
                 ),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content:
-                      Text('Access denied: Shop Owner privileges required'),
-                  backgroundColor: Colors.red,
+              ),
+            );
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.admin_panel_settings,
+          title: 'System Admin',
+          color: const Color(0xFF607D8B), // Blue Grey
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoleBasedRouteGuard(
+                  requiredRole: auth.UserRole.shopOwner,
+                  fallbackWidget: const Scaffold(
+                    body: Center(
+                      child: Text(
+                          'All access disabled: System Admin privileges required'),
+                    ),
+                  ),
+                  child: const UserManagementScreen(),
                 ),
-              );
-            }
+              ),
+            );
+          },
+        ),
+        _QuickActionCard(
+          icon: Icons.backup_table,
+          title: 'Database Tools',
+          color: const Color(0xFF795548), // Brown
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoleBasedRouteGuard(
+                  requiredRole: auth.UserRole.shopOwner,
+                  fallbackWidget: const Scaffold(
+                    body: Center(
+                      child: Text(
+                          'All access disabled: Database Admin privileges required'),
+                    ),
+                  ),
+                  child: const DatabaseManagementHome(),
+                ),
+              ),
+            );
           },
         ),
         _QuickActionCard(

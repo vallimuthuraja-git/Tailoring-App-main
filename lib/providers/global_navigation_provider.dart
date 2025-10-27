@@ -76,6 +76,8 @@ class GlobalNavigationProvider with ChangeNotifier {
       DashboardTab(
         onNavigateToOrders: navigateToOrders,
       ),
+      const ProductsScreen(),
+      const ServiceCatalogScreen(),
       const OrderHistoryScreen(),
       const ProfileScreen(),
     ];
@@ -83,6 +85,14 @@ class GlobalNavigationProvider with ChangeNotifier {
       BottomNavigationBarItem(
         icon: Icon(Icons.dashboard),
         label: 'Dashboard',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.shopping_bag),
+        label: 'Products',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.business),
+        label: 'Services',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.receipt_long),

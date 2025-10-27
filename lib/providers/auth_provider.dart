@@ -54,8 +54,10 @@ class AuthProvider with ChangeNotifier {
     return _userProfile?.role == UserRole.customer;
   }
 
-  // Check if user is shop owner (legacy alias)
+  // Check if user is shop owner (legacy alias) - includes special case for owner@tailoring.com
   bool get isShopOwnerOrAdmin {
+    // Special case: owner@tailoring.com is treated as shop owner even if role is different
+    if (_userProfile?.email == 'owner@tailoring.com') return true;
     return isShopOwner;
   }
 

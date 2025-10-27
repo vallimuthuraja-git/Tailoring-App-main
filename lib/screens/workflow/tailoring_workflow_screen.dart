@@ -50,6 +50,7 @@ class _TailoringWorkflowScreenState extends State<TailoringWorkflowScreen>
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
       final employeeProvider =
           Provider.of<EmployeeProvider>(context, listen: false);
+      debugPrint('Loaded employee provider successfully');
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       // Load all orders

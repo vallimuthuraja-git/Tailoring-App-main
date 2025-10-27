@@ -37,7 +37,7 @@ class ProductSearchService {
         return ProductSearchResult(
           productId: product.id,
           productName: product.name,
-          productDescription: product.description ?? '',
+          productDescription: product.description,
           brand: product.brand,
           imageUrls: product.imageUrls,
           price: product.basePrice,
@@ -134,7 +134,7 @@ class ProductSearchService {
         final query = options.query.toLowerCase();
         final matchesName = product.name.toLowerCase().contains(query);
         final matchesDescription =
-            (product.description ?? '').toLowerCase().contains(query);
+            product.description.toLowerCase().contains(query);
         final matchesCategory =
             product.category.name.toLowerCase().contains(query);
         final matchesBrand = product.brand.toLowerCase().contains(query);
@@ -217,7 +217,7 @@ class ProductSearchService {
     }
 
     // Description match
-    if (product.description.toLowerCase().contains(query) ?? false) {
+    if (product.description.toLowerCase().contains(query)) {
       score += 0.3;
     }
 

@@ -2,8 +2,8 @@ const admin = require('firebase-admin');
 
 // Initialize Firebase Admin
 // You need to download the service account key from Firebase Console > Project Settings > Service Accounts
-// Save it as serviceAccountKey.json in the project root
-const serviceAccount = require('./serviceAccountKey.json');
+// Save it as serviceAccountKey.json in the config directory
+const serviceAccount = require('../config/serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

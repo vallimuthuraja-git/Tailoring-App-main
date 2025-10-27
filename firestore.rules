@@ -24,15 +24,15 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return hasRole(2); // admin role is index 2
+      return hasRole(4); // admin role is index 4 (if used)
     }
 
     function isShopOwner() {
-      return hasRole(1); // shopOwner role is index 1
+      return hasRole(2); // shopOwner role is index 2 (per data setup)
     }
 
     function isEmployee() {
-      return hasRole(4) || hasRole(5) || hasRole(6) || hasRole(7) || hasRole(8); // employee roles
+      return hasRole(3); // employee role is index 3 (per data setup)
     }
 
     function isCustomer() {

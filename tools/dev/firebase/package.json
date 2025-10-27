@@ -2,9 +2,9 @@
   "name": "firebase-setup",
   "version": "1.0.0",
   "description": "Firebase data setup script",
-  "main": "firebase_data_setup.js",
+  "main": "tools/dev/firebase/firebase_data_setup.js",
   "scripts": {
-    "setup": "node firebase_data_setup.js"
+    "setup": "node tools/dev/firebase/firebase_data_setup.js"
   },
   "dependencies": {
     "firebase-admin": "^12.0.0"

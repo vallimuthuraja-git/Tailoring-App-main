@@ -29,6 +29,7 @@ import 'screens/profile/profile_screen.dart';
 import 'product/wishlist_screen.dart';
 import 'widgets/theme_toggle_widget.dart';
 import 'widgets/loading_splash_screen.dart';
+import 'product/products_screen.dart';
 
 // Initialization provider to manage app startup state
 class InitializationProvider extends ChangeNotifier {
@@ -198,6 +199,8 @@ class _MyAppState extends State<MyApp> {
     Future.delayed(const Duration(milliseconds: 500), () async {
       await _themeProvider.initializeTheme();
       setState(() => _isThemeInitialized = true);
+      debugPrint(
+          'Theme initialization completed successfully. Theme initialized: $_isThemeInitialized');
     });
   }
 
@@ -234,9 +237,7 @@ class _MyAppState extends State<MyApp> {
               '/profile': (context) => const ProfileScreen(),
               '/settings': (context) => const Scaffold(
                   body: Center(child: Text('Settings - Coming Soon'))),
-              '/catalog': (context) => Scaffold(
-                  appBar: AppBar(title: Text('Product Catalog')),
-                  body: Center(child: Text('Product Catalog - Coming Soon'))),
+              '/catalog': (context) => const ProductsScreen(),
               // '/new-products': (context) => const NewProductsScreen(),
             },
             onGenerateRoute: (settings) {
@@ -471,8 +472,7 @@ class HomePage extends StatelessWidget {
                   title: 'Browse Products',
                   subtitle: 'View our catalog',
                   icon: Icons.shopping_bag,
-                  onPressed: () => _showMessage(
-                      context, 'Product catalog feature coming soon!'),
+                  onPressed: () => Navigator.pushNamed(context, '/catalog'),
                 ),
                 _ActionButton(
                   title: 'View Orders',

@@ -76,6 +76,7 @@ class ProductCacheService {
       'hit_rate': _calculateHitRate(),
       'oldest_entry': _findOldestEntry(),
       'newest_entry': _findNewestEntry(),
+      'cache_generated_at': now.toIso8601String(),
     };
   }
 

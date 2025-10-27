@@ -8,9 +8,9 @@
 // This script cannot run as 'dart run firebase_data_setup.dart' because Flutter Firebase packages require Flutter runtime.
 // The new script uses Node.js and Firebase Admin SDK for creating users and data.
 
-import 'firebase_options.dart';
-import 'lib/utils/demo_accounts_util.dart';
-import 'lib/utils/employee_setup_util.dart';
+import '../../firebase_options.dart';
+import '../../lib/utils/demo_accounts_util.dart';
+import '../../lib/utils/employee_setup_util.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 

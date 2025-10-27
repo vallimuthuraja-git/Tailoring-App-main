@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../utils/theme_constants.dart';
-import '../../widgets/user_avatar.dart';
 import '../../services/firebase_service.dart';
 
 class ProductCatalogScreen extends StatefulWidget {
@@ -104,7 +102,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                 bottom: BorderSide(
                   color:
                       (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -141,7 +139,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         },
                         selectedColor:
                             (isDark ? DarkAppColors.primary : AppColors.primary)
-                                .withOpacity(0.2),
+                                .withValues(alpha: 0.2),
                       ),
                     );
                   }).toList(),
@@ -215,7 +213,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
           style: TextStyle(
             fontSize: 12,
             color: (isDark ? DarkAppColors.onSurface : AppColors.onSurface)
-                .withOpacity(0.7),
+                .withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -258,7 +256,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                 height: 60,
                 decoration: BoxDecoration(
                   color: (isDark ? DarkAppColors.primary : AppColors.primary)
-                      .withOpacity(0.1),
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -306,8 +304,8 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             color: (product['active'] ?? false)
-                                ? Colors.green.withOpacity(0.1)
-                                : Colors.red.withOpacity(0.1),
+                                ? Colors.green.withValues(alpha: 0.1)
+                                : Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -348,7 +346,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       color: (isDark
                               ? DarkAppColors.onSurface
                               : AppColors.onSurface)
-                          .withOpacity(0.7),
+                          .withValues(alpha: 0.7),
                     ),
                   ),
                 ],

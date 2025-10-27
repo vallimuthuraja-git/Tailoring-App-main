@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../core/injection_container.dart';
 import 'product_models.dart';
+import 'sample_product_adder.dart';
 import '../providers/cart_provider.dart';
 import '../providers/product_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/responsive_utils.dart';
 import '../utils/theme_constants.dart';
 import '../providers/wishlist_provider.dart';
+import '../services/firebase_service.dart';
 
 // Catalog Configuration and Widget Classes
 
@@ -1245,8 +1247,14 @@ class _ProductsScreenState extends State<ProductsScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_hasLoadedProducts) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         try {
+          // Temporary: Add sample products to database
+          // TODO: Remove this after initial database setup
+          final firebaseService = context.read<FirebaseService>();
+          final adder = SampleProductAdder(firebaseService);
+          await adder.addSampleProducts();
+
           Provider.of<ProductProvider>(context, listen: false).loadProducts();
           _hasLoadedProducts = true;
         } catch (e) {
@@ -2320,6 +2328,9 @@ class EnhancedEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
+        final themeProvider = Provider.of<ThemeProvider>(context);
+        debugPrint(
+            'Theme provider status: darkMode=${themeProvider.isDarkMode}');
         final query = searchQuery ?? productProvider.searchQuery;
         final filters = hasActiveFilters ?? _hasActiveFilters(productProvider);
 

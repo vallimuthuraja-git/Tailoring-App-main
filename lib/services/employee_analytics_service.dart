@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../models/employee.dart' as emp;
 
 class EmployeeAnalyticsService {
@@ -547,6 +548,8 @@ class EmployeeAnalyticsService {
   Future<List<Map<String, dynamic>>> _identifyBottlenecks(
       List<emp.WorkAssignment> assignments) async {
     final bottlenecks = <Map<String, dynamic>>[];
+    debugPrint(
+        'Identified ${bottlenecks.length} workflow bottlenecks in analytics');
 
     // Analyze by skill
     final skillDelays = <emp.EmployeeSkill, List<double>>{};

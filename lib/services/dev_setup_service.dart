@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/demo_accounts_util.dart';
-
 class DevSetupService {
   /// Current active demo accounts - these are the 4 real users created in Firebase with Madurai, Tamil Nadu details
   static const List<Map<String, dynamic>> currentDemoUsers = [

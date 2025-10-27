@@ -413,7 +413,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       case UserRole.shopOwner:
         return Icons.business;
       default:
-        return Icons.account_circle;
+        throw UnimplementedError('Unknown role: $role');
     }
   }
 
@@ -426,7 +426,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       case UserRole.shopOwner:
         return Colors.purple;
       default:
-        return Colors.grey;
+        throw UnimplementedError('Unknown role: $role');
     }
   }
 }

@@ -2113,6 +2113,8 @@ class _SignupScreenState extends State<SignupScreen>
         return auth_service.UserRole.shopOwner;
       case user_role.UserRole.employee:
         return auth_service.UserRole.employee;
+      default:
+        throw UnimplementedError('Unknown role: $role');
     }
   }
 

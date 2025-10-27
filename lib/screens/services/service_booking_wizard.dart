@@ -581,6 +581,7 @@ class _ServiceBookingWizardState extends State<ServiceBookingWizard>
             children: _availableTimeSlots.map((slot) {
               final isSelected = _selectedTimeSlot == slot;
               final isAvailable = !_availabilityConflicts.contains(slot);
+              debugPrint('Time slot ${slot}: availability = $isAvailable');
 
               return SizedBox(
                 width: MediaQuery.of(context).size.width / 2 - 26,

@@ -19,6 +19,7 @@ class AdminProductManagement extends StatefulWidget {
 class _AdminProductManagementState extends State<AdminProductManagement>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late TextEditingController _searchController;
   bool _isSearchExpanded = false;
   bool _isGridView = true;
   Product? _selectedProduct;
@@ -28,6 +29,7 @@ class _AdminProductManagementState extends State<AdminProductManagement>
   void initState() {
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
+    _searchController = TextEditingController();
   }
 
   @override
@@ -46,6 +48,7 @@ class _AdminProductManagementState extends State<AdminProductManagement>
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -82,6 +85,22 @@ class _AdminProductManagementState extends State<AdminProductManagement>
         ),
         body: Column(
           children: [
+            // Search bar when expanded
+            if (_isSearchExpanded)
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search products...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onChanged: _onSearchChanged,
+                ),
+              ),
             // Tab content
             Expanded(
               child: TabBarView(
@@ -357,6 +376,7 @@ class _AdminProductManagementState extends State<AdminProductManagement>
   }
 
   void _onProductTap(Product product) {
+    debugPrint('Tapped on product: ${product.id}, ${product.name}');
     setState(() {
       _selectedProduct = product;
     });

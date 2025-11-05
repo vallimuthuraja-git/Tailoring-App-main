@@ -2,32 +2,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_role.dart';
 
 enum EmployeeSkill {
-  cutting,      // Fabric cutting
-  stitching,    // Sewing/tailoring
-  finishing,    // Final touches (buttons, hems, etc.)
-  alterations,  // Alteration work
-  embroidery,   // Embroidery work
+  cutting, // Fabric cutting
+  stitching, // Sewing/tailoring
+  finishing, // Final touches (buttons, hems, etc.)
+  alterations, // Alteration work
+  embroidery, // Embroidery work
   qualityCheck, // Quality inspection
   patternMaking // Pattern creation
 }
 
 enum EmployeeAvailability {
-  fullTime,     // 8 hours/day
-  partTime,     // 4 hours/day
-  flexible,     // Variable hours
+  fullTime, // 8 hours/day
+  partTime, // 4 hours/day
+  flexible, // Variable hours
   projectBased, // Per project basis
-  remote,       // Works from home
-  unavailable   // Currently not available
+  remote, // Works from home
+  unavailable // Currently not available
 }
 
 enum WorkStatus {
-  notStarted,   // Order assigned but not started
-  inProgress,   // Currently working on order
-  paused,       // Work temporarily paused
-  completed,    // Work finished
+  notStarted, // Order assigned but not started
+  inProgress, // Currently working on order
+  paused, // Work temporarily paused
+  completed, // Work finished
   qualityCheck, // Under quality review
-  approved,     // Quality approved
-  rejected      // Quality rejected, needs rework
+  approved, // Quality approved
+  rejected // Quality rejected, needs rework
 }
 
 class Employee {
@@ -37,7 +37,8 @@ class Employee {
   final String email;
   final String? phoneNumber;
   final String? photoUrl;
-  final UserRole? role; // ShopOwner for owner, employee for regular staff, null for legacy data
+  final UserRole?
+      role; // ShopOwner for owner, employee for regular staff, null for legacy data
 
   // Skills and Expertise
   final List<EmployeeSkill> skills;
@@ -131,21 +132,30 @@ class Employee {
       email: json['email'] ?? '',
       phoneNumber: json['phoneNumber'],
       photoUrl: json['photoUrl'],
-      role: json['role'] != null ? UserRole.values[json['role']] : null,
+      role: json['role'] != null &&
+              json['role'] is int &&
+              json['role'] >= 0 &&
+              json['role'] < UserRole.values.length
+          ? UserRole.values[json['role']]
+          : null,
       skills: (json['skills'] as List<dynamic>?)
-          ?.map((skill) => EmployeeSkill.values[skill])
-          .toList() ?? [],
+              ?.map((skill) => EmployeeSkill.values[skill])
+              .toList() ??
+          [],
       specializations: (json['specializations'] as List<dynamic>?)
-          ?.map((spec) => spec.toString())
-          .toList() ?? [],
+              ?.map((spec) => spec.toString())
+              .toList() ??
+          [],
       experienceYears: json['experienceYears'] ?? 0,
       certifications: (json['certifications'] as List<dynamic>?)
-          ?.map((cert) => cert.toString())
-          .toList() ?? [],
+              ?.map((cert) => cert.toString())
+              .toList() ??
+          [],
       availability: EmployeeAvailability.values[json['availability'] ?? 0],
       preferredWorkDays: (json['preferredWorkDays'] as List<dynamic>?)
-          ?.map((day) => day.toString())
-          .toList() ?? [],
+              ?.map((day) => day.toString())
+              .toList() ??
+          [],
       preferredStartTime: json['preferredStartTime'] != null
           ? TimeOfDay.fromJson(json['preferredStartTime'])
           : null,
@@ -159,18 +169,21 @@ class Employee {
       averageRating: (json['averageRating'] ?? 0.0).toDouble(),
       completionRate: (json['completionRate'] ?? 0.0).toDouble(),
       strengths: (json['strengths'] as List<dynamic>?)
-          ?.map((strength) => strength.toString())
-          .toList() ?? [],
+              ?.map((strength) => strength.toString())
+              .toList() ??
+          [],
       areasForImprovement: (json['areasForImprovement'] as List<dynamic>?)
-          ?.map((area) => area.toString())
-          .toList() ?? [],
+              ?.map((area) => area.toString())
+              .toList() ??
+          [],
       baseRatePerHour: (json['baseRatePerHour'] ?? 0.0).toDouble(),
       performanceBonusRate: (json['performanceBonusRate'] ?? 0.0).toDouble(),
       paymentTerms: json['paymentTerms'] ?? 'Monthly',
       totalEarnings: (json['totalEarnings'] ?? 0.0).toDouble(),
       recentAssignments: (json['recentAssignments'] as List<dynamic>?)
-          ?.map((assignment) => WorkAssignment.fromJson(assignment))
-          .toList() ?? [],
+              ?.map((assignment) => WorkAssignment.fromJson(assignment))
+              .toList() ??
+          [],
       lastActive: json['lastActive'] != null
           ? (json['lastActive'] as Timestamp).toDate()
           : null,
@@ -216,12 +229,14 @@ class Employee {
       'performanceBonusRate': performanceBonusRate,
       'paymentTerms': paymentTerms,
       'totalEarnings': totalEarnings,
-      'recentAssignments': recentAssignments.map((assignment) => assignment.toJson()).toList(),
+      'recentAssignments':
+          recentAssignments.map((assignment) => assignment.toJson()).toList(),
       'lastActive': lastActive != null ? Timestamp.fromDate(lastActive!) : null,
       'consecutiveDaysWorked': consecutiveDaysWorked,
       'isActive': isActive,
       'joinedDate': Timestamp.fromDate(joinedDate),
-      'deactivatedDate': deactivatedDate != null ? Timestamp.fromDate(deactivatedDate!) : null,
+      'deactivatedDate':
+          deactivatedDate != null ? Timestamp.fromDate(deactivatedDate!) : null,
       'deactivationReason': deactivationReason,
       'additionalInfo': additionalInfo,
       'createdAt': Timestamp.fromDate(createdAt),
@@ -311,7 +326,8 @@ class Employee {
       totalEarnings: totalEarnings ?? this.totalEarnings,
       recentAssignments: recentAssignments ?? this.recentAssignments,
       lastActive: lastActive ?? this.lastActive,
-      consecutiveDaysWorked: consecutiveDaysWorked ?? this.consecutiveDaysWorked,
+      consecutiveDaysWorked:
+          consecutiveDaysWorked ?? this.consecutiveDaysWorked,
       isActive: isActive ?? this.isActive,
       joinedDate: joinedDate ?? this.joinedDate,
       deactivatedDate: deactivatedDate ?? this.deactivatedDate,
@@ -395,8 +411,9 @@ class WorkAssignment {
       qualityNotes: json['qualityNotes'],
       qualityRating: json['qualityRating']?.toDouble(),
       updates: (json['updates'] as List<dynamic>?)
-          ?.map((update) => WorkUpdate.fromJson(update))
-          .toList() ?? [],
+              ?.map((update) => WorkUpdate.fromJson(update))
+              .toList() ??
+          [],
       materials: json['materials'] ?? {},
       isRemoteWork: json['isRemoteWork'] ?? false,
       location: json['location'],
@@ -413,7 +430,8 @@ class WorkAssignment {
       'taskDescription': taskDescription,
       'assignedAt': Timestamp.fromDate(assignedAt),
       'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'completedAt':
+          completedAt != null ? Timestamp.fromDate(completedAt!) : null,
       'deadline': deadline != null ? Timestamp.fromDate(deadline!) : null,
       'status': status.index,
       'estimatedHours': estimatedHours,
@@ -430,7 +448,8 @@ class WorkAssignment {
     };
   }
 
-  double get totalEarnings => (actualHours * hourlyRate) + (actualHours * bonusRate);
+  double get totalEarnings =>
+      (actualHours * hourlyRate) + (actualHours * bonusRate);
 
   bool get isOverdue {
     if (deadline == null) return false;

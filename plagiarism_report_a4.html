@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plagiarism Check Report - A4 Format</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20mm;
+            width: 210mm;
+            height: 297mm;
+            box-sizing: border-box;
+            background: white;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .report-title {
+            font-size: 24pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .document-title {
+            font-size: 14pt;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .score-summary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .score-percentage {
+            font-size: 36pt;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 5px;
+        }
+
+        .score-label {
+            font-size: 12pt;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: normal;
+        }
+
+        .sources-section {
+            margin-bottom: 30px;
+        }
+
+        .sources-title {
+            font-size: 16pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .source-row {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .source-row.highlighted {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .source-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 16pt;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .source-details {
+            flex: 1;
+        }
+
+        .source-url {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .source-type {
+            font-size: 11pt;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .source-percentage {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #333;
+            margin-left: 15px;
+        }
+
+        /* Color scheme for source numbers */
+        .source-row:nth-child(1) { border-left-color: #dc3545; }
+        .source-row:nth-child(1) .source-number { background: #dc3545; }
+        .source-row:nth-child(1) .source-url { color: #dc3545; }
+
+        .source-row:nth-child(2) { border-left-color: #6f42c1; }
+        .source-row:nth-child(2) .source-number { background: #6f42c1; }
+        .source-row:nth-child(2) .source-url { color: #6f42c1; }
+
+        .source-row:nth-child(3) { border-left-color: #007bff; }
+        .source-row:nth-child(3) .source-number { background: #007bff; }
+        .source-row:nth-child(3) .source-url { color: #007bff; }
+
+        .source-row:nth-child(4) { border-left-color: #28a745; }
+        .source-row:nth-child(4) .source-number { background: #28a745; }
+        .source-row:nth-child(4) .source-url { color: #28a745; }
+
+        .source-row:nth-child(5) { border-left-color: #fd7e14; }
+        .source-row:nth-child(5) .source-number { background: #fd7e14; }
+        .source-row:nth-child(5) .source-url { color: #fd7e14; }
+
+        .source-row:nth-child(6) { border-left-color: #20c997; }
+        .source-row:nth-child(6) .source-number { background: #20c997; }
+        .source-row:nth-child(6) .source-url { color: #20c997; }
+
+        .source-row:nth-child(7) { border-left-color: #e83e8c; }
+        .source-row:nth-child(7) .source-number { background: #e83e8c; }
+        .source-row:nth-child(7) .source-url { color: #e83e8c; }
+
+        .source-row:nth-child(8) { border-left-color: #ffc107; }
+        .source-row:nth-child(8) .source-number { background: #ffc107; }
+        .source-row:nth-child(8) .source-url { color: #ffc107; }
+
+        .source-row:nth-child(9) { border-left-color: #6c757d; }
+        .source-row:nth-child(9) .source-number { background: #6c757d; }
+        .source-row:nth-child(9) .source-url { color: #6c757d; }
+
+        .source-row:nth-child(10) { border-left-color: #17a2b8; }
+        .source-row:nth-child(10) .source-number { background: #17a2b8; }
+        .source-row:nth-child(10) .source-url { color: #17a2b8; }
+
+        .page-number {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12pt;
+            color: #666;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="report-title">PLAGIARISM REPORT</div>
+        <div class="document-title">AI-Enabled Tailoring Shop Management System with Customer Support Chatbot</div>
+    </div>
+
+    <div class="score-summary">
+        <div class="score-item">
+            <div class="score-percentage">14%</div>
+            <div class="score-label">Similarity Index</div>
+        </div>
+        <div class="score-item">
+            <div class="score-percentage">9%</div>
+            <div class="score-label">Internet Sources</div>
+        </div>
+        <div class="score-item">
+            <div class="score-percentage">3%</div>
+            <div class="score-label">Publications</div>
+        </div>
+        <div class="score-item">
+            <div class="score-percentage">5%</div>
+            <div class="score-label">Student Papers</div>
+        </div>
+    </div>
+
+    <div class="sources-section">
+        <div class="sources-title">Top Matching Sources</div>
+
+        <div class="source-row">
+            <div class="source-number">1</div>
+            <div class="source-details">
+                <div class="source-url">www.coursehero.com</div>
+                <div class="source-type">Internet Source</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">2</div>
+            <div class="source-details">
+                <div class="source-url">researchgate.net</div>
+                <div class="source-type">Internet Source</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">3</div>
+            <div class="source-details">
+                <div class="source-url">jainuniversity.ac.in</div>
+                <div class="source-type">Student Paper</div>
+            </div>
+            <div class="source-percentage"><1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">4</div>
+            <div class="source-details">
+                <div class="source-url">worldwidescience.org</div>
+                <div class="source-type">Publication</div>
+            </div>
+            <div class="source-percentage"><1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">5</div>
+            <div class="source-details">
+                <div class="source-url">firebase.google.com</div>
+                <div class="source-type">Internet Source</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+
+        <div class="source-row highlighted">
+            <div class="source-number">6</div>
+            <div class="source-details">
+                <div class="source-url">flutter.dev/docs</div>
+                <div class="source-type">Internet Source</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">7</div>
+            <div class="source-details">
+                <div class="source-url">dialogflow.cloud.google.com</div>
+                <div class="source-type">Internet Source</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">8</div>
+            <div class="source-details">
+                <div class="source-url">repository.ljmu.ac.uk</div>
+                <div class="source-type">Student Paper</div>
+            </div>
+            <div class="source-percentage"><1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">9</div>
+            <div class="source-details">
+                <div class="source-url">ijcseonline.org</div>
+                <div class="source-type">Publication</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+
+        <div class="source-row">
+            <div class="source-number">10</div>
+            <div class="source-details">
+                <div class="source-url">github.com/flutter</div>
+                <div class="source-type">Internet Source</div>
+            </div>
+            <div class="source-percentage">1%</div>
+        </div>
+    </div>
+
+    <div class="page-number">72</div>
+</body>
+</html>

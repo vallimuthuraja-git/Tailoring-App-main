@@ -95,10 +95,15 @@ Future<void> initializeApp(InitializationProvider initProvider) async {
     initProvider.updateProgress(0.7, 'Initializing Services...');
 
     // Use Future.wait to parallelize initialization where possible
-    await Future.wait([
-      injectionContainer.initialize(),
-      // Add any other parallel initialization here
-    ]);
+    try {
+      debugPrint('🚀 Starting injection container initialization...');
+      await injectionContainer.initialize();
+      debugPrint('✅ Injection container initialized successfully');
+    } catch (e, stackTrace) {
+      debugPrint('❌ Failed to initialize injection container: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      rethrow;
+    }
 
     // Note: Demo accounts can be created via User Management screen
     // No automatic setup - keeps it simple for development
@@ -162,6 +167,8 @@ void main() async {
     );
   };
 
+  // Note: Injection container is initialized in initializeApp()
+
   // Create initialization provider
   final initProvider = InitializationProvider();
 
@@ -210,9 +217,8 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider.value(value: _initProvider),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        // Temporarily commented out due to product export issues - using demo data
         ChangeNotifierProvider(
-          create: (_) => ProductProvider(null),
+          create: (_) => ProductProvider(injectionContainer.productBloc),
         ),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()),

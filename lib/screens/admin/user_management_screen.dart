@@ -258,7 +258,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         await _firestore.collection('users').doc(user['id']).delete();
 
         // Delete role-specific data
-        final role = UserRole.values[user['role'] as int];
+        int roleIndex = user['role'] as int;
+        if (roleIndex < 0 || roleIndex >= UserRole.values.length) {
+          roleIndex = 0; // Default to customer
+        }
+        final role = UserRole.values[roleIndex];
         if (role == UserRole.employee) {
           final employeeDocs = await _firestore
               .collection('employees')
@@ -289,7 +293,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<app_auth.AuthProvider>(context);
-    final isShopOwner = authProvider.userRole == UserRole.shopOwner;
+    final isShopOwner = authProvider.isShopOwnerOrAdmin;
 
     // Only shop owners can access this screen
     if (!isShopOwner) {
@@ -344,7 +348,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       itemCount: _users.length,
       itemBuilder: (context, index) {
         final user = _users[index];
-        final role = UserRole.values[user['role'] as int];
+        int roleIndex = user['role'] as int;
+        if (roleIndex < 0 || roleIndex >= UserRole.values.length) {
+          roleIndex = 0; // Default to customer
+        }
+        final role = UserRole.values[roleIndex];
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -456,7 +464,11 @@ class _UserFormDialogState extends State<UserFormDialog> {
       _displayNameController.text = widget.user!['displayName'] ?? '';
       _emailController.text = widget.user!['email'] ?? '';
       _phoneController.text = widget.user!['phoneNumber'] ?? '';
-      _selectedRole = UserRole.values[widget.user!['role'] as int];
+      int roleIndex = widget.user!['role'] as int;
+      if (roleIndex < 0 || roleIndex >= UserRole.values.length) {
+        roleIndex = 0; // Default to customer
+      }
+      _selectedRole = UserRole.values[roleIndex];
     }
   }
 
@@ -533,25 +545,27 @@ class _UserFormDialogState extends State<UserFormDialog> {
               const Text('User Role:',
                   style: TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 8),
-              RadioGroup<UserRole>(
-                groupValue: _selectedRole,
-                onChanged: (value) => setState(() => _selectedRole = value!),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<UserRole>(
-                        title: const Text('Customer'),
-                        value: UserRole.customer,
-                      ),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<UserRole>(
+                      title: const Text('Customer'),
+                      value: UserRole.customer,
+                      groupValue: _selectedRole,
+                      onChanged: (value) =>
+                          setState(() => _selectedRole = value!),
                     ),
-                    Expanded(
-                      child: RadioListTile<UserRole>(
-                        title: const Text('Employee'),
-                        value: UserRole.employee,
-                      ),
+                  ),
+                  Expanded(
+                    child: RadioListTile<UserRole>(
+                      title: const Text('Employee'),
+                      value: UserRole.employee,
+                      groupValue: _selectedRole,
+                      onChanged: (value) =>
+                          setState(() => _selectedRole = value!),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),

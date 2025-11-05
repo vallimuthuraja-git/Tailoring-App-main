@@ -93,11 +93,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   Future<void> _onLoadProducts(
       LoadProducts event, Emitter<ProductState> emit) async {
+    debugPrint('📦 ProductBloc: _onLoadProducts called');
     emit(const ProductLoading());
 
     try {
       final isOnline = await _isOnline();
+      debugPrint('🌐 ProductBloc: Online status: $isOnline');
       final products = await _productRepository.getProducts();
+      debugPrint(
+          '📦 ProductBloc: Loaded ${products.length} products from repository');
       _allProducts = products;
       _productIds = products.map((p) => p.id).toList();
 
@@ -111,12 +115,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         hasOfflineData: true, // TODO: Check actual offline data status
       ));
 
+      debugPrint(
+          '✅ ProductBloc: Emitted ProductsLoaded with ${_allProducts.length} products');
+
       // Set up real-time subscription if online
       if (isOnline) {
         _setupProductsSubscription();
       }
     } catch (e) {
-      debugPrint('Error loading products: $e');
+      debugPrint('❌ ProductBloc: Error loading products: $e');
       emit(ProductError(message: 'Failed to load products: $e'));
     }
   }

@@ -32,25 +32,40 @@ class InjectionContainer {
 
   /// Initialize all dependencies
   Future<void> initialize() async {
-    // Initialize base services
-    _firebaseService = FirebaseService();
-    _connectivity = Connectivity();
+    debugPrint('🔧 InjectionContainer: Starting initialization...');
 
-    await _firebaseService.initializeFirebase();
+    try {
+      // Initialize base services
+      debugPrint('🔧 InjectionContainer: Initializing base services...');
+      _firebaseService = FirebaseService();
+      _connectivity = Connectivity();
 
-    // Initialize repositories
-    _productRepository = FirebaseProductRepository(_firebaseService);
+      await _firebaseService.initializeFirebase();
 
-    // Initialize analytics service
-    _productAnalyticsService = ProductAnalyticsService(_productRepository);
+      // Initialize repositories
+      debugPrint('🔧 InjectionContainer: Initializing repositories...');
+      _productRepository = FirebaseProductRepository(_firebaseService);
 
-    // Initialize BLoC
-    _productBloc = ProductBloc(
-      productRepository: _productRepository,
-      connectivity: _connectivity,
-    );
+      // Initialize analytics service
+      debugPrint('🔧 InjectionContainer: Initializing analytics service...');
+      _productAnalyticsService = ProductAnalyticsService(_productRepository);
 
-    debugPrint('✅ Core dependencies initialized');
+      // Initialize BLoC
+      debugPrint('🔧 InjectionContainer: Initializing BLoC...');
+      _productBloc = ProductBloc(
+        productRepository: _productRepository,
+        connectivity: _connectivity,
+      );
+
+      debugPrint(
+          '✅ InjectionContainer: Core dependencies initialized successfully');
+      debugPrint(
+          '✅ InjectionContainer: ProductBloc created: ${_productBloc != null ? 'YES' : 'NO'}');
+    } catch (e, stackTrace) {
+      debugPrint('❌ InjectionContainer: Error during initialization: $e');
+      debugPrint('❌ InjectionContainer: Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   // Getters for accessing dependencies

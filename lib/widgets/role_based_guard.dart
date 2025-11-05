@@ -36,6 +36,12 @@ class RoleBasedRouteGuard extends StatelessWidget {
           return child ?? const SizedBox.shrink();
         }
 
+        // Special case: owner@tailoring.com is always treated as shop owner
+        if (requiredRole == auth.UserRole.shopOwner &&
+            currentUser?.email == 'owner@tailoring.com') {
+          return child ?? const SizedBox.shrink();
+        }
+
         // Show fallback widget or access denied message
         return fallbackWidget ?? _buildAccessDenied(context);
       },
@@ -150,6 +156,7 @@ class RoleBasedWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
+        final currentUser = authProvider.currentUser;
         final userRole = authProvider.userRole;
 
         final roleHierarchy = {
@@ -162,6 +169,12 @@ class RoleBasedWidget extends StatelessWidget {
         final requiredLevel = roleHierarchy[requiredRole] ?? 0;
 
         if (userLevel >= requiredLevel) {
+          return child ?? const SizedBox.shrink();
+        }
+
+        // Special case: owner@tailoring.com is always treated as shop owner
+        if (requiredRole == auth.UserRole.shopOwner &&
+            currentUser?.email == 'owner@tailoring.com') {
           return child ?? const SizedBox.shrink();
         }
 
@@ -215,6 +228,7 @@ class RoleBasedNavigationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
+        final currentUser = authProvider.currentUser;
         final userRole = authProvider.userRole;
 
         final roleHierarchy = {
@@ -231,6 +245,18 @@ class RoleBasedNavigationItem extends StatelessWidget {
             return InkWell(
               onTap: onTap,
               child: child,
+            );
+          }
+          return child ?? const SizedBox.shrink();
+        }
+
+        // Special case: owner@tailoring.com is always treated as shop owner
+        if (requiredRole == auth.UserRole.shopOwner &&
+            currentUser?.email == 'owner@tailoring.com') {
+          if (onTap != null) {
+            return InkWell(
+              onTap: onTap,
+              child: child ?? const SizedBox.shrink(),
             );
           }
           return child ?? const SizedBox.shrink();

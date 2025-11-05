@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'product_models.dart';
 import '../services/firebase_service.dart';
@@ -12,16 +13,24 @@ class FirebaseProductRepository implements IProductRepository {
 
   @override
   Future<List<Product>> getProducts() async {
+    debugPrint('🔥 FirebaseProductRepository: getProducts() called');
     try {
       final querySnapshot = await _firebaseService.getCollection('products');
+      debugPrint(
+          '🔥 FirebaseProductRepository: Got ${querySnapshot.docs.length} documents from Firestore');
       final products = querySnapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
+        debugPrint(
+            '🔥 FirebaseProductRepository: Processing product ${doc.id} - ${data['name']}');
         return Product.fromJson(data);
       }).toList();
 
+      debugPrint(
+          '🔥 FirebaseProductRepository: Successfully parsed ${products.length} products');
       return products;
     } catch (e) {
+      debugPrint('❌ FirebaseProductRepository: Error loading products: $e');
       throw Exception('Failed to load products: $e');
     }
   }

@@ -107,7 +107,7 @@ class DevSetupService {
     return [
       // Shop Owner - Arun Kumar Rajendran - Master Tailor
       {
-        'title': '🏪 Shop Owner',
+        'title': 'Shop Owner',
         'subtitle': 'Arun Kumar Rajendran',
         'email': 'owner@tailoring.com',
         'password': 'Owner123!',
@@ -117,7 +117,7 @@ class DevSetupService {
       },
       // Customer - Priya Senthilkumar - Software Engineer
       {
-        'title': '🛒 Customer',
+        'title': 'Customer',
         'subtitle': 'Priya Senthilkumar',
         'email': 'customer@tailoring.com',
         'password': 'Customer123!',
@@ -127,7 +127,7 @@ class DevSetupService {
       },
       // Tailor 1 - Suresh Rajalingam - Stitching Master
       {
-        'title': '✂️ Stitching Master',
+        'title': 'Stitching Master',
         'subtitle': 'Suresh Rajalingam',
         'email': 'tailor1@tailoring.com',
         'password': 'Tailor123!',
@@ -137,7 +137,7 @@ class DevSetupService {
       },
       // Tailor 2 - Lakshmi Balasubramanian - Designer
       {
-        'title': '🎨 Designer',
+        'title': 'Designer',
         'subtitle': 'Lakshmi Balasubramanian',
         'email': 'tailor2@tailoring.com',
         'password': 'Tailor456!',

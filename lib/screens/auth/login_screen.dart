@@ -889,181 +889,202 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 if (const bool.fromEnvironment(
                                                         'dart.vm.product') ==
                                                     false) ...[
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            20),
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        colors: [
-                                                          Colors.blue.shade50
-                                                              .withValues(
-                                                                  alpha: 0.8),
-                                                          Colors.purple.shade50
-                                                              .withValues(
-                                                                  alpha: 0.6),
-                                                        ],
-                                                        begin:
-                                                            Alignment.topLeft,
-                                                        end: Alignment
-                                                            .bottomRight,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16),
-                                                      border: Border.all(
-                                                        color: Colors
-                                                            .blue.shade200,
-                                                        width: 1.5,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.blue
-                                                              .withValues(
-                                                                  alpha: 0.1),
-                                                          blurRadius: 8,
-                                                          spreadRadius: 1,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Column(
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            const Icon(
-                                                              Icons
-                                                                  .admin_panel_settings,
-                                                              color:
-                                                                  Colors.purple,
-                                                              size: 24,
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 12),
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                const Text(
-                                                                  '🚀 Quick Login - Demo Accounts',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .purple,
-                                                                  ),
+                                                  // Responsive grid layout for quick login buttons
+                                                  LayoutBuilder(
+                                                    builder:
+                                                        (context, constraints) {
+                                                      final availableWidth =
+                                                          constraints.maxWidth;
+                                                      final buttonHeight =
+                                                          ResponsiveUtils
+                                                              .responsiveSpacing(
+                                                                  56.0,
+                                                                  deviceType);
+                                                      final buttonSpacing =
+                                                          ResponsiveUtils
+                                                              .responsiveSpacing(
+                                                                  8.0,
+                                                                  deviceType);
+
+                                                      // Calculate how many buttons can fit per row
+                                                      const minButtonWidth =
+                                                          140.0; // Minimum width for a button
+                                                      final maxButtonsPerRow =
+                                                          (availableWidth /
+                                                                  (minButtonWidth +
+                                                                      buttonSpacing))
+                                                              .floor();
+                                                      final buttonsPerRow =
+                                                          maxButtonsPerRow.clamp(
+                                                              1,
+                                                              4); // Max 4 buttons per row for readability
+
+                                                      final quickLoginButtons =
+                                                          DevSetupService
+                                                              .getQuickLoginButtons();
+                                                      final rows = <Widget>[];
+
+                                                      for (var i = 0;
+                                                          i <
+                                                              quickLoginButtons
+                                                                  .length;
+                                                          i += buttonsPerRow) {
+                                                        final endIndex = (i +
+                                                                buttonsPerRow)
+                                                            .clamp(
+                                                                0,
+                                                                quickLoginButtons
+                                                                    .length);
+                                                        final rowButtons =
+                                                            quickLoginButtons
+                                                                .sublist(i,
+                                                                    endIndex);
+
+                                                        rows.add(
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: rowButtons
+                                                                .map(
+                                                                    (buttonData) {
+                                                              final buttonWidth =
+                                                                  (availableWidth -
+                                                                          (buttonSpacing *
+                                                                              (rowButtons.length -
+                                                                                  1))) /
+                                                                      rowButtons
+                                                                          .length;
+                                                              return Container(
+                                                                width: buttonWidth.clamp(
+                                                                    minButtonWidth,
+                                                                    double
+                                                                        .infinity),
+                                                                margin:
+                                                                    EdgeInsets
+                                                                        .only(
+                                                                  right: rowButtons
+                                                                              .last ==
+                                                                          buttonData
+                                                                      ? 0
+                                                                      : buttonSpacing,
                                                                 ),
-                                                                Text(
-                                                                  '10 user accounts created via firebase_data_setup.js',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        11,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 16),
-                                                        Wrap(
-                                                          spacing: 8,
-                                                          runSpacing: 8,
-                                                          alignment:
-                                                              WrapAlignment
-                                                                  .center,
-                                                          children: DevSetupService
-                                                                  .getQuickLoginButtons()
-                                                              .map(
-                                                                  (buttonData) {
-                                                            return SizedBox(
-                                                              width: 160,
-                                                              child:
-                                                                  ElevatedButton(
-                                                                onPressed: () => _handleQuickLogin(
+                                                                child:
+                                                                    ElevatedButton(
+                                                                  onPressed: () =>
+                                                                      _handleQuickLogin(
                                                                     buttonData[
                                                                             'email']
                                                                         as String,
                                                                     buttonData[
                                                                             'password']
-                                                                        as String),
-                                                                style: ElevatedButton
-                                                                    .styleFrom(
-                                                                  backgroundColor:
-                                                                      buttonData[
-                                                                              'color']
-                                                                          as Color,
-                                                                  foregroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  minimumSize:
-                                                                      const Size(
-                                                                          double
-                                                                              .infinity,
-                                                                          50),
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12),
+                                                                        as String,
                                                                   ),
-                                                                  elevation: 2,
-                                                                ),
-                                                                child: Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  children: [
-                                                                    Text(
-                                                                      buttonData[
-                                                                              'title']
-                                                                          as String,
-                                                                      style: const TextStyle(
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    backgroundColor: buttonData['color']
+                                                                            as Color? ??
+                                                                        Colors
+                                                                            .white,
+                                                                    foregroundColor: buttonData['color'] !=
+                                                                            null
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .black87,
+                                                                    minimumSize: Size(
+                                                                        buttonWidth,
+                                                                        buttonHeight),
+                                                                    maximumSize: Size(
+                                                                        buttonWidth,
+                                                                        buttonHeight),
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              12),
+                                                                      side: buttonData['color'] ==
+                                                                              null
+                                                                          ? const BorderSide(
+                                                                              color: Colors.grey)
+                                                                          : BorderSide.none,
                                                                     ),
-                                                                    Text(
-                                                                      buttonData[
-                                                                              'subtitle']
-                                                                          as String,
-                                                                      style: const TextStyle(
-                                                                          fontSize:
-                                                                              10),
+                                                                    elevation:
+                                                                        0,
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .symmetric(
+                                                                      horizontal:
+                                                                          ResponsiveUtils.responsiveSpacing(
+                                                                              8.0,
+                                                                              deviceType),
                                                                     ),
-                                                                  ],
+                                                                  ),
+                                                                  child:
+                                                                      FittedBox(
+                                                                    fit: BoxFit
+                                                                        .scaleDown,
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      children: [
+                                                                        Icon(
+                                                                          buttonData['icon'] as IconData? ??
+                                                                              Icons.person,
+                                                                          size: ResponsiveUtils.responsiveFontSize(
+                                                                              20.0,
+                                                                              deviceType),
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            height:
+                                                                                2),
+                                                                        Text(
+                                                                          buttonData['title']
+                                                                              as String,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                ResponsiveUtils.responsiveFontSize(12.0, deviceType),
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                          ),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          maxLines:
+                                                                              1,
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            );
-                                                          }).toList(),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 8),
-                                                        Text(
-                                                          'Tap any button to instantly login as that user!',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .grey.shade600,
-                                                            fontStyle: FontStyle
-                                                                .italic,
+                                                              );
+                                                            }).toList(),
                                                           ),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                      ],
-                                                    ),
+                                                        );
+
+                                                        if (i + buttonsPerRow <
+                                                            quickLoginButtons
+                                                                .length) {
+                                                          rows.add(SizedBox(
+                                                              height:
+                                                                  buttonSpacing));
+                                                        }
+                                                      }
+
+                                                      return Column(
+                                                        children: rows,
+                                                      );
+                                                    },
                                                   ),
-                                                  const SizedBox(height: 24),
+                                                  SizedBox(
+                                                      height: ResponsiveUtils
+                                                          .responsiveSpacing(
+                                                              24.0,
+                                                              deviceType)),
                                                 ],
 
                                                 // Sign Up Link

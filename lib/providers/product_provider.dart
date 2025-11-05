@@ -144,6 +144,18 @@ class ProductProvider with ChangeNotifier {
 
   // Actions that delegate to BLoC
   void loadProducts() {
+    debugPrint('🛍️ ProductProvider: loadProducts() called');
+    debugPrint(
+        '🛍️ ProductProvider: _productBloc is ${_productBloc == null ? 'NULL' : 'NOT NULL'}');
+
+    // If bloc is null, try to initialize it
+    if (_productBloc == null) {
+      debugPrint(
+          '🛍️ ProductProvider: ProductBloc is null, falling back to demo data');
+      _initializeBasicData();
+      return;
+    }
+
     _productBloc?.add(LoadProducts());
   }
 

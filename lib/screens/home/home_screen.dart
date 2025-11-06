@@ -579,7 +579,7 @@ class DashboardTab extends StatelessWidget {
     final isForceShopOwner = userEmail == 'owner@tailoring.com' || isShopOwner;
 
     if (isForceShopOwner) {
-      // Modern Dashboard Design for Shop Owners/Admins
+      // Shop Owner Dashboard with 2-Column Quick Actions Grid
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -588,9 +588,9 @@ class DashboardTab extends StatelessWidget {
 
           const SizedBox(height: 32),
 
-          // Primary Action Categories
+          // Quick Actions in 2-Column Grid
           Text(
-            'Management Hub',
+            'Quick Actions',
             style: TextStyle(
               fontSize: ResponsiveUtils.responsiveFontSize(20.0, deviceType),
               fontWeight: FontWeight.bold,
@@ -602,150 +602,150 @@ class DashboardTab extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Business Operations Section
-          _buildActionCategory(
-            context,
-            'Business Operations',
-            [
-              _ModernActionTile(
-                icon: Icons.inventory_2,
-                title: 'Product Catalog',
-                subtitle: 'Manage inventory & products',
-                color: const Color(0xFFFF9800),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProductCatalogScreen())),
-              ),
-              _ModernActionTile(
-                icon: Icons.add_box,
-                title: 'Add Products',
-                subtitle: 'Create new items',
-                color: const Color(0xFF4CAF50),
-                onTap: () => _showAddProductOptions(context),
-              ),
-              _ModernActionTile(
-                icon: Icons.assignment,
-                title: 'Active Orders',
-                subtitle: 'Track current orders',
-                color: const Color(0xFF00BCD4),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const OrderManagementDashboard())),
-              ),
-            ],
-            themeProvider,
-            deviceType,
-          ),
+          // Dynamic Responsive Grid Layout for Quick Actions
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final availableWidth = constraints.maxWidth;
+              final spacing = 16.0;
 
-          const SizedBox(height: 24),
+              // Calculate number of columns based on screen width
+              int crossAxisCount;
+              if (availableWidth < 600) {
+                crossAxisCount = 2; // Mobile
+              } else if (availableWidth < 900) {
+                crossAxisCount = 3; // Tablet
+              } else if (availableWidth < 1200) {
+                crossAxisCount = 4; // Small desktop
+              } else {
+                crossAxisCount = 5; // Large desktop
+              }
 
-          // Team & Operations Section
-          _buildActionCategory(
-            context,
-            'Team & Operations',
-            [
-              _ModernActionTile(
-                icon: Icons.groups,
-                title: 'Employee Team',
-                subtitle: 'Manage staff & roles',
-                color: const Color(0xFF673AB7),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const EmployeeManagementHome())),
-              ),
-              _ModernActionTile(
-                icon: Icons.people_alt,
-                title: 'Customer Database',
-                subtitle: 'Client management',
-                color: const Color(0xFF009688),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const CustomerManagementScreen())),
-              ),
-              _ModernActionTile(
-                icon: Icons.timeline,
-                title: 'Production Flow',
-                subtitle: 'Workflow management',
-                color: const Color(0xFF3F51B5),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const TailoringWorkflowScreen())),
-              ),
-            ],
-            themeProvider,
-            deviceType,
-          ),
+              final totalSpacing = spacing * (crossAxisCount - 1);
+              final tileWidth =
+                  (availableWidth - totalSpacing) / crossAxisCount;
 
-          const SizedBox(height: 24),
-
-          // Analytics & Admin Section
-          _buildActionCategory(
-            context,
-            'Analytics & Administration',
-            [
-              _ModernActionTile(
-                icon: Icons.bar_chart,
-                title: 'Business Analytics',
-                subtitle: 'Reports & insights',
-                color: const Color(0xFFFFC107),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const AnalyticsDashboardScreen())),
-              ),
-              _ModernActionTile(
-                icon: Icons.admin_panel_settings,
-                title: 'System Admin',
-                subtitle: 'User management',
-                color: const Color(0xFF607D8B),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const UserManagementScreen())),
-              ),
-              _ModernActionTile(
-                icon: Icons.backup_table,
-                title: 'Database Tools',
-                subtitle: 'Data management',
-                color: const Color(0xFF795548),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const DatabaseManagementHome())),
-              ),
-            ],
-            themeProvider,
-            deviceType,
-          ),
-
-          const SizedBox(height: 24),
-
-          // AI & Tools Section
-          _buildActionCategory(
-            context,
-            'AI & Smart Tools',
-            [
-              _ModernActionTile(
-                icon: Icons.smart_toy,
-                title: 'AI Assistant',
-                subtitle: 'Intelligent support',
-                color: const Color(0xFF2196F3),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AIAssistanceScreen())),
-              ),
-            ],
-            themeProvider,
-            deviceType,
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  _ModernActionTile(
+                    icon: Icons.inventory_2,
+                    title: 'Product Catalog',
+                    subtitle: 'Manage inventory & products',
+                    color: const Color(0xFFFF9800),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const ProductCatalogScreen())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.add_box,
+                    title: 'Add Products',
+                    subtitle: 'Create new items',
+                    color: const Color(0xFF4CAF50),
+                    width: tileWidth,
+                    onTap: () => _showAddProductOptions(context),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.assignment,
+                    title: 'Active Orders',
+                    subtitle: 'Track current orders',
+                    color: const Color(0xFF00BCD4),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const OrderManagementDashboard())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.groups,
+                    title: 'Employee Team',
+                    subtitle: 'Manage staff & roles',
+                    color: const Color(0xFF673AB7),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const EmployeeManagementHome())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.people_alt,
+                    title: 'Customer Database',
+                    subtitle: 'Client management',
+                    color: const Color(0xFF009688),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const CustomerManagementScreen())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.timeline,
+                    title: 'Production Flow',
+                    subtitle: 'Workflow management',
+                    color: const Color(0xFF3F51B5),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const TailoringWorkflowScreen())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.bar_chart,
+                    title: 'Business Analytics',
+                    subtitle: 'Reports & insights',
+                    color: const Color(0xFFFFC107),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const AnalyticsDashboardScreen())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.admin_panel_settings,
+                    title: 'System Admin',
+                    subtitle: 'User management',
+                    color: const Color(0xFF607D8B),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const UserManagementScreen())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.backup_table,
+                    title: 'Database Tools',
+                    subtitle: 'Data management',
+                    color: const Color(0xFF795548),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const DatabaseManagementHome())),
+                  ),
+                  _ModernActionTile(
+                    icon: Icons.smart_toy,
+                    title: 'AI Assistant',
+                    subtitle: 'Intelligent support',
+                    color: const Color(0xFF2196F3),
+                    width: tileWidth,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AIAssistanceScreen())),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       );
@@ -839,17 +839,16 @@ class DashboardTab extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Customer Action Grid
+          // Customer Action Grid - 2 Columns
           LayoutBuilder(
             builder: (context, constraints) {
               final availableWidth = constraints.maxWidth;
-              final tileWidth = deviceType == DeviceType.mobile
-                  ? availableWidth
-                  : (availableWidth - 16) / 2;
+              final spacing = 16.0;
+              final tileWidth = (availableWidth - spacing) / 2;
 
               return Wrap(
-                spacing: 16,
-                runSpacing: 16,
+                spacing: spacing,
+                runSpacing: spacing,
                 children: [
                   _ModernActionTile(
                     icon: Icons.shopping_bag,

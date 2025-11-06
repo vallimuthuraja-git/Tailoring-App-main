@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import '../core/injection_container.dart';
 import 'product_models.dart';
 
 import '../providers/auth_provider.dart';
@@ -11,8 +10,8 @@ import '../providers/theme_provider.dart';
 import '../utils/responsive_utils.dart';
 import '../utils/theme_constants.dart';
 import '../providers/wishlist_provider.dart';
-import '../services/firebase_service.dart';
 import '../models/user_role.dart';
+import '../widgets/optimized_image.dart';
 
 // Catalog Configuration and Widget Classes
 
@@ -475,7 +474,7 @@ class UnifiedProductCard extends StatelessWidget {
           flex: 6,
           child: Stack(
             children: [
-              // Main Image with Error Handling
+              // Main Image with Optimized Caching
               Hero(
                 tag: 'product_${product.id}_$index',
                 child: Container(
@@ -494,27 +493,10 @@ class UnifiedProductCard extends StatelessWidget {
                     ),
                   ),
                   child: product.imageUrls.isNotEmpty
-                      ? Image.network(
-                          product.imageUrls.first,
-                          fit: BoxFit.cover,
+                      ? ProductImage(
+                          imageUrl: product.imageUrls.first,
                           width: double.infinity,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: themeProvider.isDarkMode
-                                  ? DarkAppColors.surface
-                                  : Colors.grey.shade100,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.orange),
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (ctx, error, stack) =>
-                              _buildImageFallback(context),
+                          height: double.infinity,
                         )
                       : _buildImageFallback(context),
                 ),
@@ -680,55 +662,56 @@ class UnifiedProductCard extends StatelessWidget {
         Expanded(
           flex: 5,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Premium Brand Badge
                 if (product.brand.isNotEmpty) ...[
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: themeProvider.isDarkMode
                           ? DarkAppColors.primary.withValues(alpha: 0.1)
                           : AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       product.brand.toUpperCase(),
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 8,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
+                        letterSpacing: 1.0,
                         color: themeProvider.isDarkMode
                             ? DarkAppColors.primary
                             : AppColors.primary,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                 ],
 
                 // Product Name with Typography
-                Expanded(
+                Flexible(
                   child: Text(
                     product.name,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      height: 1.3,
+                      height: 1.2,
                       color: themeProvider.isDarkMode
                           ? DarkAppColors.onSurface
                           : AppColors.onSurface,
-                      letterSpacing: 0.2,
+                      letterSpacing: 0.1,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
 
                 // Rating Display
                 if (showRating && product.rating.averageRating > 0) ...[
@@ -736,10 +719,10 @@ class UnifiedProductCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                            horizontal: 4, vertical: 1),
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                           border: Border.all(
                             color: Colors.amber.withValues(alpha: 0.3),
                             width: 0.5,
@@ -749,14 +732,14 @@ class UnifiedProductCard extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.star,
-                              size: 12,
+                              size: 10,
                               color: Colors.amber.shade600,
                             ),
-                            const SizedBox(width: 3),
+                            const SizedBox(width: 2),
                             Text(
                               product.rating.averageRating.toStringAsFixed(1),
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.amber.shade800,
                               ),
@@ -764,11 +747,11 @@ class UnifiedProductCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       Text(
                         '(${product.rating.reviewCount})',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           color: themeProvider.isDarkMode
                               ? DarkAppColors.onSurface.withValues(alpha: 0.6)
                               : AppColors.onSurface.withValues(alpha: 0.6),
@@ -777,13 +760,11 @@ class UnifiedProductCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                 ],
 
                 // Price Section
                 _buildPriceSection(themeProvider),
-
-                const Spacer(),
               ],
             ),
           ),
@@ -918,11 +899,13 @@ class UnifiedProductCard extends StatelessWidget {
   }
 
   Widget _buildWishlistButton() {
-    return Consumer<ProductProvider>(
-      builder: (context, productProvider, child) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
+    return Selector<ProductProvider, bool>(
+      selector: (context, productProvider) =>
+          productProvider.isProductInWishlist(product.id),
+      builder: (context, isInWishlist, child) {
+        final themeProvider =
+            Provider.of<ThemeProvider>(context, listen: false);
         final isDarkMode = themeProvider.isDarkMode;
-        final isInWishlist = productProvider.isProductInWishlist(product.id);
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -991,11 +974,10 @@ class UnifiedProductCard extends StatelessWidget {
   }
 
   Widget _buildQuickAddButton(BuildContext context) {
-    return Consumer<CartProvider>(
-      builder: (context, cartProvider, child) {
-        final isInCart =
-            cartProvider.items.any((item) => item.product.id == product.id);
-
+    return Selector<CartProvider, bool>(
+      selector: (context, cartProvider) =>
+          cartProvider.items.any((item) => item.product.id == product.id),
+      builder: (context, isInCart, child) {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: 44,
@@ -1233,6 +1215,9 @@ class _ProductsScreenState extends State<ProductsScreen>
   bool _isPullRefreshing = false;
   Timer? _searchDebounceTimer;
 
+  // Performance optimization: Cache for filtered and sorted products
+  final Map<String, (List<Product>, int)> _filteredProductsCache = {};
+
   // Optimization constants
   static const Duration _debounceDuration = Duration(milliseconds: 300);
 
@@ -1458,38 +1443,16 @@ class _ProductsScreenState extends State<ProductsScreen>
   Widget _buildProductGrid({ProductCategory? category, String? productType}) {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        var products = productProvider.products;
-        debugPrint(
-            '🛍️ ProductsScreen: Building grid with ${products.length} products');
-        if (products.isNotEmpty) {
-          debugPrint('🛍️ ProductsScreen: First product: ${products[0].name}');
-        }
-
-        // Apply category filter
-        if (category != null) {
-          products = products.where((p) => p.category == category).toList();
-        }
-
-        // Apply product type filter
-        if (productType == 'new') {
-          products = products.where((p) => p.isNewArrival).toList();
-        }
-
-        // Apply search filter with debounced query for better performance
-        if (_debouncedSearchQuery.isNotEmpty) {
-          products = products.where((p) {
-            final query = _debouncedSearchQuery.toLowerCase();
-            return p.name.toLowerCase().contains(query) ||
-                p.description.toLowerCase().contains(query) ||
-                p.brand.toLowerCase().contains(query);
-          }).toList();
-        }
-
-        // Apply sorting
-        products.sort(_sortComparator());
+        // Memoize filtered and sorted products to avoid recalculation on every build
+        final filteredProducts = _getFilteredProducts(
+          productProvider.products,
+          category: category,
+          productType: productType,
+          searchQuery: _debouncedSearchQuery,
+        );
 
         // Loading state with skeleton
-        if (productProvider.isLoading && products.isEmpty) {
+        if (productProvider.isLoading && filteredProducts.isEmpty) {
           return _buildSkeletonGrid();
         }
 
@@ -1499,6 +1462,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           color: Colors.orange,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           child: CustomScrollView(
+            key: const PageStorageKey('products_scroll_view'),
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -1506,7 +1470,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                   child: Row(
                     children: [
                       Text(
-                        '${products.length} product${products.length == 1 ? '' : 's'}',
+                        '${filteredProducts.length} product${filteredProducts.length == 1 ? '' : 's'}',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w500,
                             ),
@@ -1532,36 +1496,36 @@ class _ProductsScreenState extends State<ProductsScreen>
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final product = products[index];
+                          if (index >= filteredProducts.length) return null;
+                          final product = filteredProducts[index];
                           return UnifiedProductCard(
-                            key: ValueKey('product_${product.id}'),
+                            key: ValueKey('product_${product.id}_$index'),
                             product: product,
                             index: index,
                             onTap: () =>
                                 _navigateToProductDetail(context, product),
                           );
                         },
-                        childCount: products.length,
+                        childCount: filteredProducts.length,
+                        addAutomaticKeepAlives: true,
+                        addRepaintBoundaries: true,
+                        addSemanticIndexes: false,
                       ),
                     )
                   : SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final product = products[index];
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            height: 300, // Fixed height for consistency
-                            child: UnifiedProductCard(
-                              key: ValueKey('product_${product.id}'),
-                              product: product,
-                              index: index,
-                              onTap: () =>
-                                  _navigateToProductDetail(context, product),
-                            ),
-                          );
+                          if (index >= filteredProducts.length) return null;
+                          final product = filteredProducts[index];
+                          final themeProvider = Provider.of<ThemeProvider>(
+                              context,
+                              listen: false);
+                          return _buildProductListItem(product, themeProvider);
                         },
-                        childCount: products.length,
+                        childCount: filteredProducts.length,
+                        addAutomaticKeepAlives: true,
+                        addRepaintBoundaries: true,
+                        addSemanticIndexes: false,
                       ),
                     ),
               const SliverToBoxAdapter(
@@ -1571,6 +1535,59 @@ class _ProductsScreenState extends State<ProductsScreen>
         );
       },
     );
+  }
+
+  // Memoized filtering and sorting function
+  List<Product> _getFilteredProducts(
+    List<Product> allProducts, {
+    ProductCategory? category,
+    String? productType,
+    String? searchQuery,
+  }) {
+    // Create a cache key for memoization
+    final cacheKey =
+        '${category?.name ?? 'all'}_${productType ?? 'all'}_${searchQuery ?? ''}_$_sortOption';
+
+    // Check if we have cached results
+    if (_filteredProductsCache.containsKey(cacheKey) &&
+        _filteredProductsCache[cacheKey]!.$2 == allProducts.length) {
+      return _filteredProductsCache[cacheKey]!.$1;
+    }
+
+    var products = List<Product>.from(allProducts);
+
+    // Apply category filter
+    if (category != null) {
+      products = products.where((p) => p.category == category).toList();
+    }
+
+    // Apply product type filter
+    if (productType == 'new') {
+      products = products.where((p) => p.isNewArrival).toList();
+    }
+
+    // Apply search filter with debounced query for better performance
+    if (searchQuery?.isNotEmpty ?? false) {
+      final query = searchQuery!.toLowerCase();
+      products = products.where((p) {
+        return p.name.toLowerCase().contains(query) ||
+            p.description.toLowerCase().contains(query) ||
+            p.brand.toLowerCase().contains(query);
+      }).toList();
+    }
+
+    // Apply sorting
+    products.sort(_sortComparator());
+
+    // Cache the result
+    _filteredProductsCache[cacheKey] = (products, allProducts.length);
+
+    // Limit cache size
+    if (_filteredProductsCache.length > 10) {
+      _filteredProductsCache.remove(_filteredProductsCache.keys.first);
+    }
+
+    return products;
   }
 
   Widget _buildSkeletonGrid() {
@@ -1746,6 +1763,276 @@ class _ProductsScreenState extends State<ProductsScreen>
         },
       ),
     );
+  }
+
+  Widget _buildProductListItem(Product product, ThemeProvider themeProvider) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Consumer<WishlistProvider>(
+        builder: (context, wishlistProvider, child) => InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => _navigateToProductDetail(context, product),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Product Image
+                Hero(
+                  tag: 'product_${product.id}_list',
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      image: product.imageUrls.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(product.imageUrls.first),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: product.imageUrls.isEmpty
+                        ? Icon(
+                            Icons.inventory_2,
+                            color: themeProvider.isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                            size: 32,
+                          )
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Product Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Brand
+                      if (product.brand.isNotEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: themeProvider.isDarkMode
+                                ? Colors.grey[700]
+                                : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            product.brand.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: themeProvider.isDarkMode
+                                  ? Colors.white
+                                  : Colors.grey[800],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                      ],
+
+                      // Product Name
+                      Text(
+                        product.name,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+
+                      // Description
+                      Text(
+                        product.description,
+                        style: TextStyle(
+                          color: themeProvider.isDarkMode
+                              ? Colors.grey[400]
+                              : Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Rating and Category
+                      Row(
+                        children: [
+                          // Rating
+                          if (product.rating.averageRating > 0) ...[
+                            Icon(Icons.star,
+                                size: 14, color: Colors.amber[600]),
+                            const SizedBox(width: 2),
+                            Text(
+                              product.rating.averageRating.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: themeProvider.isDarkMode
+                                    ? Colors.grey[300]
+                                    : Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+
+                          // Category
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: _getCategoryColor(product.category)
+                                  .withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              product.categoryName,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: _getCategoryColor(product.category),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Price and Wishlist
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Price
+                    Text(
+                      product.formattedPrice,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode
+                            ? Colors.orange[300]
+                            : Colors.orange[800],
+                      ),
+                    ),
+
+                    // Original price if discounted
+                    if (product.originalPrice != null &&
+                        product.originalPrice! > product.basePrice) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        product.formattedOriginalPrice,
+                        style: TextStyle(
+                          fontSize: 12,
+                          decoration: TextDecoration.lineThrough,
+                          color: themeProvider.isDarkMode
+                              ? Colors.grey[400]
+                              : Colors.grey[500],
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 8),
+
+                    // Stock indicator
+                    if (product.stockCount <= 5 && product.stockCount > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '${product.stockCount} left',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+
+                    // Wishlist button
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () async {
+                        final authProvider =
+                            Provider.of<AuthProvider>(context, listen: false);
+                        if (authProvider.user == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('Please log in to manage favorites')),
+                          );
+                          return;
+                        }
+
+                        final success =
+                            await wishlistProvider.toggleWishlist(product.id);
+                        if (success && mounted) {
+                          final isInWishlist =
+                              wishlistProvider.isProductInWishlist(product.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(isInWishlist
+                                  ? '${product.name} added to favorites'
+                                  : '${product.name} removed from favorites'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      icon: Icon(
+                        wishlistProvider.isProductInWishlist(product.id)
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        size: 20,
+                        color: wishlistProvider.isProductInWishlist(product.id)
+                            ? Colors.red
+                            : Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getCategoryColor(ProductCategory category) {
+    switch (category) {
+      case ProductCategory.mensWear:
+        return Colors.blue;
+      case ProductCategory.womensWear:
+        return Colors.pink;
+      case ProductCategory.kidsWear:
+        return Colors.green;
+      case ProductCategory.formalWear:
+        return Colors.indigo;
+      case ProductCategory.casualWear:
+        return Colors.orange;
+      case ProductCategory.traditionalWear:
+        return Colors.brown;
+      case ProductCategory.alterations:
+        return Colors.teal;
+      case ProductCategory.customDesign:
+        return Colors.purple;
+    }
   }
 
   void _showFilterBottomSheet(BuildContext context) {
@@ -2633,9 +2920,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           // Edit button for admin users
           Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
+              final isShopOwnerOrAdmin = authProvider.isShopOwnerOrAdmin;
               final userRole = authProvider.userRole;
-              if (userRole == UserRole.shopOwner ||
-                  userRole == UserRole.employee) {
+
+              if (isShopOwnerOrAdmin || userRole == UserRole.employee) {
                 return IconButton(
                   icon: const Icon(Icons.edit),
                   tooltip: 'Edit Product',

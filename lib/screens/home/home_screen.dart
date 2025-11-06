@@ -19,8 +19,6 @@ import '../admin/product_catalog_screen.dart';
 import '../auth/login_screen.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/global_bottom_navigation_bar.dart';
-import '../../widgets/role_based_guard.dart';
-import '../../services/auth_service.dart' as auth;
 import '../../services/firebase_service.dart';
 
 // Using beautiful theme-level opacity extensions

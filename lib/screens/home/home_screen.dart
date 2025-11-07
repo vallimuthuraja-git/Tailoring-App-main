@@ -282,13 +282,23 @@ class DashboardTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                _buildQuickActions(
+                // Enhanced Quick Actions with contextual suggestions
+                _buildEnhancedQuickActions(
+                    context,
                     authProvider,
                     isShopOwner,
                     onNavigateToProducts,
                     onNavigateToOrders,
-                    context,
                     deviceType),
++++++++ REPLACE</diff>
+<task_progress>- [x] Analyze current navigation structure
+- [x] Review all screen categories and their purposes
+- [x] Test navigation flow between screens
+- [x] Identify navigation inconsistencies
+- [x] Plan seamless navigation improvements
+- [x] Implement enhanced navigation system
+- [ ] Add contextual navigation features
+- [ ] Improve role-based navigation flows
 
                 const SizedBox(height: 32),
 
@@ -1027,6 +1037,247 @@ class DashboardTab extends StatelessWidget {
     );
   }
 
+  Widget _buildEnhancedQuickActions(
+      BuildContext context,
+      AuthProvider authProvider,
+      bool isShopOwner,
+      VoidCallback? onNavigateToProducts,
+      VoidCallback onNavigateToOrders,
+      DeviceType deviceType) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final navProvider = Provider.of<GlobalNavigationProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    // TEMPORARY: Force show shop owner actions if user is owner@tailoring.com
+    final userEmail = authProvider.email ?? '';
+    final isForceShopOwner = userEmail == 'owner@tailoring.com' || isShopOwner;
+
+    if (isForceShopOwner) {
+      // Enhanced Shop Owner Dashboard with Smart Navigation
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Welcome Section with Stats
+          _buildWelcomeStatsSection(context, authProvider, themeProvider),
+
+          const SizedBox(height: 32),
+
+          // Smart Quick Actions Grid with Analytics
+          Text(
+            'Quick Actions',
+            style: TextStyle(
+              fontSize: ResponsiveUtils.responsiveFontSize(20.0, deviceType),
+              fontWeight: FontWeight.bold,
+              color: isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Dynamic Responsive Grid with Enhanced Actions
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final availableWidth = constraints.maxWidth;
+              final spacing = 16.0;
+
+              // Calculate number of columns based on screen width
+              int crossAxisCount;
+              if (availableWidth < 600) {
+                crossAxisCount = 2; // Mobile
+              } else if (availableWidth < 900) {
+                crossAxisCount = 3; // Tablet
+              } else if (availableWidth < 1200) {
+                crossAxisCount = 4; // Small desktop
+              } else {
+                crossAxisCount = 5; // Large desktop
+              }
+
+              final totalSpacing = spacing * (crossAxisCount - 1);
+              final tileWidth = (availableWidth - totalSpacing) / crossAxisCount;
+
+              // Get enhanced quick actions from navigation provider
+              final quickActions = navProvider.getQuickActions();
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: quickActions.map((action) => _ModernActionTile(
+                  icon: action['icon'] as IconData,
+                  title: action['title'] as String,
+                  subtitle: 'Tap to navigate',
+                  color: action['color'] as Color,
+                  width: tileWidth,
+                  onTap: action['action'] as VoidCallback,
+                )).toList(),
+              );
+            },
+          ),
+
+          const SizedBox(height: 24),
+
+          // Contextual Suggestions
+          Text(
+            'Suggested Actions',
+            style: TextStyle(
+              fontSize: ResponsiveUtils.responsiveFontSize(18.0, deviceType),
+              fontWeight: FontWeight.w600,
+              color: isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Contextual suggestions from navigation provider
+          Consumer<GlobalNavigationProvider>(
+            builder: (context, navProvider, child) {
+              final suggestions = navProvider.getContextualSuggestions();
+              if (suggestions.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: suggestions.take(4).map((suggestion) => ActionChip(
+                  label: Text(suggestion['title'] as String),
+                  avatar: Icon(
+                    Icons.lightbulb,
+                    size: 16,
+                    color: Colors.amber,
+                  ),
+                  onPressed: suggestion['action'] as VoidCallback,
+                  backgroundColor: isDarkMode
+                      ? DarkAppColors.surface.withValues(alpha: 0.8)
+                      : AppColors.surface.withValues(alpha: 0.8),
+                )).toList(),
+              );
+            },
+          ),
+        ],
+      );
+    } else {
+      // Enhanced Customer Dashboard
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Customer Welcome Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDarkMode
+                    ? [
+                        DarkAppColors.primary.withValues(alpha: 0.1),
+                        DarkAppColors.surface
+                      ]
+                    : [
+                        AppColors.primary.withValues(alpha: 0.05),
+                        AppColors.surface
+                      ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDarkMode
+                    ? DarkAppColors.primary.withValues(alpha: 0.2)
+                    : AppColors.primary.withValues(alpha: 0.1),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.shopping_bag,
+                      size: 32,
+                      color: isDarkMode
+                          ? DarkAppColors.primary
+                          : AppColors.primary,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Ready to shop?',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode
+                                  ? DarkAppColors.onBackground
+                                  : AppColors.onBackground,
+                            ),
+                          ),
+                          Text(
+                            'Discover our latest collection',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDarkMode
+                                  ? DarkAppColors.onSurface
+                                      .withValues(alpha: 0.7)
+                                  : AppColors.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // Customer Actions
+          Text(
+            'Quick Actions',
+            style: TextStyle(
+              fontSize: ResponsiveUtils.responsiveFontSize(20.0, deviceType),
+              fontWeight: FontWeight.bold,
+              color: isDarkMode
+                  ? DarkAppColors.onBackground
+                  : AppColors.onBackground,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Enhanced Customer Action Grid
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final availableWidth = constraints.maxWidth;
+              final spacing = 16.0;
+              final tileWidth = (availableWidth - spacing) / 2;
+
+              // Get customer-specific quick actions
+              final quickActions = navProvider.getQuickActions();
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: quickActions.map((action) => _ModernActionTile(
+                  icon: action['icon'] as IconData,
+                  title: action['title'] as String,
+                  subtitle: 'Tap to navigate',
+                  color: action['color'] as Color,
+                  width: tileWidth,
+                  onTap: action['action'] as VoidCallback,
+                )).toList(),
+              );
+            },
+          ),
+        ],
+      );
+    }
+  }
+
   Widget _buildActionCategory(
       BuildContext context,
       String categoryTitle,
@@ -1070,6 +1321,15 @@ class DashboardTab extends StatelessWidget {
       ),
     );
   }
++++++++ REPLACE</diff>
+<task_progress>- [x] Analyze current navigation structure
+- [x] Review all screen categories and their purposes
+- [x] Test navigation flow between screens
+- [x] Identify navigation inconsistencies
+- [x] Plan seamless navigation improvements
+- [x] Implement enhanced navigation system
+- [x] Add contextual navigation features
+- [ ] Improve role-based navigation flows
 }
 
 class _ModernActionTile extends StatelessWidget {
